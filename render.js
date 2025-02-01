@@ -28,25 +28,20 @@ function createBar(chords, notes, lines) {
   element.style.marginTop = "20px"
   element.style.float = "left"
 
-  if (notes.length != chords.length) {
-      element.innerHTML = "- INVALID DATA -"
-      return
-  }
-
-  let width = notes.length * 36
+  let width = 48 + notes.length * 32
   let renderer = new Vex.Flow.Renderer(element, Vex.Flow.Renderer.Backends.SVG)
   renderer.resize(width, 100)
   let context = renderer.getContext()
   context.scale(0.75, 0.75)
-  let scaledWidth = notes.length * 27
+  let scaledWidth = 36 + notes.length * 24
   element.style.width = scaledWidth.toString() + "px"
 
   let stave = new Vex.Flow.Stave(0, 0, width)
 
   var extras = []
-  for (var i = 0; i < chords.length; i += 1) {
+  for (var i = 0; i < notes.length; i += 1) {
       let chord = chords[i]
-      if (chord == ".") continue
+      if ((chord == undefined) || (chord == ".")) continue
 
       if (chord[0] == "~") {
           let tie = new Vex.Flow.StaveTie({
@@ -72,6 +67,14 @@ function createBar(chords, notes, lines) {
       symbol.setFontSize(14)
       symbol.addText(chord)
       notes[i].addModifier(symbol)
+  }
+
+  if (chords[notes.length] == "~") {
+    let tie = new Vex.Flow.StaveTie({
+        first_note: notes[notes.length-1],
+        first_indices: [0],
+    })
+    extras.push(tie)
   }
 
   stave.setContext(context).draw()

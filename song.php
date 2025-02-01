@@ -14,7 +14,7 @@ if( isset( $_POST['data'] ) ) {
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>
-<?php echo $_GET['name']; ?>
+<?php echo str_replace('_', ' ', $_GET['name']); ?>
 </title>
 <style>
 #data {
@@ -56,7 +56,7 @@ $PITCHES = ["G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D
 $DURATONS = ["1", "2.", "2", "4.", "4", "8", "16"]
 foreach ($DURATONS as $duration) {
     foreach ($PITCHES as $pitch) {
-        $label = $duration == "1" ? $pitch : str_replace($duration, ".", "&bull;");
+        $label = $duration == "1" ? $pitch : str_replace(".", "&bull;", $duration);
         echo '<button class="addbtn" onclick="add(' . "'" . $pitch . '/' . $duration . "'" . ')">' . $label . '</button>':
     }
     echo '<br/>';

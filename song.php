@@ -1,15 +1,12 @@
 <?php
 if( isset( $_POST['data'] ) ) {
     $path = "songs/" . $_GET['name'] . ".txt";
-    move($path, $path . ".bak");
+    rename($path, $path . ".bak");
     file_put_contents($path, $_POST['data']);
-    exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html>
-
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -27,9 +24,12 @@ if( isset( $_POST['data'] ) ) {
 }
 </style>
 </head>
-
 <body style="margin: 0; font-size: 15px;">
-<?php echo isset($_GET['edit']) ? '<form method="post">' : '<form method="post" style="display: none">'; ?>
+<?php 
+$display = isset($_GET['edit']) ? "block" : "none";
+$url = "song.php?name=" . $_GET['name'];
+echo '<form method="post" action="' . $url . '" style="display: ' . $display . '">';
+?>
 <textarea id="data" name="data" style="float: left; width: 640px; height: 265px; overflow: scroll; white-space: pre;">
 <?php echo file_get_contents("songs/" . $_GET['name'] . ".txt"); ?>
 </textarea>
@@ -40,7 +40,7 @@ $PITCHES = ["A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E
 foreach ($PITCHES as $pitch) {
     foreach ($DURATONS as $duration) {
         $label = $duration == "1" ? $pitch : str_replace(".", "&middot;", $duration);
-        echo '<button class="addbtn" onclick="add(' . "'" . $pitch . '/' . $duration . "'" . ')">' . $label . '</button>';
+        echo '<button type="button" class="addbtn" onclick="add(' . "'" . $pitch . '/' . $duration . "'" . ')">' . $label . '</button>';
     }
     echo '<br/>';
 }
@@ -57,7 +57,7 @@ foreach ($PITCHES as $pitch) {
 <div id="sheet" style="margin-left: 20px"></div>
 <div style="clear: both; height: 20px"></div>
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
-<script src="render.js?v=3"></script>
+<script src="render.js?v=1"></script>
 <script>
 function draw() {
     renderSong('data', 'sheet')
@@ -74,5 +74,4 @@ function del() {
 draw()
 </script>
 </body>
-
 </html>

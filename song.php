@@ -47,16 +47,17 @@ foreach ($PITCHES as $pitch) {
 ?>
 </div>
 <div style="clear: both; height: 5px"></div>
-<button onclick="add('B4/2/r')">&frac12; Rest</button>
-<button onclick="add('B4/4/r')">&frac14; Rest</button>
-<button onclick="add('B4/8/r')">&frac18; Rest</button>
-<button onclick="del()">Delete</button>
-<button onclick="draw()">Draw</button>
+<button type="button" onclick="add('B4/2/r')">&frac12; Rest</button>
+<button type="button" onclick="add('B4/4/r')">&frac14; Rest</button>
+<button type="button" onclick="add('B4/8/r')">&frac18; Rest</button>
+<button type="button" onclick="del()">Delete</button>
+<button type="button" onclick="draw()">Draw</button>
 <input type="submit" value="Save" />
 </form>
-<div id="sheet" style="margin: 20px"></div>
+<div id="sheet" style="margin-left: 20px"></div>
+<div style="clear: both; height: 20px"></div>
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
-<script src="render.js?v=1"></script>
+<script src="render.js?v=3"></script>
 <script>
 function draw() {
     renderSong('data', 'sheet')

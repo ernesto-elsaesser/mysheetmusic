@@ -112,17 +112,17 @@ function modifyData(textId, transform) {
     cursorPos += res[1].length - melody.length
     lines[row-1] = res[0]
     lines[row] = res[1]
-    song.focus()
-    song.value = lines.join("\n")
-    song.selectionStart = cursorPos
-    song.selectionEnd = cursorPos
+    textarea.focus()
+    textarea.value = lines.join("\n")
+    textarea.selectionStart = cursorPos
+    textarea.selectionEnd = cursorPos
 }
 
 function addNote(textId, note) {
 
     let chord = "." + " ".repeat(note.length - 1)
 
-    modify(textId, (harmony, melody, col) => {
+    modifyData(textId, (harmony, melody, col) => {
         if (melody.length == 0) {
             harmony = chord
             melody = note
@@ -139,7 +139,7 @@ function addNote(textId, note) {
 
 function deleteNote(textId) {
 
-    modify(textId, (harmony, melody, col) => {
+    modifyData(textId, (harmony, melody, col) => {
         let tail = melody.substr(col)
         let len = tail.indexOf(",")
         if (len == -1) {

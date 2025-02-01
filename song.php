@@ -17,58 +17,49 @@ if( isset( $_POST['data'] ) ) {
 <?php echo str_replace('_', ' ', $_GET['name']); ?>
 </title>
 <style>
-#data {
-    width: 100%;
-    height: 200px;
-    overflow: scroll;
-    white-space: pre;
-}
-#editor {
-<?php if (empty($_GET['edit'])) echo 'display: none'; ?>
-}
-#sheet {
-    margin: 0 40px 40px;
-    font-family: serif;
-    font-size: 15px;
-}
 .addbtn {
-    font-size: 16px;
-    width: 40px;
+    width: 24px;
+    height: 18px;
+    padding: 1px;
+    border: 0;
+    border-right: 1px solid grey;
+    border-bottom: 1px solid grey;
 }
 </style>
 </head>
 
-<body>
-<div id="editor">
-<form method="post">
-<textarea id="data" name="data">
+<body style="margin: 0; font-size: 15px;">
+<?php echo isset($_GET['edit']) ? '<form method="post">' : '<form method="post" style="display: none">'; ?>
+<textarea id="data" name="data" style="float: left; width: 640px; height: 265px; overflow: scroll; white-space: pre;">
 <?php echo file_get_contents("songs/" . $_GET['name'] . ".txt"); ?>
 </textarea>
-<input type="submit">Save</input>
-</form>
-<button onclick="view()">View</button>
-<button onclick="del()">Delete</button>
-<button onclick="add('B4/2/r')">Rest 1/2</button>
-<button onclick="add('B4/4/r')">Rest 1/4</button>
-<button onclick="add('B4/8/r')">Rest 1/8</button>
+<div style="float: left; border-top: 1px solid grey;">
 <?php
-$PITCHES = ["G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5"];
-$DURATONS = ["1", "2.", "2", "4.", "4", "8", "16"]
-foreach ($DURATONS as $duration) {
-    foreach ($PITCHES as $pitch) {
-        $label = $duration == "1" ? $pitch : str_replace(".", "&bull;", $duration);
-        echo '<button class="addbtn" onclick="add(' . "'" . $pitch . '/' . $duration . "'" . ')">' . $label . '</button>':
+$DURATONS = ["1", "2.", "2", "4.", "4", "8", "16"];
+$PITCHES = ["A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5"];
+foreach ($PITCHES as $pitch) {
+    foreach ($DURATONS as $duration) {
+        $label = $duration == "1" ? $pitch : str_replace(".", "&middot;", $duration);
+        echo '<button class="addbtn" onclick="add(' . "'" . $pitch . '/' . $duration . "'" . ')">' . $label . '</button>';
     }
     echo '<br/>';
 }
 ?>
 </div>
-<div id="sheet"></div>
+<div style="clear: both; height: 5px"></div>
+<button onclick="add('B4/2/r')">&frac12; Rest</button>
+<button onclick="add('B4/4/r')">&frac14; Rest</button>
+<button onclick="add('B4/8/r')">&frac18; Rest</button>
+<button onclick="del()">Delete</button>
+<button onclick="draw()">Draw</button>
+<input type="submit" value="Save" />
+</form>
+<div id="sheet" style="margin: 20px"></div>
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
-<script src="render.js"></script>
+<script src="render.js?v=1"></script>
 <script>
-function view() {
-    render('data', 'sheet')
+function draw() {
+    renderSong('data', 'sheet')
 }
 
 function add(note) {
@@ -79,7 +70,7 @@ function del() {
     deleteNote('data')
 }
 
-view()
+draw()
 </script>
 </body>
 

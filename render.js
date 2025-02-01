@@ -2,13 +2,14 @@ function renderSong(textId, sheetId) {
 
     let textarea = document.getElementById(textId)
     let sheet = document.getElementById(sheetId)
-    sheet.innerHTML = ""
 
     let factory = new Vex.Flow.Factory({
         renderer: { elementId: sheetId, width: 0, height: 0 },
     })
 
     let easy = factory.EasyScore()
+
+    sheet.innerHTML = ""
 
     textarea.value.split("\n\n").forEach((bar) => {
         let lines = bar.split("\n")

@@ -84,6 +84,7 @@ function createBar(chords, notes, lines) {
   for (var i = 0; i < lines.length; i += 1) {
       let lyrics = document.createElement("div")
       lyrics.style.paddingLeft = "10px"
+      lyrics.style.whiteSpace = "nowrap"
       lyrics.innerHTML = lines[i]
       element.appendChild(lyrics)
   }

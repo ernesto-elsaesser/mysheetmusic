@@ -11,7 +11,7 @@ if( isset( $_POST['data'] ) ) {
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>
-<?php echo str_replace('_', ' ', $_GET['name']); ?>
+<?php echo $_GET['name']; ?>
 </title>
 <style>
 .addbtn {

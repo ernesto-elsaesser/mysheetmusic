@@ -14,8 +14,7 @@ foreach( $files as $file ) {
     $parts = explode('.', $file);
     if ($parts[1] != 'txt') continue;
     $name = $parts[0];
-    $title = str_replace('_', ' ', $name);
-    echo '<a href="song.php?name=' . $name . '">' . $title . '</a> (<a href="song.php?name=' . $name . '&edit">edit</a>)<br/>';
+    echo '<a href="song.php?name=' . $name . '">' . $name . '</a> (<a href="song.php?name=' . $name . '&edit">edit</a>)<br/>';
 }
 ?>
 </body>

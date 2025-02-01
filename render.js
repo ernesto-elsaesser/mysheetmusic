@@ -28,12 +28,12 @@ function createBar(chords, notes, lines) {
   element.style.marginTop = "20px"
   element.style.float = "left"
 
-  let width = 48 + notes.length * 32
+  let width = 60 + notes.length * 32
   let renderer = new Vex.Flow.Renderer(element, Vex.Flow.Renderer.Backends.SVG)
   renderer.resize(width, 100)
   let context = renderer.getContext()
   context.scale(0.75, 0.75)
-  let scaledWidth = 36 + notes.length * 24
+  let scaledWidth = 45 + notes.length * 24
   element.style.width = scaledWidth.toString() + "px"
 
   let stave = new Vex.Flow.Stave(0, 0, width)

@@ -1,7 +1,7 @@
 <?php
 if( isset( $_POST['data'] ) ) {
     $path = "songs/" . $_GET['name'] . ".txt";
-    rename($path, $path . ".bak");
+    rename($path, $path . time());
     file_put_contents($path, $_POST['data']);
 }
 ?>

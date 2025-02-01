@@ -12,7 +12,7 @@
 $files = scandir("songs");
 foreach( $files as $file ) {
     $parts = explode('.', $file);
-    if ($parts[0] == '') continue;
+    if ($parts[1] != 'txt') continue;
     $name = $parts[0];
     $title = str_replace('_', ' ', $name);
     echo '<a href="song.php?name=' . $name . '">' . $title . '</a> (<a href="song.php?name=' . $name . '&edit">edit</a>)<br/>';

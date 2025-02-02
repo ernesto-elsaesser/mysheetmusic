@@ -52,7 +52,7 @@ foreach ($PITCHES as $pitch) {
 </form>
 <div id="sheet" style="margin-left: 20px"></div>
 <div style="clear: both; height: 20px"></div>
-<button style="position: absolute; right: 10px; bottom: 10px" type="button" onclick="edit()">Edit</button>
+<button style="position: fixed; right: 10px; top: 10px" type="button" onclick="edit()">Edit</button>
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
 <?php echo '<script src="render.js?t=' . time() . '"></script>'; ?>
 <script>

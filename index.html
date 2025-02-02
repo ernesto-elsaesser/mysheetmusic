@@ -16,10 +16,10 @@
 </style>
 </head>
 <body style="margin: 0; font-size: 15px;">
-<div style="position: absolute; top: 0; text-align: center; background-color: lightgrey">
-<select id="list" onchange="show()"></select>
-<input id="edit" type="checkbox" onchange="edit()">
-<label>Edit</label>
+<div style="text-align: center">
+<select id="list" onchange="show()" style="outline: none">
+<option>Select a song ...</option>
+</select>
 </div>
 <div id="editor" style="display: none">
 <textarea id="data" style="float: left; width: 640px; height: 265px; overflow: scroll; white-space: pre;"></textarea>
@@ -47,16 +47,18 @@
 <button onclick="del()">Delete</button>
 <button onclick="draw()">Draw</button>
 <button onclick="save()">Save</button>
+</div>
 <div id="sheet" style="margin-left: 20px"></div>
-<div style="clear: both; height: 20px"></div>
+<div style="clear: both"></div>
+<a id="edit" onclick="edit()" style="position: absolute; bottom: 5px; left: 8px; color: #555; text-decoration: none;">Edit</a>
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
 <script src="render.js?v=20250201"></script>
 <script>
 
 let select = document.getElementById('list')
-let checkbox = document.getElementById('edit')
 let editor = document.getElementById('editor')
 let textarea = document.getElementById('data')
+
 var songs = {}
 var current = null
 
@@ -65,10 +67,11 @@ function show() {
     document.title = current
     textarea.value = songs[current]
     renderSong('data', 'sheet')
+    editor.style.display = 'none'
 }
 
 function edit() {
-    editor.style.display = checkbox.checked ? 'block' : 'none'
+    editor.style.display = 'block'
 }
 
 function add(note) {
@@ -80,6 +83,7 @@ function del() {
 }
 
 function save() {
+    editor.style.display = 'none'
     fetch('set.php?name=' + current, {
         method: 'POST',
         body: textarea.value,

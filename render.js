@@ -130,29 +130,33 @@ function addNote(textId, note) {
         if (melody.length == 0) {
             harmony = chord
             melody = note
-        } else if (col == melody.length) {
-            harmony += "  " + chord
-            melody += ", " + note
+            col += note.length
+        } else if (col == 0) {
+            harmony += chord + "  "
+            melody += note + ", "
+            col += note.length + 2
         } else {
-            harmony = harmony.substr(0, col) + chord + "  " + harmony.substr(col)
-            melody = melody.substr(0, col) + note + ", " + melody.substr(col)
+            harmony = harmony.substr(0, col) + "  " + chord + harmony.substr(col)
+            melody = melody.substr(0, col) + ", " + note + melody.substr(col)
+            col += note.length + 2
         }
-        return [harmony, melody]
+        return [harmony, melody, col]
     })
 }
 
 function deleteNote(textId) {
 
     modifyData(textId, (harmony, melody, col) => {
-        let tail = melody.substr(col)
-        let len = tail.indexOf(",")
-        if (len == -1) {
-            harmony = harmony.substr(0, col > 0 ? col - 2 : 0)
-            melody = melody.substr(0, col > 0 ? col - 2 : 0)
+        let cut = melody.substr(0, col).lastIndexOf(",")
+        if (cut == -1) {
+            harmony = harmony.substr(col + 2)
+            melody = melody.substr(col + 2)
+            col = 0
         } else {
-            harmony = harmony.substr(0, col) + harmony.substr(col + len + 2)
-            melody = melody.substr(0, col) + melody.substr(col + len + 2)
+            harmony = harmony.substr(0, cut) + harmony.substr(col)
+            melody = melody.substr(0, cut) + melody.substr(col)
+            col = cut
         }
-        return [harmony, melody]
+        return [harmony, melody, col]
     })
 }

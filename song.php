@@ -24,9 +24,9 @@ if( isset( $_POST['data'] ) ) {
 </style>
 </head>
 <body style="margin: 0; font-size: 15px;">
-<button id="edit" type="button" onclick="edit()" style="position: absolute; top: 10px; right: 10px">Edit</button>
-<?php echo '<form id="form" method="post" action="song.php?name=' . $_GET['name'] . '" style="display: none">'; ?>
-<textarea id="data" name="data" style="float: left; width: 640px; height: 265px; overflow: scroll; white-space: pre;">
+<button id="switch" type="button" onclick="edit()" style="position: absolute; top: 10px; right: 10px">Edit</button>
+<div id="editor" style="display: none">
+<textarea id="data" style="float: left; width: 640px; height: 265px; overflow: scroll; white-space: pre;">
 <?php echo file_get_contents("songs/${_GET['name']}.txt"); ?>
 </textarea>
 <div style="float: left; border-top: 1px solid grey;">
@@ -48,8 +48,7 @@ foreach ($PITCHES as $pitch) {
 <button type="button" onclick="add('B4/8/r')">&frac18; Rest</button>
 <button type="button" onclick="del()">Delete</button>
 <button type="button" onclick="draw()">Draw</button>
-<input type="submit" value="Save" />
-</form>
+<button type="button" onclick="save()">Save</button>
 <div id="sheet" style="margin-left: 20px"></div>
 <div style="clear: both; height: 20px"></div>
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
@@ -60,8 +59,8 @@ function draw() {
 }
 
 function edit() {
-    document.getElementById('form').style.display = 'block'
-    document.getElementById('edit').style.display = 'none'
+    document.getElementById('editor').style.display = 'block'
+    document.getElementById('switch').style.display = 'none'
 }
 
 function add(note) {
@@ -70,6 +69,13 @@ function add(note) {
 
 function del() {
     deleteNote('data')
+}
+
+function save() {
+    fetch('song.php?name=' + $_GET['name'], {
+        method: 'POST',
+        body: document.getElementById('editor').value,
+    }).then(res => window.alert(res.status))
 }
 
 draw()

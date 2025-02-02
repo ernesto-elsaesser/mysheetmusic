@@ -87,7 +87,7 @@ function save() {
     fetch('set.php?name=' + current, {
         method: 'POST',
         body: textarea.value,
-    }).then(res => window.alert(res.status))
+    }).then(res => window.alert(res.statusText))
 }
 
 fetch("get.php").then(async res => {

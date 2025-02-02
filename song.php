@@ -1,7 +1,6 @@
 <?php
 if( isset( $_POST['data'] ) ) {
     $path = "songs/" . $_GET['name'] . ".txt";
-    rename($path, $path . time());
     file_put_contents($path, $_POST['data']);
 }
 ?>
@@ -25,7 +24,7 @@ if( isset( $_POST['data'] ) ) {
 </style>
 </head>
 <body style="margin: 0; font-size: 15px;">
-<button id="edit" type="button" onclick="edit()" style="position: fixed; top: 10px; right: 10px">Edit</button>
+<button id="edit" type="button" onclick="edit()" style="position: absolute; top: 10px; right: 10px">Edit</button>
 <?php echo '<form id="form" method="post" action="song.php?name=' . $_GET['name'] . '" style="display: none">'; ?>
 <textarea id="data" name="data" style="float: left; width: 640px; height: 265px; overflow: scroll; white-space: pre;">
 <?php echo file_get_contents("songs/${_GET['name']}.txt"); ?>

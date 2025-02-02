@@ -21,7 +21,7 @@
 <option>Select a song ...</option>
 </select>
 </div>
-<div id="editor" style="display: none">
+<div id="editor" style="display: none; margin-left: 20px">
 <textarea id="data" style="float: left; width: 640px; height: 265px; overflow: scroll; white-space: pre;"></textarea>
 <div style="float: left; border-top: 1px solid grey">
 <button class="add" onclick="add('A3/1')">A3</button><button class="add" onclick="add('A3/2.')">2·</button><button class="add" onclick="add('A3/2')">2</button><button class="add" onclick="add('A3/4.')">4·</button><button class="add" onclick="add('A3/4')">4</button><button class="add" onclick="add('A3/8')">8</button><button class="add" onclick="add('A3/16')">16</button><br>
@@ -49,8 +49,8 @@
 <button onclick="save()">Save</button>
 </div>
 <div id="sheet" style="margin-left: 20px"></div>
-<div style="clear: both"></div>
-<a id="edit" onclick="edit()" style="position: absolute; bottom: 5px; left: 8px; color: #555; text-decoration: none;">Edit</a>
+<div style="clear: both; height: 20px"></div>
+<img id="edit" src="edit.png?v=1" onclick="edit()" style="position: fixed; bottom: 6px; right: 6px; opacity: 0.6;" />
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
 <script src="render.js?v=20250201"></script>
 <script>

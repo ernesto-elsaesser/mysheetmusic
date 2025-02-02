@@ -25,6 +25,7 @@ if( isset( $_POST['data'] ) ) {
 </style>
 </head>
 <body style="margin: 0; font-size: 15px;">
+<button id="edit" type="button" onclick="edit()" style="position: fixed; top: 10px; right: 10px">Edit</button>
 <?php echo '<form id="form" method="post" action="song.php?name=' . $_GET['name'] . '" style="display: none">'; ?>
 <textarea id="data" name="data" style="float: left; width: 640px; height: 265px; overflow: scroll; white-space: pre;">
 <?php echo file_get_contents("songs/${_GET['name']}.txt"); ?>
@@ -52,7 +53,6 @@ foreach ($PITCHES as $pitch) {
 </form>
 <div id="sheet" style="margin-left: 20px"></div>
 <div style="clear: both; height: 20px"></div>
-<button style="position: fixed; right: 10px; top: 10px" type="button" onclick="edit()">Edit</button>
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
 <?php echo '<script src="render.js?t=' . time() . '"></script>'; ?>
 <script>
@@ -62,6 +62,7 @@ function draw() {
 
 function edit() {
     document.getElementById('form').style.display = 'block'
+    document.getElementById('edit').style.display = 'none'
 }
 
 function add(note) {

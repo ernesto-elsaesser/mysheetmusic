@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Songs</title>
+<title>My Sheet Music</title>
 <style>
 .add {
     width: 24px;
@@ -64,7 +64,7 @@ var current = null
 
 function show() {
     current = select.value
-    document.title = current
+    document.title = "Sheet: " + current
     textarea.value = songs[current]
     renderSong('data', 'sheet')
     editor.style.display = 'none'
@@ -84,9 +84,9 @@ function del() {
 
 function save() {
     editor.style.display = 'none'
-    fetch('set.php?name=' + current, {
+    fetch('set.php', {
         method: 'POST',
-        body: textarea.value,
+        body: "name=" + current + "&data=" + textarea.value,
     }).then(res => window.alert(res.statusText))
 }
 

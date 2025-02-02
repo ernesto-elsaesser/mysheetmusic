@@ -5,10 +5,10 @@ if( isset( $_POST['data'] ) ) {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>
 <?php echo $_GET['name']; ?>
 </title>
@@ -53,7 +53,7 @@ foreach ($PITCHES as $pitch) {
 <div id="sheet" style="margin-left: 20px"></div>
 <div style="clear: both; height: 20px"></div>
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
-<?php echo '<script src="render.js?t=' . time() . '"></script>'; ?>
+<script src="render.js?v=20250201"></script>
 <script>
 function draw() {
     renderSong('data', 'sheet')

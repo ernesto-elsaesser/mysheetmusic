@@ -62,7 +62,7 @@
         </div>
         <div style="float: left; border-top: 1px solid grey; border-left: 1px solid grey; margin-top: 4px;">
             <button class="add wide" onclick="del()">DEL</button><button class="add wide" onclick="reset()">RST</button><button class="add wide" onclick="preview()">PRE</button><button
-                class="add wide" onclick="save()">SAV</button><br />
+                id="save" class="add wide" onclick="save()">SAV</button><br />
             <button class="add" onclick="dot()">&bull;</button><button class="add"
                 onclick="add('B4/2/r')">2</button><button class="add" onclick="add('B4/4/r')">4</button><button
                 class="add" onclick="add('B4/8/r')">8</button><button class="add"
@@ -102,6 +102,7 @@
         let select = document.getElementById('list')
         let checkbox = document.getElementById('mode')
         let editor = document.getElementById('editor')
+        let button = document.getElementById('save')
         let textarea = document.getElementById('data')
         let sheet = document.getElementById('sheet')
 
@@ -172,14 +173,19 @@
             renderSong(textarea, sheet)
         }
 
-        function save() {
+        async function save() {
             if (current == NEW) current = prompt("Song name:")
 
-            fetch('songs.php', {
+            button.innerText = "..."
+
+            let res = await fetch('songs.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: "name=" + current + "&data=" + textarea.value
-            }).then(load)
+            })
+
+            button.innerText = "SAV"
+            load(res)
         }
 
         fetch("songs.php").then(load)

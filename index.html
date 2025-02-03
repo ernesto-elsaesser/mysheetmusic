@@ -21,6 +21,7 @@
 <option>Select a song &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
 </select>
 </div>
+<input id="mode" type="checkbox" onchange="edit()" style="position: fixed; top: 5px; right: 5px;" />
 <div id="editor" style="display: none">
 <textarea id="data" style="float: left; width: 400px; height: 283px; overflow: scroll; white-space: pre; margin-top: 4px; margin-right: 4px;"></textarea>
 <div style="float: left; border-top: 1px solid grey; border-left: 1px solid grey; margin-top: 4px; margin-right: 4px;">
@@ -49,12 +50,12 @@
 </div>
 <div id="sheet" style="margin-left: 20px"></div>
 <div style="clear: both; height: 20px"></div>
-<img src="edit.png?v=20250203" width="32" height="32" onclick="edit()" style="position: fixed; bottom: 10px; right: 10px; opacity: 0.6;" />
 <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
 <script src="render.js?v=20250201"></script>
 <script>
 
 let select = document.getElementById('list')
+let checkbox = document.getElementById('mode')
 let editor = document.getElementById('editor')
 let textarea = document.getElementById('data')
 
@@ -66,11 +67,10 @@ function show() {
     document.title = "Sheet: " + current
     textarea.value = songs[current]
     renderSong('data', 'sheet')
-    editor.style.display = 'none'
 }
 
 function edit() {
-    editor.style.display = 'block'
+    editor.style.display = checkbox.checked ? 'block' : 'none'
 }
 
 function add(note) {

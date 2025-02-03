@@ -1,10 +1,7 @@
-function renderSong(textId, sheetId) {
-
-    let textarea = document.getElementById(textId)
-    let sheet = document.getElementById(sheetId)
+function renderSong(textarea, sheet) {
 
     let factory = new Vex.Flow.Factory({
-        renderer: { elementId: sheetId, width: 0, height: 0 },
+        renderer: { elementId: sheet.id, width: 0, height: 0 },
     })
 
     let easy = factory.EasyScore()
@@ -92,9 +89,8 @@ function createBar(chords, notes, lines) {
   return element
 }
 
-function modifyData(textId, transform) {
+function modifyData(textarea, transform) {
 
-    let textarea = document.getElementById(textId)
     var cursorPos = textarea.selectionStart
     var lines = textarea.value.split("\n")
     var startPos = 0
@@ -111,7 +107,11 @@ function modifyData(textId, transform) {
     }
     let harmony = lines[row-1]
     let melody = lines[row]
-    let res = transform(harmony, melody, col)
+    let pre = melody.substr(0, col).lastIndexOf(",")
+    let left = pre == -1 ? 0 : pre + 2
+    let post = melody.substr(col).indexOf(",")
+    let right = post == -1 ? melody.length : col + post
+    let res = transform(harmony, melody, left, right)
     cursorPos += res[0].length - harmony.length
     cursorPos += res[1].length - melody.length
     lines[row-1] = res[0]
@@ -122,41 +122,52 @@ function modifyData(textId, transform) {
     textarea.selectionEnd = cursorPos
 }
 
-function addNote(textId, note) {
+function addNote(textarea, note) {
 
     let chord = "." + " ".repeat(note.length - 1)
 
-    modifyData(textId, (harmony, melody, col) => {
-        if (melody.length == 0) {
+    modifyData(textarea, (harmony, melody, left, right) => {
+        if (right == 0) {
             harmony = chord
             melody = note
-            col += note.length
-        } else if (col == 0) {
-            harmony += chord + "  "
-            melody += note + ", "
-            col += note.length + 2
+        } else if (right == melody.length) {
+            harmony += "  " + chord
+            melody += ", " + note
         } else {
-            harmony = harmony.substr(0, col) + "  " + chord + harmony.substr(col)
-            melody = melody.substr(0, col) + ", " + note + melody.substr(col)
-            col += note.length + 2
+            harmony = harmony.substr(0, left) + chord + "  " + harmony.substr(left)
+            melody = melody.substr(0, left) + note + ", " + melody.substr(left)
         }
-        return [harmony, melody, col]
+        return [harmony, melody]
     })
 }
 
-function deleteNote(textId) {
+function dotNote(textarea,) {
 
-    modifyData(textId, (harmony, melody, col) => {
-        let cut = melody.substr(0, col).lastIndexOf(",")
-        if (cut == -1) {
-            harmony = harmony.substr(col + 2)
-            melody = melody.substr(col + 2)
-            col = 0
-        } else {
-            harmony = harmony.substr(0, cut) + harmony.substr(col)
-            melody = melody.substr(0, cut) + melody.substr(col)
-            col = cut
-        }
-        return [harmony, melody, col]
+    modifyData(textarea, (harmony, melody, left, right) => {
+        harmony = harmony.substr(0, right) + " " + harmony.substr(right)
+        melody = melody.substr(0, right) + "." + melody.substr(right)
+        return [harmony, melody]
+    })
+}
+
+function tieNote(textarea) {
+
+    modifyData(textarea, (harmony, melody, left, right) => {
+        var chord = harmony.substr(left, right)
+        if (chord.startsWith(".")) chord = chord.replace(".", "~")
+        else chord = "~" + chord.substr(0, -1)
+        harmony = harmony.substr(0, left) + chord + harmony.substr(right)
+        return [harmony, melody]
+    })
+}
+
+function deleteNote(textarea) {
+
+    modifyData(textarea, (harmony, melody, left, right) => {
+        if (left == 0) right += 2
+        else left -= 2
+        harmony = harmony.substr(0, left) + harmony.substr(right)
+        melody = melody.substr(0, left) + melody.substr(right)
+        return [harmony, melody]
     })
 }

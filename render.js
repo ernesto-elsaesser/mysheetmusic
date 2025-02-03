@@ -8,10 +8,12 @@ function renderSong(textarea, sheet) {
 
     sheet.innerHTML = ""
 
-    textarea.value.split("\n\n").forEach((bar) => {
+    textarea.value.split("\n\n").forEach(bar => {
+        if (bar == "") return
         let lines = bar.split("\n")
         let harmony = lines.shift()
         let melody = lines.shift()
+        if (melody == "") return
         let chords = harmony.trim().split(/ +/)
         let notes = easy.notes(melody)
         let element = createBar(chords, notes, lines)
@@ -76,7 +78,7 @@ function createBar(chords, notes, lines) {
 
   stave.setContext(context).draw()
   Vex.Flow.Formatter.FormatAndDraw(context, stave, notes, true)
-  extras.forEach((e) => e.setContext(context).draw())
+  extras.forEach(e => e.setContext(context).draw())
 
   for (var i = 0; i < lines.length; i += 1) {
       let lyrics = document.createElement("div")
@@ -105,6 +107,7 @@ function modifyData(textarea, transform) {
         }
         startPos = endPos
     }
+    if (row == 0) return
     let harmony = lines[row-1]
     let melody = lines[row]
     let pre = melody.substr(0, col).lastIndexOf(",")

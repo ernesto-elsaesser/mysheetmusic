@@ -22,12 +22,12 @@
 
 <body style="margin: 0; font-size: 15px;">
     <div style="text-align: center">
-        <select id="list" onchange="show()" style="height: 32px; outline: none">
-            <option>Select a song &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+        <select id="list" onchange="show()" style="height: 32px; width: 200px; outline: none">
+            <option>Loading ...</option>
         </select>
     </div>
     <input id="mode" type="checkbox" onchange="edit()" style="position: fixed; top: 5px; right: 5px;" />
-    <div id="editor" style="display: none">
+    <div id="editor">
         <textarea id="data"
             style="float: left; width: 400px; height: 283px; overflow: scroll; white-space: pre; margin-top: 4px; margin-right: 4px;"></textarea>
         <div
@@ -94,8 +94,10 @@
     <div id="sheet" style="margin-left: 20px; overflow-x: hidden;"></div>
     <div style="clear: both; height: 20px"></div>
     <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
-    <script src="render.js?v=20250201"></script>
+    <script src="render.js?v=20250203"></script>
     <script>
+
+        const NEW = "< New Song >"
 
         let select = document.getElementById('list')
         let checkbox = document.getElementById('mode')
@@ -104,12 +106,45 @@
         let sheet = document.getElementById('sheet')
 
         var songs = {}
-        var current = null
+        var current = NEW
+
+        async function load(res) {
+
+            if (res.status != 200) {
+                window.alert(res.statusText)
+                return
+            }
+
+            songs = await res.json()
+
+            select.innerHTML = ""
+
+            let create = document.createElement('option')
+            create.value = NEW
+            create.innerText = NEW
+            select.appendChild(create)
+
+            for (let name in songs) {
+                let option = document.createElement('option')
+                option.value = name
+                option.innerText = name
+                select.appendChild(option)
+            }
+
+            songs[NEW] = "\n"
+
+            select.value = current
+
+            show()
+        }
 
         function show() {
             current = select.value
-            document.title = "Sheet: " + current
+            document.title = "Song: " + current
+            checkbox.checked = current == NEW
             textarea.value = songs[current]
+
+            edit()
             renderSong(textarea, sheet)
         }
 
@@ -139,23 +174,16 @@
         }
 
         function save() {
-            editor.style.display = 'none'
-            songs[current] = textarea.value
-            fetch('set.php', {
+            if (current == NEW) current = prompt("Song name:")
+            
+            fetch('songs.php', {
                 method: 'POST',
-                body: "name=" + current + "&data=" + textarea.value,
-            }).then(res => window.alert(res.statusText))
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: "name=" + current + "&data=" + textarea.value
+            }).then(load)
         }
 
-        fetch("get.php").then(async res => {
-            songs = await res.json()
-            for (let name in songs) {
-                let option = document.createElement('option')
-                option.value = name
-                option.innerText = name
-                select.appendChild(option)
-            }
-        })
+        fetch("songs.php").then(load)
 
     </script>
 </body>

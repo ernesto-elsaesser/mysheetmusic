@@ -141,9 +141,8 @@
         function show() {
             current = select.value
             document.title = "Song: " + current
-            checkbox.checked = current == NEW
+            if (current == NEW) checkbox.checked = true
             textarea.value = songs[current]
-
             edit()
             renderSong(textarea, sheet)
         }
@@ -175,7 +174,7 @@
 
         function save() {
             if (current == NEW) current = prompt("Song name:")
-            
+
             fetch('songs.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},

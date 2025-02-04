@@ -1,0 +1,68 @@
+body {
+    margin: 0;
+    font-size: 15px;
+}
+
+#header {
+    display: inline-block;
+    border: 1px solid;
+    border-top: 0;
+}
+
+#picker {
+    margin: 0 5px;
+    height: 32px;
+    width: 200px;
+    border: 0;
+    outline: none;
+    background-color: white;
+}
+
+#data {
+    float: left; 
+    width: 400px; 
+    height: 283px; 
+    overflow: scroll; 
+    white-space: pre; 
+    margin-top: 4px; 
+    margin-right: 4px;
+}
+
+#sheet {
+    margin-left: 20px; 
+    margin-bottom: 20px; 
+    overflow-x: hidden;
+}
+
+.menu {
+    height: 32px;
+    margin: 0;
+    padding: 0 10px;
+    border: 0;
+    border-left: 1px solid;
+}
+
+.add {
+    width: 40px;
+    height: 32px;
+    margin: 0;
+    border: 0;
+    border-right: 1px solid grey;
+    border-bottom: 1px solid grey;
+}
+
+.wide {
+    width: 80px;
+}
+
+.pad {
+    float: left; 
+    border-top: 1px solid grey; 
+    border-left: 1px solid grey; 
+    margin-top: 4px; 
+    margin-right: 4px;
+}
+
+.clear {
+    clear: both;
+}

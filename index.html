@@ -5,32 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Sheet Music</title>
-    <style>
-        .menu {
-            height: 32px;
-            margin: 0;
-            padding: 0 10px;
-            border: 0;
-            border-left: 1px solid;
-        }
-
-        .add {
-            width: 40px;
-            height: 32px;
-            margin: 0;
-            border: 0;
-            border-right: 1px solid grey;
-            border-bottom: 1px solid grey;
-        }
-
-        .wide {
-            width: 80px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
-<body style="margin: 0; font-size: 15px;">
-    <div style="display: inline-block; border: 1px solid; border-top: 0;">
+<body>
+    <div id="header">
         <select id="picker" onchange="select()"
             style="margin: 0 5px; height: 32px; width: 200px; border: 0; outline: none;">
             <option>Loading ...</option>
@@ -39,10 +18,8 @@
             hidden>SAVE</button>
     </div>
     <div id="editor">
-        <textarea id="data"
-            style="float: left; width: 400px; height: 283px; overflow: scroll; white-space: pre; margin-top: 4px; margin-right: 4px;"></textarea>
-        <div
-            style="float: left; border-top: 1px solid grey; border-left: 1px solid grey; margin-top: 4px; margin-right: 4px;">
+        <textarea id="data"></textarea>
+        <div class="pad">
             <button class="add" onclick="add('A3/1')">A3</button><button class="add"
                 onclick="add('A3/2')">2</button><button class="add" onclick="add('A3/4')">4</button><button class="add"
                 onclick="add('A3/8')">8</button><button class="add" onclick="add('A3/16')">16</button><br />
@@ -71,7 +48,7 @@
                 onclick="add('B4/2')">2</button><button class="add" onclick="add('B4/4')">4</button><button class="add"
                 onclick="add('B4/8')">8</button><button class="add" onclick="add('B4/16')">16</button>
         </div>
-        <div style="float: left; border-top: 1px solid grey; border-left: 1px solid grey; margin-top: 4px;">
+        <div class="pad">
             <button class="add" onclick="del()">X</button><button class="add" onclick="dot()">&bull;</button><button
                 class="add" onclick="tie()">~</button><button class="add wide" onclick="render()">DISPLAY</button><br />
             <button class="add" onclick="add('B4/1/r')">R</button><button class="add"
@@ -100,10 +77,10 @@
                 onclick="add('B5/2')">2</button><button class="add" onclick="add('B5/4')">4</button><button class="add"
                 onclick="add('B5/8')">8</button><button class="add" onclick="add('B5/16')">16</button>
         </div>
-        <div style="clear: both"></div>
+        <div class="clear"></div>
     </div>
-    <div id="sheet" style="margin-left: 20px; overflow-x: hidden;"></div>
-    <div style="clear: both; height: 20px"></div>
+    <div id="sheet"></div>
+    <div class="clear"></div>
     <script src="https://cdn.jsdelivr.net/npm/vexflow/build/cjs/vexflow.js"></script>
     <script src="render.js?v=20250203"></script>
     <script>

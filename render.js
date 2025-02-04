@@ -51,14 +51,14 @@ function createBar(chords, notes, lines) {
           })
           extras.push(tie)
           if (chord.length == 1) continue
-          chord = chord.substr(1)
+          chord = chord.slice(1)
       }
 
       if (chord[0] == "3") {
           let triplet = new Vex.Flow.Tuplet(notes.slice(i, i+3), {location: -1})
           extras.push(triplet)
           if (chord.length == 1) continue
-          chord = chord.substr(1)
+          chord = chord.slice(1)
       }
 
       let symbol = new Vex.Flow.ChordSymbol()
@@ -110,9 +110,9 @@ function modifyData(textarea, transform) {
     if (row == 0) return
     let harmony = lines[row-1]
     let melody = lines[row]
-    let pre = melody.substr(0, col).lastIndexOf(",")
+    let pre = melody.slice(0, col).lastIndexOf(",")
     let left = pre == -1 ? 0 : pre + 2
-    let post = melody.substr(col).indexOf(",")
+    let post = melody.slice(col).indexOf(",")
     let right = post == -1 ? melody.length : col + post
     let res = transform(harmony, melody, left, right)
     cursorPos += res[0].length - harmony.length
@@ -137,8 +137,8 @@ function addNote(textarea, note) {
             harmony += "  " + chord
             melody += ", " + note
         } else {
-            harmony = harmony.substr(0, left) + chord + "  " + harmony.substr(left)
-            melody = melody.substr(0, left) + note + ", " + melody.substr(left)
+            harmony = harmony.slice(0, left) + chord + "  " + harmony.slice(left)
+            melody = melody.slice(0, left) + note + ", " + melody.slice(left)
         }
         return [harmony, melody]
     })
@@ -147,8 +147,8 @@ function addNote(textarea, note) {
 function dotNote(textarea,) {
 
     modifyData(textarea, (harmony, melody, left, right) => {
-        harmony = harmony.substr(0, right) + " " + harmony.substr(right)
-        melody = melody.substr(0, right) + "." + melody.substr(right)
+        harmony = harmony.slice(0, right) + " " + harmony.slice(right)
+        melody = melody.slice(0, right) + "." + melody.slice(right)
         return [harmony, melody]
     })
 }
@@ -156,10 +156,10 @@ function dotNote(textarea,) {
 function tieNote(textarea) {
 
     modifyData(textarea, (harmony, melody, left, right) => {
-        var chord = harmony.substr(left, right)
+        var chord = harmony.slice(left, right)
         if (chord.startsWith(".")) chord = chord.replace(".", "~")
-        else chord = "~" + chord.substr(0, -1)
-        harmony = harmony.substr(0, left) + chord + harmony.substr(right)
+        else chord = "~" + chord.slice(0, -1)
+        harmony = harmony.slice(0, left) + chord + harmony.slice(right)
         return [harmony, melody]
     })
 }
@@ -169,8 +169,8 @@ function deleteNote(textarea) {
     modifyData(textarea, (harmony, melody, left, right) => {
         if (left == 0) right += 2
         else left -= 2
-        harmony = harmony.substr(0, left) + harmony.substr(right)
-        melody = melody.substr(0, left) + melody.substr(right)
+        harmony = harmony.slice(0, left) + harmony.slice(right)
+        melody = melody.slice(0, left) + melody.slice(right)
         return [harmony, melody]
     })
 }

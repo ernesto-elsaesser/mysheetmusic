@@ -9,6 +9,7 @@ if (!is_writable($DIR)) {
 if (isset($_POST['name'])) {
     $file = $DIR . '/' . $_POST['name'] . '.txt';
     file_put_contents($file, $_POST['data']);
+    http_response_code(201);
 }
 
 $files = scandir($DIR);

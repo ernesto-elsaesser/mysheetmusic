@@ -29,8 +29,7 @@ function renderSong(textarea, sheet) {
 function createBar(chords, notes, lines) {
 
   let element = document.createElement("div")
-  element.style.marginTop = "20px"
-  element.style.float = "left"
+  element.className = "bar"
 
   let width = 60 + notes.length * 32
   let renderer = new Vex.Flow.Renderer(element, Vex.Flow.Renderer.Backends.SVG)
@@ -87,8 +86,7 @@ function createBar(chords, notes, lines) {
 
   for (var i = 0; i < lines.length; i += 1) {
       let lyrics = document.createElement("div")
-      lyrics.style.paddingLeft = "10px"
-      lyrics.style.whiteSpace = "nowrap"
+      lyrics.className = "lyrics"
       lyrics.innerHTML = lines[i]
       element.appendChild(lyrics)
   }

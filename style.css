@@ -34,6 +34,16 @@ body {
     overflow-x: hidden;
 }
 
+.bar {
+    margin-top: 20px;
+    float: left;
+}
+
+.lyrics {
+    padding-left: 10px;
+    white-space: nowrap;
+}
+
 .menu {
     height: 32px;
     margin: 0;

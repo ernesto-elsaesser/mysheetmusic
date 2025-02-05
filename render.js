@@ -1,5 +1,7 @@
 function renderSong(textarea, sheet) {
 
+    let bars = textarea.value.split("\n\n")
+
     let factory = new Vex.Flow.Factory({
         renderer: { elementId: sheet.id, width: 0, height: 0 },
     })
@@ -8,17 +10,20 @@ function renderSong(textarea, sheet) {
 
     sheet.innerHTML = ""
 
-    textarea.value.split("\n\n").forEach(bar => {
-        if (bar == "") return
+    var maxLines = 0
+    for (let bar of bars) {
+        if (bar == "") continue
         let lines = bar.split("\n")
         let harmony = lines.shift()
         let melody = lines.shift()
-        if (melody == "") return
+        if (melody == "") continue
         let chords = harmony.trim().split(/ +/)
         let notes = easy.notes(melody)
+        if (lines.length < maxLines) lines.push("&nbsp;")
+        else maxLines = lines.length
         let element = createBar(chords, notes, lines)
         sheet.appendChild(element)
-    })
+    }
 }
 
 function createBar(chords, notes, lines) {

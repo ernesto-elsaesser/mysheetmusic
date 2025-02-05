@@ -170,6 +170,7 @@
         async function save() {
 
             if (current == NEW) current = prompt("Song name:")
+            if (current == null) return
 
             build(["Saving ..."])
 

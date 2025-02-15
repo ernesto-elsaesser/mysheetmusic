@@ -181,3 +181,28 @@ function deleteNote(textarea) {
         return [harmony, melody, left]
     })
 }
+
+function transposeSong(textarea, steps) {
+
+    let pitches = ["C", "D", "E", "F", "G", "A", "B"]
+
+    let bars = textarea.value.split("\n\n").map(s => s.split("\n"))
+
+    for (let lines of bars) {
+        lines[1] = lines[1].split(", ").map(n => {
+            if (n.endsWith("r")) return n
+            var o = parseInt(n[1])
+            var i = pitches.indexOf(n[0]) + steps
+            if (i < 0) {
+                o -= 1
+                i += 7
+            } else if (i > 6) {
+                o += 1
+                i -= 7
+            }
+            return pitches[i] + o.toString() + n.slice(2)
+        }).join(", ")
+    }
+
+    textarea.value = bars.map(b => b.join("\n")).join("\n\n")
+}

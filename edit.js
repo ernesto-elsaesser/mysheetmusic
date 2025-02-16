@@ -93,6 +93,12 @@ function transposeSong(textarea, steps) {
     let bars = textarea.value.split("\n\n").map(s => s.split("\n"))
 
     for (let lines of bars) {
+
+        lines[0] = lines[0].split("").map(c => {
+            let i = pitches.indexOf(c)
+            return i == -1 ? c : pitches[(i + steps + 7) % 7]
+        }).join("")
+
         lines[1] = lines[1].split(", ").map(n => {
             if (n.endsWith("r")) return n
             var o = parseInt(n[1])

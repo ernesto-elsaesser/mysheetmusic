@@ -19,17 +19,6 @@ const SCALES = {
     }
 }
 
-const DURATIONS = {
-    w: "1",
-    h: "2",
-    d: "2d",
-    q: "4",
-    p: "4d",
-    a: "8",
-    b: "8d",
-    x: "16"
-}
-
 function renderSong(textarea, sheet) {
 
     let bars = textarea.value.split("\n\n")
@@ -86,8 +75,15 @@ function createBar(element, lines, scale, tieEnd) {
     }
     var pitch = scale[pitchNum]
 
-    let durationCode = data.shift()
-    var duration = DURATIONS[durationCode]
+    var duration = data.shift()
+    duration = duration.replace("a", "8")
+    duration = duration.replace("x", "16")
+
+    var dot = false
+    if (data[0] == ".") {
+        dot = true
+        data.shift()
+    }
 
     if (pitchNum == "0") {
         pitch = "b/4"
@@ -98,9 +94,15 @@ function createBar(element, lines, scale, tieEnd) {
         clef: "treble",
         keys: [pitch],
         duration: duration,
+        dots: dot ? 1 : 0,
         auto_stem: true,
     })
     notes.push(note)
+
+    if (dot) {
+        let dot = new Vex.Flow.Dot()
+        note.addModifier(dot)
+    }
 
     if (tie) {
         let tie = new Vex.Flow.StaveTie({

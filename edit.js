@@ -15,7 +15,7 @@ function editSong(textarea, transform) {
     lines[cursor.lineNum] = res[1]
     let delta = res[0].length - harmony.length
     let newPos = cursor.offset + delta + res[2]
-    
+
     textarea.focus()
     textarea.value = lines.join("\n")
     textarea.selectionStart = newPos
@@ -115,14 +115,14 @@ function splitBar(textarea) {
     var newLines = [""]
     var i = cursor.lineNum
     while (lines[i] != "") {
-        let head = lines[i].slice(0, cursor.colNum)
+        let head = lines[i].slice(0, cursor.colNum - 2).trim()
         let tail = lines[i].slice(cursor.colNum)
         lines[i] = head
         newLines.push(tail)
         i += 1
     }
 
-    lines = lines.slice(0, i) + newLines + lines.slice(i)
+    lines.splice(i, 0, ...newLines)
     textarea.focus()
     textarea.value = lines.join("\n")
 }

@@ -75,13 +75,29 @@ function createBar(element, lines, scale, tieEnd) {
     }
     var pitch = scale[pitchNum]
 
+    var mods = []
+
+    if (data[0] == "#") {
+        let sharp = new Vex.Flow.Accidental("#")
+        mods.push(sharp)
+        data.shift()
+    }
+
+    if (data[0] == "b") {
+        let flat = new Vex.Flow.Accidental("b")
+        mods.push(flat)
+        data.shift()
+    }
+
     var duration = data.shift()
     duration = duration.replace("o", "8")
     duration = duration.replace("x", "16")
 
-    var dot = false
+    var dots = 0
     if (data[0] == ".") {
-        dot = true
+        let dot = new Vex.Flow.Dot()
+        mods.push(dot)
+        dots = 1
         data.shift()
     }
 
@@ -94,15 +110,11 @@ function createBar(element, lines, scale, tieEnd) {
         clef: "treble",
         keys: [pitch],
         duration: duration,
-        dots: dot ? 1 : 0,
+        dots: dots,
         auto_stem: true,
     })
     notes.push(note)
-
-    if (dot) {
-        let dot = new Vex.Flow.Dot()
-        note.addModifier(dot)
-    }
+    mods.forEach(m => note.addModifier(m))
 
     if (tie) {
         let tie = new Vex.Flow.StaveTie({

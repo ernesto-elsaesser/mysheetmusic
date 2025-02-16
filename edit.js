@@ -1,31 +1,21 @@
 function editSong(textarea, transform) {
 
-    var cursorPos = textarea.selectionStart
     var lines = textarea.value.split("\n")
-    var startPos = 0
-    var row = 0
-    var col = 0
-    for (var i = 0; i < lines.length; i += 1) {
-        let endPos = startPos + lines[i].length + 1
-        if ((startPos <= cursorPos) && (endPos > cursorPos)) {
-            row = i
-            col = cursorPos - startPos
-            break
-        }
-        startPos = endPos
-    }
-    if (row == 0) return
-    let harmony = lines[row-1]
-    let melody = lines[row]
-    let pre = melody.slice(0, col).lastIndexOf(",")
+    let cursor = locateCursor(lines, textarea.selectionStart)
+    if (cursor.lineNum == 0) return
+
+    let harmony = lines[cursor.lineNum-1]
+    let melody = lines[cursor.lineNum]
+    let pre = melody.slice(0, cursor.colNum).lastIndexOf(",")
     let left = pre == -1 ? 0 : pre + 2
-    let post = melody.slice(col).indexOf(",")
-    let right = post == -1 ? melody.length : col + post
+    let post = melody.slice(cursor.colNum).indexOf(",")
+    let right = post == -1 ? melody.length : cursor.colNum + post
     let res = transform(harmony, melody, left, right)
-    lines[row-1] = res[0]
-    lines[row] = res[1]
+    lines[cursor.lineNum-1] = res[0]
+    lines[cursor.lineNum] = res[1]
     let delta = res[0].length - harmony.length
-    let newPos = startPos + delta + res[2]
+    let newPos = cursor.offset + delta + res[2]
+    
     textarea.focus()
     textarea.value = lines.join("\n")
     textarea.selectionStart = newPos
@@ -115,4 +105,37 @@ function transposeSong(textarea, steps) {
     }
 
     textarea.value = bars.map(b => b.join("\n")).join("\n\n")
+}
+
+function splitBar(textarea) {
+
+    var lines = textarea.value.split("\n")
+    let cursor = locateCursor(lines, textarea.selectionStart)
+
+    var newLines = [""]
+    var i = cursor.lineNum
+    while (lines[i] != "") {
+        let head = lines[i].slice(0, cursor.colNum)
+        let tail = lines[i].slice(cursor.colNum)
+        lines[i] = head
+        newLines.push(tail)
+        i += 1
+    }
+
+    lines = lines.slice(0, i) + newLines + lines.slice(i)
+    textarea.focus()
+    textarea.value = lines.join("\n")
+}
+
+function locateCursor(lines, selectionStart) {
+
+    var offset = 0
+    for (var lineNum = 0; lineNum < lines.length; lineNum += 1) {
+        let nextLineStart = offset + lines[lineNum].length + 1
+        if ((offset <= selectionStart) && (nextLineStart > selectionStart)) {
+            let colNum = selectionStart - offset
+            return {lineNum, colNum, offset}
+        }
+        offset = nextLineStart
+    }
 }

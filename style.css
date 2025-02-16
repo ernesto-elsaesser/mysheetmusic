@@ -61,10 +61,6 @@ body {
     border-bottom: 1px solid grey;
 }
 
-.wide {
-    width: 80px;
-}
-
 .pad {
     float: left; 
     border-top: 1px solid grey; 

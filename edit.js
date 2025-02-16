@@ -115,7 +115,8 @@ function splitBar(textarea) {
     var newLines = [""]
     var i = cursor.lineNum
     while (lines[i] != "") {
-        let head = lines[i].slice(0, cursor.colNum - 2).trim()
+        var head = lines[i].slice(0, cursor.colNum - 2)
+        if (i > cursor.lineNum) head = head.trim()
         let tail = lines[i].slice(cursor.colNum)
         lines[i] = head
         newLines.push(tail)

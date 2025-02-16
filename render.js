@@ -76,7 +76,7 @@ function createBar(element, lines, scale, tieEnd) {
     var pitch = scale[pitchNum]
 
     var duration = data.shift()
-    duration = duration.replace("a", "8")
+    duration = duration.replace("o", "8")
     duration = duration.replace("x", "16")
 
     var dot = false

@@ -2,99 +2,19 @@ function editSong(textarea, transform) {
 
     var lines = textarea.value.split("\n")
     let cursor = locateCursor(lines, textarea.selectionStart)
-    if (cursor.lineNum == 0) return
-
-    let harmony = lines[cursor.lineNum-1]
     let melody = lines[cursor.lineNum]
-    let pre = melody.slice(0, cursor.colNum).lastIndexOf(",")
-    let left = pre == -1 ? 0 : pre + 2
-    let post = melody.slice(cursor.colNum).indexOf(",")
+    let pre = melody.slice(0, cursor.colNum).lastIndexOf(" ")
+    let left = pre == -1 ? 0 : pre + 1
+    let post = melody.slice(cursor.colNum).indexOf(" ")
     let right = post == -1 ? melody.length : cursor.colNum + post
-    let res = transform(harmony, melody, left, right)
-    lines[cursor.lineNum-1] = res[0]
-    lines[cursor.lineNum] = res[1]
-    let delta = res[0].length - harmony.length
-    let newPos = cursor.offset + delta + res[2]
+    let res = transform(melody, left, right)
+    lines[cursor.lineNum] = res[0]
+    let newPos = cursor.offset + res[1]
 
     textarea.focus()
     textarea.value = lines.join("\n")
     textarea.selectionStart = newPos
     textarea.selectionEnd = newPos
-}
-
-function addNote(textarea, note) {
-
-    let len = note.length
-    let chord = "." + " ".repeat(len - 1)
-
-    editSong(textarea, (harmony, melody, left, right) => {
-        if (right == 0) {
-            harmony = chord
-            melody = note
-            right = len
-        } else if (right == melody.length) {
-            harmony += "  " + chord
-            melody += ", " + note
-            right += 2 + len
-        } else {
-            harmony = harmony.slice(0, left) + chord + "  " + harmony.slice(left)
-            melody = melody.slice(0, left) + note + ", " + melody.slice(left)
-            right = left + len
-        }
-        return [harmony, melody, right]
-    })
-}
-
-function dotNote(textarea) {
-
-    editSong(textarea, (harmony, melody, left, right) => {
-        harmony = harmony.slice(0, right) + " " + harmony.slice(right)
-        melody = melody.slice(0, right) + "." + melody.slice(right)
-        return [harmony, melody, left]
-    })
-}
-
-function tieNote(textarea) {
-
-    editSong(textarea, (harmony, melody, left, right) => {
-        var chord = harmony.slice(left, right)
-        if (chord.startsWith(".")) chord = chord.replace(".", "~")
-        else chord = "~" + chord.slice(0, -1)
-        harmony = harmony.slice(0, left) + chord + harmony.slice(right)
-        return [harmony, melody, left]
-    })
-}
-
-function deleteNote(textarea) {
-
-    editSong(textarea, (harmony, melody, left, right) => {
-        if (left == 0) right += 2
-        else left -= 2
-        harmony = harmony.slice(0, left) + harmony.slice(right)
-        melody = melody.slice(0, left) + melody.slice(right)
-        return [harmony, melody, left]
-    })
-}
-
-function splitBar(textarea) {
-
-    var lines = textarea.value.split("\n")
-    let cursor = locateCursor(lines, textarea.selectionStart)
-
-    var newLines = [""]
-    var i = cursor.lineNum
-    while (lines[i] != "") {
-        var head = lines[i].slice(0, cursor.colNum - 2)
-        if (i > cursor.lineNum) head = head.trim()
-        let tail = lines[i].slice(cursor.colNum)
-        lines[i] = head
-        newLines.push(tail)
-        i += 1
-    }
-
-    lines.splice(i, 0, ...newLines)
-    textarea.focus()
-    textarea.value = lines.join("\n")
 }
 
 function locateCursor(lines, selectionStart) {
@@ -108,4 +28,53 @@ function locateCursor(lines, selectionStart) {
         }
         offset = nextLineStart
     }
+}
+
+function addNote(textarea, note) {
+
+    let len = note.length
+
+    editSong(textarea, (melody, left, right) => {
+        if (right == 0) {
+            melody = note
+            right = len
+        } else if (right == melody.length) {
+            melody += " " + note
+            right += 1 + len
+        } else {
+            melody = melody.slice(0, left) + note + " " + melody.slice(left)
+            right = left + len
+        }
+        return [melody, right]
+    })
+}
+
+function dotNote(textarea) {
+
+    editSong(textarea, (melody, left, right) => {
+        var note = melody.slice(left, right)
+        note = note.replace("h", "d")
+        note = note.replace("q", "p")
+        note = note.replace("a", "b")
+        melody = melody.slice(0, left) + note + melody.slice(right)
+        return [melody, left]
+    })
+}
+
+function tieNote(textarea) {
+
+    editSong(textarea, (melody, left, right) => {
+        melody = melody.slice(0, left) + "~" + melody.slice(left)
+        return [melody, left]
+    })
+}
+
+function deleteNote(textarea) {
+
+    editSong(textarea, (melody, left, right) => {
+        if (left == 0) right += 1
+        else left -= 1
+        melody = melody.slice(0, left) + melody.slice(right)
+        return [melody, left]
+    })
 }

@@ -1,3 +1,16 @@
+const SCALES = {
+    C4: {
+        "-3": "e/3", "-4": "f/3", "-5": "g/3", "-6": "a/3", "-7": "b/3",
+        "1": "c/4", "2": "d/4", "3": "e/4", "4": "f/4", "5": "g/4", "6": "a/4", "7": "b/4",
+        "+1": "c/5", "+2": "d/5", "+3": "e/5", "+4": "f/5", "+5": "g/5", "+6": "a/5", "+7": "b/5",
+    },
+    Am: {},
+    C5: {
+        "-1": "c/4", "-2": "d/4", "-3": "e/4", "-4": "f/4", "-5": "g/4", "-6": "a/4", "-7": "b/4",
+        "1": "c/5", "2": "d/5", "3": "e/5", "4": "f/5", "5": "g/5", "6": "a/5", "7": "b/5",
+    }
+}
+
 const DURATIONS = {
     w: "1",
     h: "2",
@@ -9,18 +22,11 @@ const DURATIONS = {
     x: "16"
 }
 
-// TODO other signatures with sharps and flats
-const KEYS = {
-    C: 0, Am: +5
-}
-
 function renderSong(textarea, sheet) {
 
     let bars = textarea.value.split("\n\n")
-    let header = bars.shift().split(" ")
-    let keyShift = KEYS[header[0]]
-    let scale = "xcdefgabcdefga".slice(keyShift)
-    let octave = parseInt(header[1])
+    let key = bars.shift()
+    let scale = SCALES[key]
 
     sheet.innerHTML = ""
 
@@ -40,7 +46,7 @@ function renderSong(textarea, sheet) {
         element.className = "bar"
 
         try {
-            createBar(element, lines, scale, octave, tieEnd)
+            createBar(element, lines, scale, tieEnd)
         } catch (error) {
             element.innerText = error.toString()
             element.style.color = "red"
@@ -50,12 +56,9 @@ function renderSong(textarea, sheet) {
     }
 }
 
-function createBar(element, lines, scale, octave, tieEnd) {
+function createBar(element, lines, scale, tieEnd) {
 
   let melody = lines.shift().split(" ")
-
-  let pitches = scale.split("")
-  let chords = scale.toUpperCase().split("")
 
   var notes = []
   var extras = []
@@ -69,28 +72,21 @@ function createBar(element, lines, scale, octave, tieEnd) {
         data.shift()
     }
 
-    var oct = octave
-    while (data[0] == "-") {
-        oct -= 1
-        data.shift()
+    var pitchNum = data.shift()
+    if ((pitchNum == "-") || (pitchNum == "+")) {
+        pitchNum += data.shift()
     }
-    while (data[0] == "+") {
-        oct += 1
-        data.shift()
-    }
+    var pitch = scale[pitchNum]
 
-    let pitchCode = data.shift()
-    var pitch = pitches[parseInt(pitchCode)]
     let durationCode = data.shift()
     var duration = DURATIONS[durationCode]
-    if (pitchCode == "0") {
-        pitch = "b"
-        oct = 4
+
+    if (pitchNum == "0") {
+        pitch = "b/4"
         duration += "r"
     }
 
-    let key = pitch + "/" + oct.toString()
-    let note = new Vex.Flow.StaveNote({ keys: [key], duration: duration })
+    let note = new Vex.Flow.StaveNote({ keys: [pitch], duration: duration })
     notes.push(note)
 
     if (tie) {
@@ -112,8 +108,8 @@ function createBar(element, lines, scale, octave, tieEnd) {
 
     if (data.length == 0) continue
 
-    let chordCode = data.shift()
-    var chord = chords[parseInt(chordCode)]
+    let chordNum = data.shift()
+    var chord = scale[chordNum].slice(0, 1).toUpperCase()
     if (data[0] == "m") chord += "m"
 
     let symbol = new Vex.Flow.ChordSymbol()

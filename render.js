@@ -85,6 +85,7 @@ function createBar(element, lines, scale, octave, tieEnd) {
     var duration = DURATIONS[durationCode]
     if (pitchCode == "0") {
         pitch = "b"
+        oct = 4
         duration += "r"
     }
 

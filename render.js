@@ -133,7 +133,7 @@ function createBar(element, lines, scale, tieEnd) {
 
   if (tieEnd) {
     let tie = new Vex.Flow.StaveTie({
-        first_note: notes[i],
+        first_note: notes[i - 1],
         first_indices: [0],
     })
     extras.push(tie)

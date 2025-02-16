@@ -25,10 +25,14 @@ function renderSong(textarea, sheet) {
     sheet.innerHTML = ""
 
     var maxLines = 0
-    for (let bar of bars) {
+    for (let i = 0; i < bars.length; i += 1) {
+        let bar = bars[i]
         if (bar == "") continue
         let lines = bar.split("\n")
         if (lines[0] == "") continue
+
+        let tieEnd = bars[i+1] && (bars[i+1][0] == "~")
+
         while (lines.length < maxLines) lines.push("&nbsp;")
         if (lines.length > maxLines) maxLines = lines.length
 
@@ -36,18 +40,17 @@ function renderSong(textarea, sheet) {
         element.className = "bar"
 
         try {
-            createBar(element, lines, scale, octave)
+            createBar(element, lines, scale, octave, tieEnd)
         } catch (error) {
             element.innerText = error.toString()
             element.style.color = "red"
         }
 
-
         sheet.appendChild(element)
     }
 }
 
-function createBar(element, lines, scale, octave) {
+function createBar(element, lines, scale, octave, tieEnd) {
 
   let melody = lines.shift().split(" ")
 
@@ -59,7 +62,12 @@ function createBar(element, lines, scale, octave) {
   for (var i = 0; i < melody.length; i += 1) {
 
     let data = melody[i].split("")
-    let pitchCode = data.shift()
+
+    var tie = false
+    if (data[0] == "~") {
+        tie = true
+        data.shift()
+    }
 
     var oct = octave
     while (data[0] == "-") {
@@ -71,27 +79,20 @@ function createBar(element, lines, scale, octave) {
         data.shift()
     }
 
+    let pitchCode = data.shift()
+    var pitch = pitches[parseInt(pitchCode)]
     let durationCode = data.shift()
-    let duration = DURATIONS[durationCode]
-
-    var pitch = "b"
+    var duration = DURATIONS[durationCode]
     if (pitchCode == "0") {
+        pitch = "b"
         duration += "r"
-    } else {
-        pitch = pitches[parseInt(pitchCode)]
     }
 
     let key = pitch + "/" + oct.toString()
     let note = new Vex.Flow.StaveNote({ keys: [key], duration: duration })
     notes.push(note)
 
-    if (data[0] == "t") {
-        let triplet = new Vex.Flow.Tuplet(notes.slice(i-2), {location: -1})
-        extras.push(triplet)
-        data.shift()
-    }
-
-    if (data[0] == "~") {
+    if (tie) {
         let tie = new Vex.Flow.StaveTie({
             first_note: notes[i - 1],
             last_note: note,
@@ -102,12 +103,9 @@ function createBar(element, lines, scale, octave) {
         data.shift()
     }
 
-    if (data[0] == "$") {
-        let tie = new Vex.Flow.StaveTie({
-            first_note: note,
-            first_indices: [0],
-        })
-        extras.push(tie)
+    if (data[0] == "t") {
+        let triplet = new Vex.Flow.Tuplet(notes.slice(i-2), {location: -1})
+        extras.push(triplet)
         data.shift()
     }
 
@@ -122,6 +120,14 @@ function createBar(element, lines, scale, octave) {
     symbol.setFontSize(14)
     symbol.addText(chord)
     note.addModifier(symbol)
+  }
+
+  if (tieEnd) {
+    let tie = new Vex.Flow.StaveTie({
+        first_note: notes[i],
+        first_indices: [0],
+    })
+    extras.push(tie)
   }
 
   let width = 60 + notes.length * 32

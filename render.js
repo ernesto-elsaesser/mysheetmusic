@@ -45,6 +45,8 @@ function renderSong(textarea, sheet) {
         let lines = bar.split("\n")
         if (lines[0] == "") continue
 
+        let tieEnd = bars[i+1] && (bars[i+1][0] == "~")
+
         while (lines.length < maxLines) lines.push("&nbsp;")
         if (lines.length > maxLines) maxLines = lines.length
 
@@ -52,7 +54,7 @@ function renderSong(textarea, sheet) {
         element.className = "bar"
 
         try {
-            createBar(element, lines, scale)
+            createBar(element, lines, scale, tieEnd)
         } catch (error) {
             element.innerText = error.toString()
             element.style.color = "red"
@@ -62,14 +64,12 @@ function renderSong(textarea, sheet) {
     }
 }
 
-function createBar(element, lines, scale) {
+function createBar(element, lines, scale, tieEnd) {
 
   let melody = lines.shift().split(" ")
 
   var notes = []
   var extras = []
-  var prevNote = null
-
   for (var i = 0; i < melody.length; i += 1) {
 
     let data = melody[i].split("")
@@ -104,15 +104,13 @@ function createBar(element, lines, scale) {
 
     if (tie) {
         let tie = new Vex.Flow.StaveTie({
-            first_note: prevNote,
+            first_note: notes[i - 1],
             last_note: note,
             first_indices: [0],
             last_indices: [0],
         })
         extras.push(tie)
     }
-
-    prevNote = note
 
     if (data[0] == "t") {
         let triplet = new Vex.Flow.Tuplet(notes.slice(i-2), {location: -1})
@@ -131,6 +129,14 @@ function createBar(element, lines, scale) {
     symbol.setFontSize(14)
     symbol.addText(chord)
     note.addModifier(symbol)
+  }
+
+  if (tieEnd) {
+    let tie = new Vex.Flow.StaveTie({
+        first_note: notes[i - 1],
+        first_indices: [0],
+    })
+    extras.push(tie)
   }
 
   let width = 60 + notes.length * 32

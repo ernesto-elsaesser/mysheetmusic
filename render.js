@@ -81,7 +81,16 @@ function createBar(chords, notes, lines) {
   }
 
   stave.setContext(context).draw()
-  Vex.Flow.Formatter.FormatAndDraw(context, stave, notes, true)
+
+  try {
+    Vex.Flow.Formatter.FormatAndDraw(context, stave, notes, true)
+  } catch (error) {
+    let msg = document.createElement("div")
+    msg.innerText = "INVALID DATA"
+    msg.style.color = "red"
+    element.appendChild(msg)
+  }
+  
   extras.forEach(e => e.setContext(context).draw())
 
   for (var i = 0; i < lines.length; i += 1) {

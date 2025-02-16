@@ -94,7 +94,12 @@ function createBar(element, lines, scale, tieEnd) {
         duration += "r"
     }
 
-    let note = new Vex.Flow.StaveNote({ keys: [pitch], duration: duration })
+    let note = new Vex.Flow.StaveNote({
+        clef: "treble",
+        keys: [pitch],
+        duration: duration,
+        auto_stem: true,
+    })
     notes.push(note)
 
     if (tie) {

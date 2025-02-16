@@ -1,10 +1,3 @@
-const PITCHES = "xcdefgabcdefga"
-
-const CHORDS = {
-    i: -1, ii: -2, iii: -3, iv: -4, v: -5, vi: -6,
-    I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6,
-}
-
 const DURATIONS = {
     w: "1",
     h: "2",
@@ -26,7 +19,7 @@ function renderSong(textarea, sheet) {
     let bars = textarea.value.split("\n\n")
     let header = bars.shift().split(" ")
     let keyShift = KEYS[header[0]]
-    let scale = PITCHES.slice(keyShift)
+    let scale = "xcdefgabcdefga".slice(keyShift)
     let octave = parseInt(header[1])
 
     sheet.innerHTML = ""

@@ -46,7 +46,7 @@
             }
 
             songs = await res.json()
-            songs[NEW] = ""
+            songs[NEW] = "C4\n\n1q1 2a 3a 4h"
 
             let names = Object.keys(songs).sort()
             build(names, current)
@@ -95,7 +95,7 @@
 
         async function save() {
 
-            if (current == NEW) current = prompt("Song name:")
+            if (current == NEW) current = prompt("Title:")
             if (current == null) return
 
             build(["Saving ..."])

@@ -17,6 +17,9 @@ function renderSong(textarea, sheet) {
     let key = bars.shift()
     let scale = SCALES[key]
 
+    let dark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    let color = dark ? "white" : "black"
+
     sheet.innerHTML = ""
 
     var maxLines = 0
@@ -35,7 +38,7 @@ function renderSong(textarea, sheet) {
         element.className = "bar"
 
         try {
-            createBar(element, lines, scale, tieEnd)
+            createBar(element, color, lines, scale, tieEnd)
         } catch (error) {
             element.innerText = error.toString()
             element.style.color = "red"
@@ -45,7 +48,7 @@ function renderSong(textarea, sheet) {
     }
 }
 
-function createBar(element, lines, scale, tieEnd) {
+function createBar(element, color, lines, scale, tieEnd) {
 
   let melody = lines.shift().split(" ")
 
@@ -150,6 +153,8 @@ function createBar(element, lines, scale, tieEnd) {
   renderer.resize(width, 100)
   let context = renderer.getContext()
   context.scale(0.75, 0.75)
+  context.setFillStyle(color)
+  context.setStrokeStyle(color)
   let scaledWidth = 45 + notes.length * 24
   element.style.width = scaledWidth.toString() + "px"
 

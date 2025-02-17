@@ -1,6 +1,8 @@
 body {
     margin: 0;
     font-size: 15px;
+    color: #222;
+    background-color: white;
 }
 
 button {
@@ -9,6 +11,7 @@ button {
     padding: 0 10px;
     border: 0;
     border-left: 1px solid;
+    background-color: #eee;
 }
 
 #header {
@@ -49,4 +52,27 @@ button {
 .lyrics {
     padding-left: 10px;
     white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+
+    body {
+        color: white;
+        background-color: #222;
+    }
+
+    button {
+        color: white;
+        background-color: #444;
+    }
+
+    #picker {
+        color: white;
+        background-color: #222;
+    }
+
+    #editor {
+        color: white;
+        background-color: #222;
+    }
 }

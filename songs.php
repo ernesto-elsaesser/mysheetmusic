@@ -9,6 +9,7 @@ if (!is_writable($DIR)) {
 if (isset($_POST['name'])) {
     $file = $DIR . '/' . $_POST['name'] . '.txt';
     $count = file_put_contents($file, $_POST['data']);
+    chmod($file, 0666);
     http_response_code($count ? 201 : 401);
 }
 

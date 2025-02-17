@@ -42,6 +42,7 @@
         async function load(res) {
 
             if (res.status > 201) {
+                build(["ERROR"])
                 window.alert(res.statusText)
                 return
             }

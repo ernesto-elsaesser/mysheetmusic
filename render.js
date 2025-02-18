@@ -88,6 +88,7 @@ function createBar(element, color, lines, scale, tieEnd) {
     var duration = data.shift()
     duration = duration.replace("o", "8")
     duration = duration.replace("x", "16")
+    duration = duration.replace("z", "32")
 
     var dots = 0
     if (data[0] == ".") {

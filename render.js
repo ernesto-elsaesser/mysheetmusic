@@ -160,6 +160,7 @@ function createBar(element, color, lines, scale, tieEnd) {
   element.style.width = scaledWidth.toString() + "px"
 
   let stave = new Vex.Flow.Stave(0, 0, width)
+  stave.setDefaultLedgerLineStyle({ strokeStyle: "#999", lineWidth: 1.4 })
   stave.setContext(context).draw()
 
   Vex.Flow.Formatter.FormatAndDraw(context, stave, notes, true)

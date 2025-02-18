@@ -131,8 +131,7 @@ function createBar(element, color, lines, scale, tieEnd) {
     if (data.length == 0) continue
 
     let chordNum = data.shift()
-    var chord = scale[chordNum].slice(0, 1).toUpperCase()
-    if (data[0] == "m") chord += "m"
+    let chord = scale[chordNum].slice(0, 1).toUpperCase() + data.join("")
 
     let symbol = new Vex.Flow.ChordSymbol()
     symbol.setHorizontal('center')

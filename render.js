@@ -55,7 +55,8 @@ function createBar(element, color, lines, scale, tieEnd) {
   let melody = lines.shift().split(" ")
 
   var notes = []
-  var extras = []
+  var ties = []
+  var tuplets = []
   for (var i = 0; i < melody.length; i += 1) {
 
     let data = melody[i].split("")
@@ -115,18 +116,16 @@ function createBar(element, color, lines, scale, tieEnd) {
     mods.forEach(m => note.addModifier(m))
 
     if (tie) {
-        let tie = new Vex.Flow.StaveTie({
+        ties.push({
             first_note: notes[i - 1],
             last_note: note,
             first_indices: [0],
             last_indices: [0],
         })
-        extras.push(tie)
     }
 
     if (data[0] == "t") {
-        let triplet = new Vex.Flow.Tuplet(notes.slice(i-2), {location: -1})
-        extras.push(triplet)
+        tuplets.push(notes.slice(i-2))
         data.shift()
     }
 
@@ -143,11 +142,10 @@ function createBar(element, color, lines, scale, tieEnd) {
   }
 
   if (tieEnd) {
-    let tie = new Vex.Flow.StaveTie({
+    ties.push({
         first_note: notes[i - 1],
         first_indices: [0],
     })
-    extras.push(tie)
   }
 
   let width = 60 + notes.length * 32
@@ -165,8 +163,16 @@ function createBar(element, color, lines, scale, tieEnd) {
   stave.setContext(context).draw()
 
   Vex.Flow.Formatter.FormatAndDraw(context, stave, notes, true)
-  
-  extras.forEach(e => e.setContext(context).draw())
+
+  ties.forEach(options => {
+    let tie = new Vex.Flow.StaveTie(options)
+    tie.setContext(context).draw()
+  })
+
+  tuplets.forEach(notes => {
+    let tuplet = new Vex.Flow.Tuplet(notes, {location: Vex.Flow.Tuplet.LOCATION_BOTTOM})
+    tuplet.setContext(context).draw()
+  })
 
   for (var i = 0; i < lines.length; i += 1) {
       let lyrics = document.createElement("div")

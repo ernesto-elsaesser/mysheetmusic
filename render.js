@@ -148,15 +148,23 @@ function createBar(element, color, lines, scale, tieEnd) {
     })
   }
 
-  let width = 60 + notes.length * 32
+  var note_count = notes.length
+  if (note_count < 3) note_count = 3
+
+  for (let line of lines) {
+    let adj_count = (2 + line.length) / 4.5
+    if (adj_count > note_count) note_count = adj_count
+  }
+
+  let width = note_count * 40
+  element.style.width = (width * 0.8).toString() + "px"
+
   let renderer = new Vex.Flow.Renderer(element, Vex.Flow.Renderer.Backends.SVG)
   renderer.resize(width, 100)
   let context = renderer.getContext()
-  context.scale(0.75, 0.75)
+  context.scale(0.8, 0.8)
   context.setFillStyle(color)
   context.setStrokeStyle(color)
-  let scaledWidth = 45 + notes.length * 24
-  element.style.width = scaledWidth.toString() + "px"
 
   let stave = new Vex.Flow.Stave(0, 0, width)
   stave.setDefaultLedgerLineStyle({ strokeStyle: "#999", lineWidth: 1.4 })

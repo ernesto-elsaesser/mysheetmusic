@@ -7,7 +7,7 @@ const PITCHES = {
 
 function renderSong(textarea, sheet) {
 
-    let bars = textarea.value.split("\n\n")
+    let measures = textarea.value.split("\n\n")
 
     let dark = window.matchMedia('(prefers-color-scheme: dark)').matches
     let color = dark ? "white" : "black"
@@ -15,22 +15,23 @@ function renderSong(textarea, sheet) {
     sheet.innerHTML = ""
 
     var maxLines = 0
-    for (let i = 0; i < bars.length; i += 1) {
-        let bar = bars[i]
-        if (bar == "") continue
-        let lines = bar.split("\n")
+    for (let i = 0; i < measures.length; i += 1) {
+        let measure = measures[i]
+        if (measure == "") continue
+        let lines = measure.split("\n")
         if (lines[0] == "") continue
 
-        let tieEnd = bars[i+1] && (bars[i+1][0] == "~")
+        let nextMeasure = measures[i+1]
+        let tieEnd = nextMeasure && (nextMeasure[0] == "~")
 
         while (lines.length < maxLines) lines.push("&nbsp;")
         if (lines.length > maxLines) maxLines = lines.length
 
         let element = document.createElement("div")
-        element.className = "bar"
+        element.className = "measure"
 
         try {
-            createBar(element, color, lines, tieEnd)
+            createMeasure(element, color, lines, tieEnd)
         } catch (error) {
             element.innerText = error.toString()
             element.style.color = "red"
@@ -40,7 +41,7 @@ function renderSong(textarea, sheet) {
     }
 }
 
-function createBar(element, color, lines, tieEnd) {
+function createMeasure(element, color, lines, tieEnd) {
 
   let melody = lines.shift().split(" ")
 
@@ -176,4 +177,40 @@ function createBar(element, color, lines, tieEnd) {
       lyrics.innerHTML = lines[i]
       element.appendChild(lyrics)
   }
+}
+
+function transpose(textarea, shift) {
+
+    let measures = textarea.value.split("\n\n")
+
+    function mapNote(note) {
+        
+        let found = [1, 2, 3, 4, 5, 6, 7].filter((i) => note.includes(i.toString()))
+
+        for (let a of found) {
+            let b = a + shift
+            if (b > 7) {
+                b -= 7
+                if (note.includes(",")) note = note.replace(a.toString() + ",", b.toString())
+                else note = note.substr(0, 2).replace(a.toString(), b.toString() + "'") + note.substr(2)
+             } else if (b < 1) {
+                b += 7
+                if (note.includes("'")) note = note.replace(a.toString() + "'", b.toString())
+                else note = note.substr(0, 2).replace(a.toString(), b.toString() + ",") + note.substr(2)
+             }
+            note = note.replace(a.toString(), b.toString())
+        }
+    
+        return note
+    }
+
+    for (let i = 0; i < measures.length; i += 1) {
+        let measure = measures[i]
+        if (measure == "") continue
+        let lines = measure.split("\n")
+        lines[0] = lines[0].split(" ").map(mapNote).join(" ")
+        measures[i] = lines.join("\n")
+    }
+
+    textarea.value = measures.join("\n\n")
 }

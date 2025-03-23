@@ -13,7 +13,7 @@
         <select id="picker" onchange="select()">
             <option>Loading ...</option>
         </select><button id="edit" class="menu" onclick="edit()" hidden>EDIT</button><button id="revert" class="menu"
-            onclick="select()" hidden>REVERT</button><button id="preview" class="menu" onclick="render()" hidden>PREVIEW</button><button id="save" class="menu" onclick="save()"
+            onclick="select()" hidden>REVERT</button><button id="downshift" class="menu" onclick="downshift()" hidden> &darr; </button><button id="upshift" class="menu" onclick="upshift()" hidden> &uarr; </button><button id="preview" class="menu" onclick="render()" hidden>PREVIEW</button><button id="save" class="menu" onclick="save()"
             hidden>SAVE</button>
     </div>
     <textarea id="editor"></textarea>
@@ -30,6 +30,8 @@
         let picker = document.getElementById('picker')
         let editButton = document.getElementById('edit')
         let revertButton = document.getElementById('revert')
+        let downshiftButton = document.getElementById('downshift')
+        let upshiftButton = document.getElementById('upshift')
         let previewButton = document.getElementById('preview')
         let saveButton = document.getElementById('save')
         let editor = document.getElementById('editor')
@@ -76,6 +78,8 @@
             let isNew = current == NEW
             editButton.hidden = isNew
             revertButton.hidden = true
+            upshiftButton.hidden = true
+            downshiftButton.hidden = true
             previewButton.hidden = !isNew
             saveButton.hidden = !isNew
             editor.style.display = isNew ? "block" : "none"
@@ -89,9 +93,19 @@
         function edit() {
             editButton.hidden = true
             revertButton.hidden = false
+            upshiftButton.hidden = false
+            downshiftButton.hidden = false
             previewButton.hidden = false
             saveButton.hidden = false
             editor.style.display = "block"
+        }
+
+        function upshift() {
+            transpose(editor, 1)
+        }
+
+        function downshift() {
+            transpose(editor, -1)
         }
 
         async function save() {

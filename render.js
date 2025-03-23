@@ -140,6 +140,7 @@ function createMeasure(element, color, lines, tieEnd) {
   }
 
   var note_count = notes.length
+  if (note_count < 2) note_count = 2
   for (let line of lines) {
     let adj_count = (2 + line.length) / 4.5
     if (adj_count > note_count) note_count = adj_count

@@ -1,23 +1,13 @@
-const SCALES = {
-    Am: {
-        "3,": "c/3", "4,": "d/3", "5,": "e/3", "6,": "f/3", "7,": "g/3",
-        "1": "a/3", "2": "b/3", "3": "c/4", "4": "d/4", "5": "e/4", "6": "f/4", "7": "g/4",
-        "1'": "a/4", "2'": "b/4", "3'": "c/5", "4'": "d/5", "5'": "e/5", "6'": "f/5", "7'": "g/5",
-        "1\"": "a/5", "2\"": "b/5", "3\"": "c/6",
-    },
-    C: {
-        "1,": "c/3", "2,": "d/3", "3,": "e/3", "4,": "f/3", "5,": "g/3", "6,": "a/3", "7,": "b/3",
-        "1": "c/4", "2": "d/4", "3": "e/4", "4": "f/4", "5": "g/4", "6": "a/4", "7": "b/4",
-        "1'": "c/5", "2'": "d/5", "3'": "e/5", "4'": "f/5", "5'": "g/5", "6'": "a/5", "7'": "b/5",
-        "1\"": "c/6",
-    },
+const PITCHES = {
+    "1,": "c/3", "2,": "d/3", "3,": "e/3", "4,": "f/3", "5,": "g/3", "6,": "a/3", "7,": "b/3",
+    "1": "c/4", "2": "d/4", "3": "e/4", "4": "f/4", "5": "g/4", "6": "a/4", "7": "b/4",
+    "1'": "c/5", "2'": "d/5", "3'": "e/5", "4'": "f/5", "5'": "g/5", "6'": "a/5", "7'": "b/5",
+    "1''": "c/6", "2''": "d/6", "3''": "e/6", "4''": "f/6",  "5''": "g/6", 
 }
 
 function renderSong(textarea, sheet) {
 
     let bars = textarea.value.split("\n\n")
-    let key = bars.shift()
-    let scale = SCALES[key]
 
     let dark = window.matchMedia('(prefers-color-scheme: dark)').matches
     let color = dark ? "white" : "black"
@@ -40,7 +30,7 @@ function renderSong(textarea, sheet) {
         element.className = "bar"
 
         try {
-            createBar(element, color, lines, scale, tieEnd)
+            createBar(element, color, lines, tieEnd)
         } catch (error) {
             element.innerText = error.toString()
             element.style.color = "red"
@@ -50,7 +40,7 @@ function renderSong(textarea, sheet) {
     }
 }
 
-function createBar(element, color, lines, scale, tieEnd) {
+function createBar(element, color, lines, tieEnd) {
 
   let melody = lines.shift().split(" ")
 
@@ -67,11 +57,11 @@ function createBar(element, color, lines, scale, tieEnd) {
         data.shift()
     }
 
-    var pitchNum = data.shift()
-    if ((data[0] == "'") || (data[0] == '"') || (data[0] == ",")) {
-        pitchNum += data.shift()
+    var degree = data.shift()
+    while ((data[0] == "'") || (data[0] == ",")) {
+        degree += data.shift()
     }
-    var pitch = scale[pitchNum]
+    var pitch = PITCHES[degree]
 
     var mods = []
 
@@ -100,7 +90,7 @@ function createBar(element, color, lines, scale, tieEnd) {
         data.shift()
     }
 
-    if (pitchNum == "0") {
+    if (degree == "0") {
         pitch = "b/4"
         duration += "r"
     }
@@ -131,8 +121,8 @@ function createBar(element, color, lines, scale, tieEnd) {
 
     if (data.length == 0) continue
 
-    let chordNum = data.shift()
-    let chord = scale[chordNum].slice(0, 1).toUpperCase() + data.join("")
+    let chordDegree = data.shift()
+    let chord = PITCHES[chordDegree].slice(0, 1).toUpperCase() + data.join("")
 
     let symbol = new Vex.Flow.ChordSymbol()
     symbol.setHorizontal('center')

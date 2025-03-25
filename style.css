@@ -52,6 +52,7 @@ button {
 }
 
 .lyrics {
+    height: 21px;
     padding-left: 10px;
     white-space: nowrap;
 }

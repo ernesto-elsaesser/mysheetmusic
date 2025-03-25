@@ -5,23 +5,29 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Sheet Music</title>
-    <link rel="stylesheet" href="style.css?v=20250217" />
+    <link rel="stylesheet" href="style.css?v=20250325" />
 </head>
 
 <body>
-    <div id="header">
-        <select id="picker" onchange="select()">
+
+    <div id="toolbar">
+        <select id="picker" class="toolbar" onchange="select()">
             <option>Loading ...</option>
-        </select><button id="edit" class="menu" onclick="edit()" hidden>EDIT</button><button id="revert" class="menu"
-            onclick="select()" hidden>REVERT</button><button id="downshift" class="menu" onclick="downshift()" hidden> &darr; </button><button id="upshift" class="menu" onclick="upshift()" hidden> &uarr; </button><button id="preview" class="menu" onclick="render()" hidden>PREVIEW</button><button id="save" class="menu" onclick="save()"
-            hidden>SAVE</button>
+        </select>
+        <button id="edit" onclick="edit()" hidden>EDIT</button>
+        <button id="revert" class="menu" onclick="select()" hidden>ABORT</button>
+        <button id="transpose" onclick="trans()">SHIFT</button>
+        <button id="preview" onclick="render()">VIEW</button>
+        <button id="save" onclick="save()" hidden>SAVE</button>
     </div>
-    <textarea id="editor"></textarea>
-    <div id="sheet"></div>
-    <div style="clear: both"></div>
+
+    <div id="content">
+        <textarea id="code"></textarea>
+        <div id="sheet"></div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="render.js?v=20250218"></script>
+    <script src="render.js?v=20250325"></script>
     <script>
 
         const NEW = "< New Song >"
@@ -30,11 +36,10 @@
         let picker = document.getElementById('picker')
         let editButton = document.getElementById('edit')
         let revertButton = document.getElementById('revert')
-        let downshiftButton = document.getElementById('downshift')
-        let upshiftButton = document.getElementById('upshift')
+        let transposeButton = document.getElementById('transpose')
         let previewButton = document.getElementById('preview')
         let saveButton = document.getElementById('save')
-        let editor = document.getElementById('editor')
+        let code = document.getElementById('code')
         let sheet = document.getElementById('sheet')
 
         var songs = {}
@@ -74,38 +79,35 @@
 
             current = picker.value
             document.title = "Song: " + current
-            editor.value = songs[current]
+            code.value = songs[current]
             let isNew = current == NEW
             editButton.hidden = isNew
             revertButton.hidden = true
-            upshiftButton.hidden = true
-            downshiftButton.hidden = true
+            transposeButton.hidden = !isNew
             previewButton.hidden = !isNew
             saveButton.hidden = !isNew
-            editor.style.display = isNew ? "block" : "none"
+            code.hidden = !isNew
             render()
         }
 
         function render() {
-            renderSong(editor, sheet)
+            renderSong(code, sheet)
         }
 
         function edit() {
             editButton.hidden = true
             revertButton.hidden = false
-            upshiftButton.hidden = false
-            downshiftButton.hidden = false
+            transposeButton.hidden = false
             previewButton.hidden = false
             saveButton.hidden = false
-            editor.style.display = "block"
+            code.hidden = false
         }
 
-        function upshift() {
-            transpose(editor, 1)
-        }
-
-        function downshift() {
-            transpose(editor, -1)
+        function trans() {
+            let shift = prompt("Degrees:")
+            if (shift == null) return
+            transpose(code, parseInt(shift))
+            renderSong(code, sheet)
         }
 
         async function save() {
@@ -118,7 +120,7 @@
             let res = await fetch('songs.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: "name=" + current + "&data=" + editor.value
+                body: "name=" + current + "&data=" + code.value
             })
 
             load(res)

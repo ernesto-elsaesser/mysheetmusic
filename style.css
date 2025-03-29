@@ -34,9 +34,10 @@ button {
 
 #code {
     flex-shrink: 0;
-    width: 200px;
+    width: 240px;
     height: 600px;
     margin-top: 20px;
+    margin-left: 20px;
     overflow: scroll;
     white-space: pre;
 }

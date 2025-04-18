@@ -6,34 +6,57 @@
     <title>MusicXML File Import</title>
     <script src="zip.js"></script>
     <script src="import.js"></script>
+    <link rel="stylesheet" href="style.css?v=20250418" />
 </head>
 <body>
-    <h1>MusicXML File Import</h1>
-    <form>
-        <label for="file">MusicXML file (.mxl):</label><br/>
-        <input type="file" id="file" name="file" accept=".mxl"><br/>
-        <label for="part">Part:</label><br/>
-        <input type="number" id="part" name="part" min="1" max="9" value="1"><br/>
-        <label for="title">Title:</label><br/>
-        <input type="text" id="title" name="title"><br/>
-        <input type="button" onclick="upload()" value="Upload">
-    </form>
+    <div style="margin: 20px">
+        <h1>MusicXML File Import</h1>
+        <input type="file" id="file" name="file" accept=".mxl">
+    </div>
+
+    <div id="parts"></div>
+
     <textarea id="code"></textarea>
 
     <script>
-        const fileInput = document.getElementById('file')
-        const partInput = document.getElementById('part')
-        const titleInput = document.getElementById('title')
+        const input = document.getElementById('file')
+        const parts = document.getElementById('parts')
         const code = document.getElementById('code')
 
-        function upload() {
-            code.value = ""
-            if (fileInput.files.length == 0) return
-            const file = fileInput.files[0]
-            const part = partInput.valueAsNumber
-            const title = titleInput.value
-            importMXL(file, part, "1", title, (m) => code.value = m)
-        }
+        const parser = new DOMParser()
+
+        input.addEventListener('change', () => {
+            if (input.files.length == 0) return
+            parts.innerHTML = ""
+            const file = input.files[0]
+            const reader = new FileReader()
+            reader.onload = async (event) => {
+                const array = new Uint8Array(event.target.result)
+                const rawReader = new zip.Uint8ArrayReader(array)
+                const reader = new zip.ZipReader(rawReader)
+                const entries = await reader.getEntries()
+                for (let entry of entries) {
+                    if (entry.filename != "score.xml") continue;
+                    const writer = new zip.TextWriter()
+                    const xml = await entry.getData(writer)
+                    const doc = parser.parseFromString(xml, "text/xml")
+                    const eparts = doc.getElementsByTagName("part")
+                    for (let epart of eparts) {
+                        const button = document.createElement("button")
+                        button.innerText = epart.id
+                        button.onclick = () => extractPart(epart, "1", code)
+                        button.style.fontSize = "18px"
+                        button.style.marginLeft = "20px"
+                        parts.appendChild(button)
+                    }
+                }
+                await reader.close()
+            }
+            reader.onerror = () => {
+                code.value = "bad file"
+            }
+            reader.readAsArrayBuffer(file)
+        })
     </script>
 </body>
 </html>

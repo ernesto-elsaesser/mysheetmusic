@@ -41,39 +41,7 @@ const CONNECTORS = {
     "end": "",
 }
 
-function importMXL(file, part, voice, title, onUpdate) {
-
-    onUpdate("extracting ...")
-
-    const reader = new FileReader()
-    reader.onload = async (event) => {
-        const array = new Uint8Array(event.target.result)
-        const rawReader = new zip.Uint8ArrayReader(array)
-        const reader = new zip.ZipReader(rawReader)
-        const entries = await reader.getEntries()
-        for (let entry of entries) {
-            if (entry.filename != "score.xml") continue;
-            const writer = new zip.TextWriter()
-            const xml = await entry.getData(writer)
-            onUpdate("parsing ...")
-            const result = parseXML(xml, part, voice)
-            onUpdate(result)
-        }
-        await reader.close();
-    };
-    reader.onerror = () => {
-        onUpdate("Error reading file.")
-    };
-    reader.readAsArrayBuffer(file)
-}
-
-function parseXML(xml, part, voice) {
-
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(xml, "text/xml")
-
-    const eparts = doc.getElementsByTagName("part")
-    const epart = eparts[part - 1]
+function extractPart(epart, voice, textarea) {
 
     const emeasures = epart.getElementsByTagName("measure")
 
@@ -177,5 +145,5 @@ function parseXML(xml, part, voice) {
         measures.push(lines)
     }
 
-    return measures.map((m) => m.join("\n")).join("\n\n")
+    textarea.value = measures.map((m) => m.join("\n")).join("\n\n")
 }

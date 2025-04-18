@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicXML File Import</title>
+    <script src="zip.js"></script>
+    <script src="import.js"></script>
+</head>
+<body>
+    <h1>MusicXML File Import</h1>
+    <form>
+        <label for="file">MusicXML file (.mxl):</label><br/>
+        <input type="file" id="file" name="file" accept=".mxl"><br/>
+        <label for="part">Part:</label><br/>
+        <input type="number" id="part" name="part" min="1" max="9" value="1"><br/>
+        <label for="title">Title:</label><br/>
+        <input type="text" id="title" name="title"><br/>
+        <input type="button" onclick="upload()" value="Upload">
+    </form>
+    <textarea id="code"></textarea>
+
+    <script>
+        const fileInput = document.getElementById('file')
+        const partInput = document.getElementById('part')
+        const titleInput = document.getElementById('title')
+        const code = document.getElementById('code')
+
+        function upload() {
+            code.value = ""
+            if (fileInput.files.length == 0) return
+            const file = fileInput.files[0]
+            const part = partInput.valueAsNumber
+            const title = titleInput.value
+            importMXL(file, part, "1", title, (m) => code.value = m)
+        }
+    </script>
+</body>
+</html>

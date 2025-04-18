@@ -66,7 +66,7 @@ function extractPart(epart, voice, textarea) {
             }
         }
 
-        // TODO parse <harmony>
+        // TODO parse <harmony> for chords
 
         var notes = []
         var lines = []
@@ -114,8 +114,15 @@ function extractPart(epart, voice, textarea) {
                 code = degree.toString() + modifier + OCTAVES[octave]
             }
 
-            const duration = whole / parseInt(eduration.innerHTML)
-            code += DURATIONS[duration]
+            const length = whole / parseInt(eduration.innerHTML)
+            var duration = DURATIONS[length]
+            if (duration == undefined) {
+                duration = "?"
+                const edot = enote.getElementsByTagName("dot")[0]
+                if (edot) duration += "."
+                console.log("ERROR: UNMAPPED DURATION", eduration)
+            }
+            code += duration
 
             const etie = enote.getElementsByTagName("tie")[0]
             if (etie) {
@@ -123,20 +130,18 @@ function extractPart(epart, voice, textarea) {
                 if (type == "stop") code = "~" + code
             }
 
+            // TODO: <time-modification> for triplets
+
             notes.push(code)
+
             const elyrics = enote.getElementsByTagName("lyric")
-            if (lines.length == 0) {
-                lines = Array.from(elyrics).map(function(elyric) {
-                    const text = elyric.getElementsByTagName("text")[0].innerHTML
-                    return text
-                })
-            } else {
-                for (var i = 0; i < elyrics.length; i += 1) {
-                    const elyric = elyrics[i]
-                    const syllabic = elyric.getElementsByTagName("syllabic")[0].innerHTML
-                    const text = elyric.getElementsByTagName("text")[0].innerHTML
-                    lines[i] += CONNECTORS[syllabic] + text
-                }
+            while (elyrics.length > lines.length) lines.push("")
+            for (let elyric of elyrics) {
+                const index = parseInt(elyric.attributes["number"].nodeValue) - 1
+                const syllabic = elyric.getElementsByTagName("syllabic")[0].innerHTML
+                var text = elyric.getElementsByTagName("text")[0].innerHTML
+                if (lines[index]) lines[index] += CONNECTORS[syllabic] + text
+                else lines[index] = text
             }
         }
 

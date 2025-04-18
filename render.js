@@ -5,7 +5,7 @@ const PITCHES = {
     "1''": "c/6", "2''": "d/6", "3''": "e/6", "4''": "f/6",  "5''": "g/6", 
 }
 
-function renderSong(textarea, sheet) {
+function renderSong(textarea, verse, sheet) {
 
     let measures = textarea.value.split("\n\n")
 
@@ -14,24 +14,25 @@ function renderSong(textarea, sheet) {
 
     sheet.innerHTML = ""
 
-    var maxLines = 0
+    var rowCount = 1
     for (let i = 0; i < measures.length; i += 1) {
         let measure = measures[i]
         if (measure == "") continue
         let lines = measure.split("\n")
         if (lines[0] == "") continue
 
+        let melody = lines[0]
+        let text = lines[verse] ?? ""
+        if (lines.length > rowCount) rowCount = lines.length
+
         let nextMeasure = measures[i+1]
         let tieEnd = nextMeasure && (nextMeasure[0] == "~")
-
-        while (lines.length < maxLines) lines.push("&nbsp;")
-        if (lines.length > maxLines) maxLines = lines.length
 
         let element = document.createElement("div")
         element.className = "measure"
 
         try {
-            createMeasure(element, color, lines, tieEnd)
+            createMeasure(element, color, melody, text, tieEnd)
         } catch (error) {
             element.innerText = error.toString()
             element.style.color = "red"
@@ -39,18 +40,20 @@ function renderSong(textarea, sheet) {
 
         sheet.appendChild(element)
     }
+
+    return rowCount
 }
 
-function createMeasure(element, color, lines, tieEnd) {
+function createMeasure(element, color, melody, text, tieEnd) {
 
-  let melody = lines.shift().split(" ")
+  let codes = melody.split(" ")
 
   var notes = []
   var ties = []
   var tuplets = []
-  for (var i = 0; i < melody.length; i += 1) {
+  for (var i = 0; i < codes.length; i += 1) {
 
-    let data = melody[i].split("")
+    let data = codes[i].split("")
 
     var tie = false
     if (data[0] == "~") {
@@ -139,14 +142,12 @@ function createMeasure(element, color, lines, tieEnd) {
     })
   }
 
-  var note_count = notes.length
-  if (note_count < 2) note_count = 2
-  for (let line of lines) {
-    let adj_count = (2 + line.length) / 4.5
-    if (adj_count > note_count) note_count = adj_count
-  }
+  var noteCount = notes.length
+  if (noteCount < 2) noteCount = 2
+  let wordCount = (2 + text.length) / 4.5
+  if (wordCount > noteCount) noteCount = wordCount
 
-  let width = note_count * 40
+  let width = noteCount * 40
   element.style.width = (width * 0.8).toString() + "px"
 
   let renderer = new Vex.Flow.Renderer(element, Vex.Flow.Renderer.Backends.SVG)
@@ -172,12 +173,10 @@ function createMeasure(element, color, lines, tieEnd) {
     tuplet.setContext(context).draw()
   })
 
-  for (var i = 0; i < lines.length; i += 1) {
-      let lyrics = document.createElement("div")
-      lyrics.className = "lyrics"
-      lyrics.innerHTML = lines[i]
-      element.appendChild(lyrics)
-  }
+  let lyrics = document.createElement("div")
+  lyrics.className = "lyrics"
+  lyrics.innerHTML = text
+  element.appendChild(lyrics)
 }
 
 function transpose(textarea, shift) {

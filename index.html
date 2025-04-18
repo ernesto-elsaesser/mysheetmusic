@@ -5,7 +5,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Sheet Music</title>
-    <link rel="stylesheet" href="style.css?v=20250329" />
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
+    <script src="render.js?v=20250418"></script>
+    <link rel="stylesheet" href="style.css?v=20250418" />
 </head>
 
 <body>
@@ -14,6 +16,7 @@
         <select id="picker" class="toolbar" onchange="select()">
             <option>Loading ...</option>
         </select>
+        <div id="verses"></div>
         <button id="edit" onclick="edit()" hidden>EDIT</button>
         <button id="revert" class="menu" onclick="select()" hidden>ABORT</button>
         <button id="transpose" onclick="trans()">SHIFT</button>
@@ -26,14 +29,13 @@
         <div id="sheet"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="render.js?v=20250325"></script>
     <script>
 
         const NEW = "< New Song >"
         const EXAMPLE = "3o.1 4x 5h5 ~5o. 3x\nIn the town, where\n\n2o.4 3x 1h.1\nI was born ..."
 
         let picker = document.getElementById('picker')
+        let verses = document.getElementById('verses')
         let editButton = document.getElementById('edit')
         let revertButton = document.getElementById('revert')
         let transposeButton = document.getElementById('transpose')
@@ -91,10 +93,20 @@
         }
 
         function render() {
-            renderSong(code, sheet)
+
+            verses.innerHTML = ""
+            const rowCount = renderSong(code, 1, sheet)
+            if (rowCount < 3) return
+            for (let i = 1; i < rowCount; i += 1) {
+                const button = document.createElement("button")
+                button.innerText = i.toString()
+                button.onclick = () => renderSong(code, i, sheet)
+                verses.appendChild(button)
+            }
         }
 
         function edit() {
+
             editButton.hidden = true
             revertButton.hidden = false
             transposeButton.hidden = false
@@ -104,6 +116,7 @@
         }
 
         function trans() {
+
             let shift = prompt("Degrees:")
             if (shift == null) return
             transpose(code, parseInt(shift))

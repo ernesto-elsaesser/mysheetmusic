@@ -16,27 +16,27 @@ button {
     flex-wrap: wrap;
 }
 
-#toolbar * {
+#picker {
+    outline: none;
+    background-color: white;
+}
+
+#toolbar button, #toolbar select {
     height: 32px;
     border: 0;
     border-right: 1px solid;
     border-bottom: 1px solid;
 }
 
-#picker {
-    outline: none;
-    background-color: white;
-}
-
 #content {
     display: flex;
+    padding: 20px 0;
 }
 
 #code {
     flex-shrink: 0;
     width: 240px;
     height: 600px;
-    margin-top: 20px;
     margin-left: 20px;
     overflow: scroll;
     white-space: pre;
@@ -48,8 +48,11 @@ button {
 }
 
 .measure {
-    margin-top: 20px;
     float: left;
+}
+
+svg {
+    margin-bottom: -10px;
 }
 
 .lyrics {

@@ -139,7 +139,7 @@ function createMeasure(element, color, melody, text, tieEnd) {
     })
   }
 
-  let width = 120
+  let width = 125
   const textWidth = text.length * 10
   if (textWidth > width) width = textWidth
 

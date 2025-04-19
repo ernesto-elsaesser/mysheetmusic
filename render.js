@@ -176,3 +176,39 @@ function createMeasure(element, color, melody, text, tieEnd) {
   lyrics.innerHTML = text
   element.appendChild(lyrics)
 }
+
+function transposeCode(code, steps) {
+
+    let measures = code.split("\n\n")
+
+    function mapNote(note) {
+        
+        let found = [1, 2, 3, 4, 5, 6, 7].filter((i) => note.includes(i.toString()))
+
+        for (let a of found) {
+            let b = a + steps
+            if (b > 7) {
+                b -= 7
+                if (note.includes(",")) note = note.replace(a.toString() + ",", b.toString())
+                else note = note.substr(0, 2).replace(a.toString(), b.toString() + "'") + note.substr(2)
+             } else if (b < 1) {
+                b += 7
+                if (note.includes("'")) note = note.replace(a.toString() + "'", b.toString())
+                else note = note.substr(0, 2).replace(a.toString(), b.toString() + ",") + note.substr(2)
+             }
+            note = note.replace(a.toString(), b.toString())
+        }
+    
+        return note
+    }
+
+    for (let i = 0; i < measures.length; i += 1) {
+        let measure = measures[i]
+        if (measure == "") continue
+        let lines = measure.split("\n")
+        lines[0] = lines[0].split(" ").map(mapNote).join(" ")
+        measures[i] = lines.join("\n")
+    }
+
+    return measures.join("\n\n")
+}

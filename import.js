@@ -158,7 +158,7 @@ function extractCode(epart, voice) {
                 duration = "?"
                 const edot = node.getElementsByTagName("dot")[0]
                 if (edot) duration += "."
-                console.log("ERROR: UNMAPPED DURATION", eduration)
+                console.log("ERROR: UNMAPPED DURATION", node)
             }
             code += duration
 

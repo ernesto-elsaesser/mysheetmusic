@@ -19,7 +19,7 @@
         <div id="verses"></div>
         <button id="show" onclick="showCode()" hidden>CODE</button>
         <button id="hide" onclick="hideCode()" hidden>BACK</button>
-        <button id="save" onclick="saveCode()" hidden>SAVE</button>
+        <button id="save" onclick="saveSong()" hidden>SAVE</button>
     </div>
 
     <div id="content">
@@ -106,7 +106,12 @@
             editor.hidden = true
         }
 
-        async function saveCode() {
+        function transposeSong(steps) {
+
+            editor.value = transposeCode(editor.value, steps)
+        }
+
+        async function saveSong() {
 
             const res = await fetch('songs.php', {
                 method: 'POST',

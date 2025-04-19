@@ -16,7 +16,7 @@ button {
     flex-wrap: wrap;
 }
 
-#picker {
+select {
     outline: none;
     background-color: white;
 }

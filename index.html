@@ -13,11 +13,10 @@
 <body>
 
     <div id="toolbar">
-        <select id="song" class="toolbar" onchange="selectSong()">
+        <select id="picker" class="toolbar" onchange="selectSong()">
             <option>Loading ...</option>
         </select>
-        <select id="part" class="toolbar" onchange="selectPart()">
-        </select>
+        <div id="verses"></div>
         <button id="show" onclick="showCode()" hidden>CODE</button>
         <button id="hide" onclick="hideCode()" hidden>BACK</button>
         <button id="save" onclick="saveCode()" hidden>SAVE</button>
@@ -30,8 +29,8 @@
 
     <script>
 
-        let songSelect = document.getElementById('song')
-        let partSelect = document.getElementById('part')
+        let picker = document.getElementById('picker')
+        let verses = document.getElementById('verses')
         let showButton = document.getElementById('show')
         let hideButton = document.getElementById('hide')
         let saveButton = document.getElementById('save')
@@ -39,7 +38,6 @@
         let sheet = document.getElementById('sheet')
 
         var songs = {}
-        var parts = {}
 
         async function loadSongs() {
 
@@ -52,18 +50,17 @@
 
             songs = await res.json()
 
-            songSelect.innerHTML = ""
+            picker.innerHTML = ""
 
-            let names = Object.keys(songs.txt)
-            Object.keys(songs.xml).forEach((name) => names.push("*" + name ))
+            const names = Object.keys(songs).sort()
 
-            names.sort().forEach((name) => {
+            names.forEach((name) => {
                 let option = document.createElement('option')
                 option.value = name
                 option.innerText = name
                 // TODO select anchor
                 option.selected = name == names[0]
-                songSelect.appendChild(option)
+                picker.appendChild(option)
             })
 
             selectSong()
@@ -73,35 +70,21 @@
 
             hideCode()
 
-            const name = songSelect.value
-            if (name.startsWith("*")) parts = parseXML(songs.xml[name.slice(1)])
-            else parts = {"P1": songs.txt[name]}
-
-            partSelect.innerHTML = ""
-
-            // TODO option for each verse
-            const partIds = Object.keys(parts)
-            partIds.forEach((partId) => {
-                let option = document.createElement('option')
-                option.value = partId
-                option.innerText = partId
-                option.selected = partId == partIds[0]
-                partSelect.appendChild(option)
-            })
-
-            selectPart()
-        }
-
-        function selectPart() {
-
-            const partId = partSelect.value
-            const code = parts[partId]
+            const code = songs[picker.value]
             editor.value = code
 
             let dark = window.matchMedia('(prefers-color-scheme: dark)').matches
             let color = dark ? "white" : "black"
 
-            renderPart(code, 1, sheet, color)
+            verses.innerHTML = ""
+            const rowCount = renderCode(code, 1, sheet, color)
+            if (rowCount < 3) return
+            for (let i = 1; i < rowCount; i += 1) {
+                const button = document.createElement("button")
+                button.innerText = i.toString()
+                button.onclick = () => renderCode(code, i, sheet, color)
+                verses.appendChild(button)
+            }
         }
 
         function showCode() {
@@ -124,11 +107,10 @@
 
         async function saveCode() {
 
-            const name = songSelect.value
             const res = await fetch('songs.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: "name=" + name + "&data=" + editor.value
+                body: "name=" + picker.value + "&data=" + editor.value
             })
 
             if (res.status == 201) loadSongs()

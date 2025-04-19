@@ -7,21 +7,19 @@ if (!is_writable($DIR)) {
 }
 
 if (isset($_POST['name'])) {
-    $file = $DIR . '/' . $_POST['name'] . '.xml';
+    $file = $DIR . '/' . $_POST['name'] . '.txt';
     $count = file_put_contents($file, $_POST['data']);
     chmod($file, 0666);
     http_response_code($count ? 201 : 401);
-    echo $_POST['name'] . " saved.";
-    exit();
 }
 
 $files = scandir($DIR);
-$songs = ["txt" => [], "xml" => []];
+$songs = array();
 foreach( $files as $file ) {
     $parts = explode('.', $file);
+    if ($parts[1] != 'txt') continue;
     $name = $parts[0];
-    $ext = $parts[1];
-    $songs[$ext][$name] = file_get_contents($DIR . '/' . $file);
+    $songs[$name] = file_get_contents($DIR . '/' . $file);
 }
 
 echo json_encode($songs);

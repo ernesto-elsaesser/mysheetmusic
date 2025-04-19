@@ -5,53 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MusicXML Import</title>
     <script src="zip.js"></script>
+    <script src="import.js"></script>
     <link rel="stylesheet" href="style.css?v=20250418" />
 </head>
 <body>
     <div id="content">
         <h1>MusicXML Import</h1>
-        <p>
-            <input type="file" id="file" name="file" accept=".mxl">
-        <p>
-        <form action="songs.php" method="POST">
-            <label for="name">Title:</label> <input type="text" id="name" name="name" size="48"><br/>
-            <input type="text" id="data" name="data" hidden><br/>
-            <input type="submit"><br/>
-        </form>
+        <input type="file" id="file" accept=".mxl"> <input type="text" id="name" size="48"><br/>
+        <div id="parts"></div>
+        <textarea id="editor"></textarea>
+        <button onclick="saveCode">UPLOAD</button>
     </div>
 
     <script>
-        const fileInput = document.getElementById('file')
-        const nameInput = document.getElementById('name')
-        const dataInput = document.getElementById('data')
+const fileInput = document.getElementById('file')
+const nameInput = document.getElementById('name')
+const parts = document.getElementById('parts')
+const editor = document.getElementById('editor')
 
-        fileInput.addEventListener('change', (event) => {
+const parser = new DOMParser()
 
-            dataInput.value = ""
+fileInput.addEventListener('change', (event) => {
+    const file = event.target.files[0]
+    if (file == null) return
 
-            const file = event.target.files[0]
-            if (file == undefined) return
+    nameInput.value = file.name.replace("_", " ")
+    parts.innerHTML = ""
 
-            nameInput.value = file.name.replace("_", " ")
-
-            const reader = new FileReader()
-            reader.onload = async (event) => {
-                const array = new Uint8Array(event.target.result)
-                const rawReader = new zip.Uint8ArrayReader(array)
-                const reader = new zip.ZipReader(rawReader)
-                const entries = await reader.getEntries()
-                for (let entry of entries) {
-                    if (entry.filename != "score.xml") continue;
-                    const writer = new zip.TextWriter()
-                    dataInput.value = await entry.getData(writer)
-                }
-                await reader.close()
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+        const array = new Uint8Array(event.target.result)
+        const rawReader = new zip.Uint8ArrayReader(array)
+        const reader = new zip.ZipReader(rawReader)
+        const entries = await reader.getEntries()
+        for (let entry of entries) {
+            if (entry.filename != "score.xml") continue;
+            const writer = new zip.TextWriter()
+            const xml = await entry.getData(writer)
+            const doc = parser.parseFromString(xml, "text/xml")
+            const eparts = doc.getElementsByTagName("part")
+            for (let epart of eparts) {
+                const button = document.createElement("button")
+                button.innerText = epart.id
+                button.onclick = () => editor.value = extractPart(epart, "1")
+                button.style.fontSize = "18px"
+                parts.appendChild(button)
             }
-            reader.onerror = () => {
-                window.alert("can't read file!")
-            }
-            reader.readAsArrayBuffer(file)
-        })
+            addShiftButtons()
+        }
+        await reader.close()
+    }
+    reader.onerror = () => {
+        editor.value = "bad file"
+    }
+    reader.readAsArrayBuffer(file)
+})
+
+function addShiftButtons() {
+
+    const buttonUp = document.createElement("button")
+    buttonUp.innerText = "+"
+    buttonUp.onclick = () => editor.value = transposeCode(editor.value, true)
+    buttonUp.style.fontSize = "18px"
+    parts.appendChild(buttonUp)
+    
+    const buttonDown = document.createElement("button")
+    buttonDown.innerText = "-"
+    buttonDown.onclick = () => editor.value = transposeCode(editor.value, false)
+    buttonDown.style.fontSize = "18px"
+    parts.appendChild(buttonDown)
+}
+
+function saveCode() {
+    fetch('songs.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: "name=" + nameInput.value + "&data=" + editor.value
+    }).then((res) => window.alert(res.statusText))
+}
     </script>
 </body>
 </html>

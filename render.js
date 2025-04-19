@@ -139,12 +139,10 @@ function createMeasure(element, color, melody, text, tieEnd) {
     })
   }
 
-  var noteCount = notes.length
-  if (noteCount < 2) noteCount = 2
-  let wordCount = (2 + text.length) / 4.5
-  if (wordCount > noteCount) noteCount = wordCount
+  let width = 120
+  const textWidth = text.length * 10
+  if (textWidth > width) width = textWidth
 
-  let width = noteCount * 40
   element.style.width = (width * 0.8).toString() + "px"
 
   let renderer = new Vex.Flow.Renderer(element, Vex.Flow.Renderer.Backends.SVG)

@@ -18,9 +18,9 @@
         </select>
         <select id="part" class="toolbar" onchange="selectPart()">
         </select>
-        <button id="edit" onclick="edit()" hidden>EDIT</button>
-        <button id="revert" class="menu" onclick="select()" hidden>ABORT</button>
-        <button id="save" onclick="save()" hidden>SAVE</button>
+        <button id="show" onclick="showCode()" hidden>CODE</button>
+        <button id="hide" onclick="hideCode()" hidden>BACK</button>
+        <button id="save" onclick="saveCode()" hidden>SAVE</button>
     </div>
 
     <div id="content">
@@ -32,8 +32,8 @@
 
         let songSelect = document.getElementById('song')
         let partSelect = document.getElementById('part')
-        let editButton = document.getElementById('edit')
-        let revertButton = document.getElementById('revert')
+        let showButton = document.getElementById('show')
+        let hideButton = document.getElementById('hide')
         let saveButton = document.getElementById('save')
         let editor = document.getElementById('editor')
         let sheet = document.getElementById('sheet')
@@ -69,10 +69,7 @@
 
         function selectSong() {
 
-            editButton.hidden = false
-            revertButton.hidden = true
-            saveButton.hidden = true
-            editor.hidden = true
+            hideCode()
 
             const name = songSelect.value
             const xml = songs.xml[name]
@@ -106,15 +103,25 @@
             renderPart(code, 1, sheet, color)
         }
 
-        function edit() {
+        function showCode() {
 
-            editButton.hidden = true
-            revertButton.hidden = false
+            showButton.hidden = true
+            hideButton.hidden = false
             saveButton.hidden = false
+            sheet.hidden = true
             editor.hidden = false
         }
 
-        async function save() {
+        function hideCode() {
+
+            showButton.hidden = false
+            hideButton.hidden = true
+            saveButton.hidden = true
+            sheet.hidden = false
+            editor.hidden = true
+        }
+
+        async function saveCode() {
 
             const name = songSelect.value
             const res = await fetch('songs.php', {

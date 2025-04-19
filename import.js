@@ -23,15 +23,16 @@ const OCTAVES = {
 }
 
 const DURATIONS = {
-    1: "w",
-    2: "h",
-    3: "h.",
-    4: "q",
-    6: "q.",
-    8: "o",
-    12: "o.",
-    16: "x",
-    32: "z",
+    32: "w",
+    24: "h.",
+    16: "h",
+    12: "q.",
+    8: "q",
+    6: "o.",
+    4: "o",
+    3: "x.",
+    2: "x",
+    1: "z",
 }
 
 const CONNECTORS = {
@@ -45,7 +46,7 @@ function extractCode(epart, voice) {
 
     const emeasures = epart.getElementsByTagName("measure")
 
-    var whole = 4
+    var baseLength = 2
     var downshift = 0
     var measures = []
     for (let emeasure of emeasures) {
@@ -62,7 +63,7 @@ function extractCode(epart, voice) {
             }
             const edivisions = eattr.getElementsByTagName("divisions")[0]
             if (edivisions) {
-                whole = parseInt(edivisions.innerHTML) * 4
+                baseLength = parseInt(edivisions.innerHTML) / 2
             }
         }
 
@@ -98,10 +99,10 @@ function extractCode(epart, voice) {
                 const ealter = enote.getElementsByTagName("alter")[0]
 
                 const step = estep.innerHTML
-                const octave = parseInt(eoctave.innerHTML)
+                var degree = PITCHES.indexOf(step) + 1 - downshift
+                var octave = parseInt(eoctave.innerHTML)
                 const alter = ealter ? parseInt(ealter.innerHTML ?? "0") : 0
                 
-                var degree = PITCHES.indexOf(step) + 1 - downshift
                 var modifier = ""
                 if (alter != 0) {
                     modifier = "#"
@@ -114,7 +115,7 @@ function extractCode(epart, voice) {
                 code = degree.toString() + modifier + OCTAVES[octave]
             }
 
-            const length = whole / parseInt(eduration.innerHTML)
+            const length = parseInt(eduration.innerHTML) * baseLength
             var duration = DURATIONS[length]
             if (duration == undefined) {
                 duration = "?"

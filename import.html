@@ -29,7 +29,7 @@ fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0]
     if (file == null) return
 
-    nameInput.value = file.name.split(".")[0].replace("_", " ")
+    nameInput.value = file.name.split(".")[0].replaceAll("_", " ")
     parts.innerHTML = ""
 
     const reader = new FileReader()
@@ -39,7 +39,7 @@ fileInput.addEventListener('change', (event) => {
         const reader = new zip.ZipReader(rawReader)
         const entries = await reader.getEntries()
         for (let entry of entries) {
-            if (entry.filename != "score.xml") continue;
+            if (entry.filename.startsWith("META-INF")) continue
             const writer = new zip.TextWriter()
             const xml = await entry.getData(writer)
             const doc = parser.parseFromString(xml, "text/xml")

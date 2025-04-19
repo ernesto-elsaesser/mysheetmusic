@@ -39,7 +39,7 @@
 
         var songs = {}
 
-        async function loadSongs() {
+        async function loadSongs(selected) {
 
             const res = await fetch("songs.php")
 
@@ -58,8 +58,7 @@
                 let option = document.createElement('option')
                 option.value = name
                 option.innerText = name
-                // TODO select anchor
-                option.selected = name == names[0]
+                option.selected = name == selected
                 picker.appendChild(option)
             })
 
@@ -69,6 +68,8 @@
         function selectSong() {
 
             hideCode()
+
+            window.location.hash = "#" + picker.value
 
             const code = songs[picker.value]
             editor.value = code
@@ -113,11 +114,12 @@
                 body: "name=" + picker.value + "&data=" + editor.value
             })
 
-            if (res.status == 201) loadSongs()
+            if (res.status == 201) loadSongs(picker.value)
             else window.alert(res.statusText)
         }
 
-        loadSongs()
+        const anchor = decodeURIComponent(window.location.hash.slice(1))
+        loadSongs(anchor)
 
     </script>
 </body>

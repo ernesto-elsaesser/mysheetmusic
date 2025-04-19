@@ -49,6 +49,10 @@ fileInput.addEventListener('change', (event) => {
                 button.innerText = epart.id
                 button.onclick = () => editor.value = extractCode(epart, "1")
                 parts.appendChild(button)
+                const srcButton = document.createElement("button")
+                srcButton.innerText = epart.id + " (XML)"
+                srcButton.onclick = () => editor.value = epart.outerHTML
+                parts.appendChild(srcButton)
             }
             addShiftButtons()
             editor.value = extractCode(eparts[0], "1")

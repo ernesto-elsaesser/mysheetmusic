@@ -69,10 +69,11 @@ function extractCode(epart, voice) {
 
         // TODO parse <harmony> for chords
 
-        var notes = []
-        var lines = []
+        let notes = []
+        let lines = []
+        let inSlur = false
         const enotes = emeasure.getElementsByTagName("note")
-        for (let enote of enotes) {
+        for (const enote of enotes) {
 
             const echord = enote.getElementsByTagName("chord")[0]
             if (echord) continue
@@ -87,7 +88,7 @@ function extractCode(epart, voice) {
             if (eduration == undefined) continue
 
             const epitch = enote.getElementsByTagName("pitch")[0]
-            var code = "0"
+            let code = "0"
             if (epitch == undefined) {
                 const erest = enote.getElementsByTagName("rest")[0]
                 if (erest == undefined) {
@@ -99,14 +100,14 @@ function extractCode(epart, voice) {
                 const ealter = enote.getElementsByTagName("alter")[0]
 
                 const step = estep.innerHTML
-                var degree = PITCHES.indexOf(step) + 1 - DOWNSHIFTS[fifths]
-                var octave = parseInt(eoctave.innerHTML)
-                var alter = ealter ? ealter.innerHTML : "0"
+                let degree = PITCHES.indexOf(step) + 1 - DOWNSHIFTS[fifths]
+                let octave = parseInt(eoctave.innerHTML)
+                let alter = ealter ? ealter.innerHTML : "0"
 
                 if (fifths == "-1" && alter == "-1" && step == "B") alter = "0"
                 if (fifths == "1" && alter == "1" && step == "F") alter = "0"
                 
-                var modifier = ""
+                let modifier = ""
                 if (alter != 0) {
                     modifier = "#"
                     if (alter == -1) degree -= 1
@@ -119,7 +120,7 @@ function extractCode(epart, voice) {
             }
 
             const length = parseInt(eduration.innerHTML) * baseLength
-            var duration = DURATIONS[length]
+            let duration = DURATIONS[length]
             if (duration == undefined) {
                 duration = "?"
                 const edot = enote.getElementsByTagName("dot")[0]
@@ -128,11 +129,25 @@ function extractCode(epart, voice) {
             }
             code += duration
 
+            let isTied = inSlur
+
+            const enotations = enote.getElementsByTagName("notations")[0]
+            if (enotations) {
+                const eslur = enotations.getElementsByTagName("slur")[0]
+                if (eslur) {
+                    const type = eslur.attributes["type"].nodeValue
+                    if (type == "start") inSlur = true
+                    else if (type == "stop") inSlur = false
+                }
+            }
+
             const etie = enote.getElementsByTagName("tie")[0]
             if (etie) {
                 const type = etie.attributes["type"].nodeValue
-                if (type == "stop") code = "~" + code
+                if (type == "stop") isTied = true
             }
+
+            if (isTied) code = "~" + code
 
             // TODO: <time-modification> for triplets
 
@@ -140,11 +155,11 @@ function extractCode(epart, voice) {
 
             const elyrics = enote.getElementsByTagName("lyric")
             while (elyrics.length > lines.length) lines.push("")
-            for (let elyric of elyrics) {
+            for (const elyric of elyrics) {
                 const index = parseInt(elyric.attributes["number"].nodeValue) - 1
                 const syllabic = elyric.getElementsByTagName("syllabic")[0].innerHTML
                 const text = elyric.getElementsByTagName("text")[0].innerHTML
-                var line = lines[index]
+                let line = lines[index]
                 if (line.endsWith("-")) line = line.slice(0, -1)
                 line += text
                 line += INFIXES[syllabic]

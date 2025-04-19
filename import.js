@@ -12,6 +12,7 @@ const DOWNSHIFTS = {
     "-1": 3,
     "0": 0,
     "1": 4,
+    "2": 1,
 }
 
 const OCTAVES = {
@@ -44,15 +45,16 @@ const INFIXES = {
 
 function parseNote(step, octave, alter, fifths) {
 
-    if (fifths == "-1" && alter == "-1" && step == "B") alter = null
-    if (fifths == "1" && alter == "1" && step == "F") alter = null
+    if (fifths < 0 && alter == -1 && step == "B") alter = 0
+    if (fifths > 0 && alter == 1 && step == "F") alter = 0
+    if (fifths > 1 && alter == 1 && step == "C") alter = 0
 
     let degree = PITCHES.indexOf(step) + 1 - DOWNSHIFTS[fifths]
     
     let sharp = false
-    if (alter) {
+    if (alter != 0) {
         sharp = true
-        if (alter == "-1") degree -= 1
+        if (alter == -1) degree -= 1
     }
     if (degree < 1) {
         degree += 7
@@ -69,10 +71,10 @@ function extractCode(epart, voice) {
 
     const emeasures = epart.getElementsByTagName("measure")
 
-    var baseLength = 2
-    var fifths = "0"
-    var measures = []
-    for (let emeasure of emeasures) {
+    let baseLength = 2
+    let fifths = 0
+    let measures = []
+    for (const emeasure of emeasures) {
 
         const eattr = emeasure.getElementsByTagName("attributes")[0]
         if (eattr) {
@@ -82,7 +84,7 @@ function extractCode(epart, voice) {
                     console.log("ERROR: SECOND KEY", emeasure)
                 }
                 const efifths = ekey.getElementsByTagName("fifths")[0]
-                fifths = efifths.innerHTML
+                fifths = parseInt(efifths.innerHTML)
             }
             const edivisions = eattr.getElementsByTagName("divisions")[0]
             if (edivisions) {
@@ -106,7 +108,7 @@ function extractCode(epart, voice) {
                 const estep = eroot.getElementsByTagName("root-step")[0]
                 const ealter = eroot.getElementsByTagName("root-alter")[0]
                 const ekind = node.getElementsByTagName("kind")[0]
-                const alter = ealter ? ealter.innerHTML : null
+                const alter = ealter ? parseInt(ealter.innerHTML) : 0
                 const note = parseNote(estep.innerHTML, 0, alter, fifths)
                 chord = note.degree.toString()
                 if (chord.sharp) chord += "#"
@@ -141,7 +143,7 @@ function extractCode(epart, voice) {
                 const ealter = node.getElementsByTagName("alter")[0]
 
                 const octave = parseInt(eoctave.innerHTML)
-                const alter = ealter ? ealter.innerHTML : null
+                const alter = ealter ? parseInt(ealter.innerHTML) : 0
                 const note = parseNote(estep.innerHTML, octave, alter, fifths)
 
                 code = note.degree.toString() + OCTAVES[note.octave]

@@ -11,6 +11,8 @@ if (isset($_POST['name'])) {
     $count = file_put_contents($file, $_POST['data']);
     chmod($file, 0666);
     http_response_code($count ? 201 : 401);
+    echo $_POST['name'] . " saved.";
+    exit();
 }
 
 $files = scandir($DIR);

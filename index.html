@@ -41,10 +41,11 @@
         var songs = {}
         var parts = {}
 
-        async function load(res) {
+        async function loadSongs() {
 
-            if (res.status > 201) {
-                build(["ERROR"])
+            const res = await fetch("songs.php")
+
+            if (res.status != 200) {
                 window.alert(res.statusText)
                 return
             }
@@ -53,7 +54,8 @@
 
             songSelect.innerHTML = ""
 
-            const names = [...Object.keys(songs.txt), ...Object.keys(songs.xml)]
+            let names = Object.keys(songs.txt)
+            Object.keys(songs.xml).forEach((name) => names.push("*" + name ))
 
             names.sort().forEach((name) => {
                 let option = document.createElement('option')
@@ -72,8 +74,7 @@
             hideCode()
 
             const name = songSelect.value
-            const xml = songs.xml[name]
-            if (xml) parts = parseXML(xml)
+            if (name.startsWith("*")) parts = parseXML(songs.xml[name.slice(1)])
             else parts = {"P1": songs.txt[name]}
 
             partSelect.innerHTML = ""
@@ -127,13 +128,14 @@
             const res = await fetch('songs.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: "name=" + current + "&data=" + code.value
+                body: "name=" + name + "&data=" + editor.value
             })
 
-            load(res)
+            if (res.status == 201) loadSongs()
+            else window.alert(res.statusText)
         }
 
-        fetch("songs.php").then(load)
+        loadSongs()
 
     </script>
 </body>

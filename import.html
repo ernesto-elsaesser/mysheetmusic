@@ -8,24 +8,31 @@
     <link rel="stylesheet" href="style.css?v=20250418" />
 </head>
 <body>
-    <div style="margin-left: 20px">
+    <div id="content">
         <h1>MusicXML Import</h1>
-        <input type="file" id="file" name="file" accept=".mxl">
+        <p>
+            <input type="file" id="file" name="file" accept=".mxl">
+        <p>
         <form action="songs.php" method="POST">
-            <label for="name">Title:</label> <input type="text" id="name" name="name">
-            <input type="text" id="data" name="data" hidden>
-            <input type="submit">
+            <label for="name">Title:</label> <input type="text" id="name" name="name" size="48"><br/>
+            <input type="text" id="data" name="data" hidden><br/>
+            <input type="submit"><br/>
         </form>
     </div>
 
     <script>
-        document.getElementById('file').addEventListener('change', (event) => {
+        const fileInput = document.getElementById('file')
+        const nameInput = document.getElementById('name')
+        const dataInput = document.getElementById('data')
 
-            const data = document.getElementById('data')
-            data.value = ""
+        fileInput.addEventListener('change', (event) => {
+
+            dataInput.value = ""
 
             const file = event.target.files[0]
             if (file == undefined) return
+
+            nameInput.value = file.name.replace("_", " ")
 
             const reader = new FileReader()
             reader.onload = async (event) => {
@@ -36,7 +43,7 @@
                 for (let entry of entries) {
                     if (entry.filename != "score.xml") continue;
                     const writer = new zip.TextWriter()
-                    data.value = await entry.getData(writer)
+                    dataInput.value = await entry.getData(writer)
                 }
                 await reader.close()
             }

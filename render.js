@@ -140,10 +140,11 @@ function createMeasure(element, color, melody, text, tieEnd) {
   }
 
   let width = 100
-  if (notes.length > 4) width = 140
-  if (notes.length > 6) width = 180
+  if (notes.length > 2) width = 130
+  if (notes.length > 4) width = 160
+  if (notes.length > 6) width = 190
   if (notes.length > 8) width = 220
-  const textWidth = text.length * 10
+  const textWidth = text.length * 9
   if (textWidth > width) width = textWidth
 
   element.style.width = (width * 0.8).toString() + "px"

@@ -35,11 +35,11 @@ const DURATIONS = {
     1: "z",
 }
 
-const CONNECTORS = {
+const INFIXES = {
     "single": " ",
-    "begin": " ",
-    "middle": "",
-    "end": "",
+    "begin": "-",
+    "middle": "-",
+    "end": " ",
 }
 
 function extractCode(epart, voice) {
@@ -47,7 +47,7 @@ function extractCode(epart, voice) {
     const emeasures = epart.getElementsByTagName("measure")
 
     var baseLength = 2
-    var downshift = 0
+    var fifths = "0"
     var measures = []
     for (let emeasure of emeasures) {
 
@@ -58,8 +58,8 @@ function extractCode(epart, voice) {
                 if (measures.length > 0) {
                     console.log("ERROR: SECOND KEY", emeasure)
                 }
-                const fifths = ekey.getElementsByTagName("fifths")[0]
-                downshift = DOWNSHIFTS[fifths.innerHTML]
+                const efifths = ekey.getElementsByTagName("fifths")[0]
+                fifths = efifths.innerHTML
             }
             const edivisions = eattr.getElementsByTagName("divisions")[0]
             if (edivisions) {
@@ -99,9 +99,12 @@ function extractCode(epart, voice) {
                 const ealter = enote.getElementsByTagName("alter")[0]
 
                 const step = estep.innerHTML
-                var degree = PITCHES.indexOf(step) + 1 - downshift
+                var degree = PITCHES.indexOf(step) + 1 - DOWNSHIFTS[fifths]
                 var octave = parseInt(eoctave.innerHTML)
-                const alter = ealter ? parseInt(ealter.innerHTML ?? "0") : 0
+                var alter = ealter ? ealter.innerHTML : "0"
+
+                if (fifths == "-1" && alter == "-1" && step == "B") alter = "0"
+                if (fifths == "1" && alter == "1" && step == "F") alter = "0"
                 
                 var modifier = ""
                 if (alter != 0) {
@@ -140,9 +143,12 @@ function extractCode(epart, voice) {
             for (let elyric of elyrics) {
                 const index = parseInt(elyric.attributes["number"].nodeValue) - 1
                 const syllabic = elyric.getElementsByTagName("syllabic")[0].innerHTML
-                var text = elyric.getElementsByTagName("text")[0].innerHTML
-                if (lines[index]) lines[index] += CONNECTORS[syllabic] + text
-                else lines[index] = text
+                const text = elyric.getElementsByTagName("text")[0].innerHTML
+                var line = lines[index]
+                if (line.endsWith("-")) line = line.slice(0, -1)
+                line += text
+                line += INFIXES[syllabic]
+                lines[index] = line
             }
         }
 

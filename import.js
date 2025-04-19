@@ -115,7 +115,7 @@ function extractCode(epart, voice) {
                     degree += 7
                     octave -= 1
                 }
-                code = degree.toString() + modifier + OCTAVES[octave]
+                code = degree.toString() + OCTAVES[octave] + modifier
             }
 
             const length = parseInt(eduration.innerHTML) * baseLength
@@ -152,6 +152,7 @@ function extractCode(epart, voice) {
             }
         }
 
+        lines = lines.map((l) => l.trim())
         const melody = notes.join(" ")
         lines.unshift(melody)
         measures.push(lines)

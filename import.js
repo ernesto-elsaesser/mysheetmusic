@@ -63,7 +63,7 @@ function extractCode(epart, voice) {
             }
             const edivisions = eattr.getElementsByTagName("divisions")[0]
             if (edivisions) {
-                baseLength = parseInt(edivisions.innerHTML) / 2
+                baseLength = 8 / parseInt(edivisions.innerHTML)
             }
         }
 

@@ -164,10 +164,17 @@ function transposeCode(code, up) {
         let notes = lines[0].split(" ")
         notes = notes.map((note) => {
             let head = note.slice(0, 1)
-            const mark = note.slice(1, 2)
+            if (head == "0") return note
+            let mark = note.slice(1, 2)
+            let tail = note.slice(2)
+            if(head == "~") {
+                head = note.slice(0, 2)
+                mark = note.slice(2, 3)
+                tail = note.slice(3)
+            }
             if (up && mark != ",") head += "'" + mark
             if (!up && mark != "'") head += "," + mark
-            return head + note.slice(2)
+            return head + tail
         })
         lines[0] = notes.join(" ")
         measures[i] = lines.join("\n")

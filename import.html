@@ -3,32 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MusicXML File Import</title>
+    <title>MusicXML Import</title>
     <script src="zip.js"></script>
-    <script src="import.js"></script>
     <link rel="stylesheet" href="style.css?v=20250418" />
 </head>
 <body>
     <div style="margin-left: 20px">
-        <h1>MusicXML File Import</h1>
+        <h1>MusicXML Import</h1>
         <input type="file" id="file" name="file" accept=".mxl">
+        <form action="songs.php" method="POST">
+            <label for="name">Title:</label> <input type="text" id="name" name="name">
+            <input type="text" id="data" name="data" hidden>
+            <input type="submit">
+        </form>
     </div>
 
-    <div id="parts"></div>
-
-    <textarea id="code"></textarea>
-
     <script>
-        const input = document.getElementById('file')
-        const parts = document.getElementById('parts')
-        const code = document.getElementById('code')
+        document.getElementById('file').addEventListener('change', (event) => {
 
-        const parser = new DOMParser()
+            const data = document.getElementById('data')
+            data.value = ""
 
-        input.addEventListener('change', () => {
-            if (input.files.length == 0) return
-            parts.innerHTML = ""
-            const file = input.files[0]
+            const file = event.target.files[0]
+            if (file == undefined) return
+
             const reader = new FileReader()
             reader.onload = async (event) => {
                 const array = new Uint8Array(event.target.result)
@@ -38,22 +36,12 @@
                 for (let entry of entries) {
                     if (entry.filename != "score.xml") continue;
                     const writer = new zip.TextWriter()
-                    const xml = await entry.getData(writer)
-                    const doc = parser.parseFromString(xml, "text/xml")
-                    const eparts = doc.getElementsByTagName("part")
-                    for (let epart of eparts) {
-                        const button = document.createElement("button")
-                        button.innerText = epart.id
-                        button.onclick = () => extractPart(epart, "1", code)
-                        button.style.fontSize = "18px"
-                        button.style.marginLeft = "20px"
-                        parts.appendChild(button)
-                    }
+                    data.value = await entry.getData(writer)
                 }
                 await reader.close()
             }
             reader.onerror = () => {
-                code.value = "bad file"
+                window.alert("can't read file!")
             }
             reader.readAsArrayBuffer(file)
         })

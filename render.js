@@ -19,7 +19,7 @@ function renderCode(code, verse, sheet, color) {
         if (lines[0] == "") continue
 
         let melody = lines[0]
-        let text = lines[verse] ?? ""
+        let text = lines[verse] ?? lines[1] ?? ""
         if (lines.length > rowCount) rowCount = lines.length
 
         let nextMeasure = measures[i+1]

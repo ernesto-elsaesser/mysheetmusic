@@ -42,6 +42,29 @@ const INFIXES = {
     "end": " ",
 }
 
+function parseNote(step, octave, alter, fifths) {
+
+    if (fifths == "-1" && alter == "-1" && step == "B") alter = null
+    if (fifths == "1" && alter == "1" && step == "F") alter = null
+
+    let degree = PITCHES.indexOf(step) + 1 - DOWNSHIFTS[fifths]
+    
+    let sharp = false
+    if (alter) {
+        sharp = true
+        if (alter == "-1") degree -= 1
+    }
+    if (degree < 1) {
+        degree += 7
+        octave -= 1
+    }
+    return {
+        degree: degree,
+        octave: octave,
+        sharp: sharp,
+    }
+}
+
 function extractCode(epart, voice) {
 
     const emeasures = epart.getElementsByTagName("measure")
@@ -67,63 +90,69 @@ function extractCode(epart, voice) {
             }
         }
 
-        // TODO parse <harmony> for chords
-
         let notes = []
         let lines = []
+        let chord = null
         let inSlur = false
-        const enotes = emeasure.getElementsByTagName("note")
-        for (const enote of enotes) {
+        for (const node of emeasure.childNodes) {
 
-            const echord = enote.getElementsByTagName("chord")[0]
+            if (node.tagName == "harmony") {
+                const eoffset = node.getElementsByTagName("offset")[0]
+                if (eoffset) {
+                    console.log("WARNING: HARMONY OFFSET", emeasure)
+                    continue
+                }
+                const eroot = node.getElementsByTagName("root")[0]
+                const estep = eroot.getElementsByTagName("root-step")[0]
+                const ealter = eroot.getElementsByTagName("root-alter")[0]
+                const ekind = node.getElementsByTagName("kind")[0]
+                const alter = ealter ? ealter.innerHTML : null
+                const note = parseNote(estep.innerHTML, 0, alter, fifths)
+                chord = note.degree.toString()
+                if (chord.sharp) chord += "#"
+                if (ekind.innerHTML == "minor") chord += "m"
+                continue
+            }
+
+            if (node.tagName != "note") continue;
+
+            const echord = node.getElementsByTagName("chord")[0]
             if (echord) continue
 
-            const estaff = enote.getElementsByTagName("staff")[0]
+            const estaff = node.getElementsByTagName("staff")[0]
             if (estaff && estaff.innerHTML != "1") continue
 
-            const evoice = enote.getElementsByTagName("voice")[0]
+            const evoice = node.getElementsByTagName("voice")[0]
             if (evoice.innerHTML != voice) continue
 
-            const eduration = enote.getElementsByTagName("duration")[0]
+            const eduration = node.getElementsByTagName("duration")[0]
             if (eduration == undefined) continue
 
-            const epitch = enote.getElementsByTagName("pitch")[0]
+            const epitch = node.getElementsByTagName("pitch")[0]
             let code = "0"
             if (epitch == undefined) {
-                const erest = enote.getElementsByTagName("rest")[0]
+                const erest = node.getElementsByTagName("rest")[0]
                 if (erest == undefined) {
-                    console.log("ERROR: NO REST", enote)
+                    console.log("ERROR: NO REST", node)
                 }
             } else {
                 const estep = epitch.getElementsByTagName("step")[0]
                 const eoctave = epitch.getElementsByTagName("octave")[0]
-                const ealter = enote.getElementsByTagName("alter")[0]
+                const ealter = node.getElementsByTagName("alter")[0]
 
-                const step = estep.innerHTML
-                let degree = PITCHES.indexOf(step) + 1 - DOWNSHIFTS[fifths]
-                let octave = parseInt(eoctave.innerHTML)
-                let alter = ealter ? ealter.innerHTML : "0"
+                const octave = parseInt(eoctave.innerHTML)
+                const alter = ealter ? ealter.innerHTML : null
+                const note = parseNote(estep.innerHTML, octave, alter, fifths)
 
-                if (fifths == "-1" && alter == "-1" && step == "B") alter = "0"
-                if (fifths == "1" && alter == "1" && step == "F") alter = "0"
-                
-                let modifier = ""
-                if (alter != 0) {
-                    modifier = "#"
-                    if (alter == -1) degree -= 1
-                }
-                if (degree < 1) {
-                    degree += 7
-                    octave -= 1
-                }
-                code = degree.toString() + OCTAVES[octave] + modifier
+                code = note.degree.toString() + OCTAVES[note.octave]
+                if (note.sharp) code += "#"
             }
 
             const length = parseInt(eduration.innerHTML) * baseLength
             let duration = DURATIONS[length]
             if (duration == undefined) {
                 duration = "?"
-                const edot = enote.getElementsByTagName("dot")[0]
+                const edot = node.getElementsByTagName("dot")[0]
                 if (edot) duration += "."
                 console.log("ERROR: UNMAPPED DURATION", eduration)
             }
@@ -131,7 +160,7 @@ function extractCode(epart, voice) {
 
             let isTied = inSlur
 
-            const enotations = enote.getElementsByTagName("notations")[0]
+            const enotations = node.getElementsByTagName("notations")[0]
             if (enotations) {
                 const eslur = enotations.getElementsByTagName("slur")[0]
                 if (eslur) {
@@ -141,7 +170,7 @@ function extractCode(epart, voice) {
                 }
             }
 
-            const etie = enote.getElementsByTagName("tie")[0]
+            const etie = node.getElementsByTagName("tie")[0]
             if (etie) {
                 const type = etie.attributes["type"].nodeValue
                 if (type == "stop") isTied = true
@@ -149,11 +178,16 @@ function extractCode(epart, voice) {
 
             if (isTied) code = "~" + code
 
+            if (chord) {
+                code += chord
+                chord = null
+            }
+
             // TODO: <time-modification> for triplets
 
             notes.push(code)
 
-            const elyrics = enote.getElementsByTagName("lyric")
+            const elyrics = node.getElementsByTagName("lyric")
             while (elyrics.length > lines.length) lines.push("")
             for (const elyric of elyrics) {
                 const index = parseInt(elyric.attributes["number"].nodeValue) - 1

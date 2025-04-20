@@ -31,6 +31,7 @@ function renderCode(code, verse, sheet, color) {
         try {
             createMeasure(element, color, melody, text, tieEnd)
         } catch (error) {
+            console.log(error)
             element.innerText = error.toString()
             element.style.color = "red"
         }
@@ -45,36 +46,40 @@ function createMeasure(element, color, melody, text, tieEnd) {
 
   let codes = melody.split(" ")
 
-  var notes = []
-  var ties = []
-  var tuplets = []
-  for (var i = 0; i < codes.length; i += 1) {
+  let notes = []
+  let ties = []
+  let tuplets = []
+  let inTuplet = false
+  let noteWidth = 0
+  for (let i = 0; i < codes.length; i += 1) {
 
-    let data = codes[i].split("")
+    const data = codes[i].split("")
 
-    var tie = false
+    let tie = false
     if (data[0] == "~") {
         tie = true
         data.shift()
     }
 
-    var degree = data.shift()
+    let degree = data.shift()
     while ((data[0] == "'") || (data[0] == ",")) {
         degree += data.shift()
     }
-    var pitch = PITCHES[degree]
+    let pitch = PITCHES[degree]
 
-    var mods = []
+    let mods = []
 
     if (data[0] == "#") {
-        let sharp = new Vex.Flow.Accidental("#")
+        const sharp = new Vex.Flow.Accidental("#")
         mods.push(sharp)
+        noteWidth += 1
         data.shift()
     }
 
     if (data[0] == "b") {
         let flat = new Vex.Flow.Accidental("b")
         mods.push(flat)
+        noteWidth += 1
         data.shift()
     }
 
@@ -83,10 +88,11 @@ function createMeasure(element, color, melody, text, tieEnd) {
     duration = duration.replace("x", "16")
     duration = duration.replace("z", "32")
 
-    var dots = 0
+    let dots = 0
     if (data[0] == ".") {
         let dot = new Vex.Flow.Dot()
         mods.push(dot)
+        noteWidth += 0.5
         dots = 1
         data.shift()
     }
@@ -104,6 +110,20 @@ function createMeasure(element, color, melody, text, tieEnd) {
         auto_stem: true,
     })
     notes.push(note)
+    noteWidth += 1
+
+    if (data[0] == "t") {
+        data.shift()
+        if (inTuplet) {
+            tuplets[0].push(note)
+        } else {
+            tuplets.unshift([note])
+            inTuplet = true
+        }
+    } else {
+        inTuplet = false
+    }
+
     mods.forEach(m => note.addModifier(m))
 
     if (tie) {
@@ -115,15 +135,10 @@ function createMeasure(element, color, melody, text, tieEnd) {
         })
     }
 
-    if (data[0] == "t") {
-        tuplets.push(notes.slice(i-2))
-        data.shift()
-    }
-
     if (data.length == 0) continue
 
-    let chordDegree = data.shift()
-    let chord = PITCHES[chordDegree].slice(0, 1).toUpperCase() + data.join("")
+    const chordDegree = data.shift()
+    const chord = PITCHES[chordDegree].slice(0, 1).toUpperCase() + data.join("")
 
     let symbol = new Vex.Flow.ChordSymbol()
     symbol.setHorizontal('center')
@@ -134,16 +149,12 @@ function createMeasure(element, color, melody, text, tieEnd) {
 
   if (tieEnd) {
     ties.push({
-        first_note: notes[i - 1],
+        first_note: notes[notes.length - 1],
         first_indices: [0],
     })
   }
 
-  let width = 100
-  if (notes.length > 2) width = 130
-  if (notes.length > 4) width = 160
-  if (notes.length > 6) width = 190
-  if (notes.length > 8) width = 220
+  let width = 50 + (noteWidth * 20)
   const textWidth = text.length * 9
   if (textWidth > width) width = textWidth
 

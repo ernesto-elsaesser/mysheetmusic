@@ -25,16 +25,19 @@ const OCTAVES = {
 }
 
 const DURATIONS = {
-    32: "w",
-    24: "h.",
-    16: "h",
-    12: "q.",
-    8: "q",
-    6: "o.",
-    4: "o",
-    3: "x.",
-    2: "x",
-    1: "z",
+    96: "w",
+    72: "h.",
+    48: "h",
+    36: "q.",
+    24: "q",
+    18: "o.",
+    16: "qt",
+    12: "o",
+    9: "x.",
+    8: "ot",
+    6: "x",
+    4: "xt",
+    3: "z",
 }
 
 const INFIXES = {
@@ -73,7 +76,7 @@ function extractCode(epart, voice) {
 
     const emeasures = epart.getElementsByTagName("measure")
 
-    let baseLength = 2
+    let baseLength = 6
     let fifths = 0
     let measures = []
     for (const emeasure of emeasures) {
@@ -90,7 +93,7 @@ function extractCode(epart, voice) {
             }
             const edivisions = eattr.getElementsByTagName("divisions")[0]
             if (edivisions) {
-                baseLength = 8 / parseInt(edivisions.innerHTML)
+                baseLength = 24 / parseInt(edivisions.innerHTML)
             }
         }
 
@@ -186,8 +189,6 @@ function extractCode(epart, voice) {
                 code += chord
                 chord = null
             }
-
-            // TODO: <time-modification> for triplets
 
             notes.push(code)
 

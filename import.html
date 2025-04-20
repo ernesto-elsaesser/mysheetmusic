@@ -50,7 +50,7 @@ fileInput.addEventListener('change', (event) => {
                 button.onclick = () => editor.value = extractCode(epart, "1")
                 parts.appendChild(button)
                 const srcButton = document.createElement("button")
-                srcButton.innerText = epart.id + " (XML)"
+                srcButton.innerText = epart.id + " (src)"
                 srcButton.onclick = () => editor.value = epart.outerHTML
                 parts.appendChild(srcButton)
             }

@@ -9,6 +9,7 @@ const PITCHES = [
 ]
 
 const DOWNSHIFTS = {
+    "-2": 6,
     "-1": 3,
     "0": 0,
     "1": 4,
@@ -50,6 +51,7 @@ const INFIXES = {
 function parseNote(step, octave, alter, fifths) {
 
     if (fifths < 0 && alter == -1 && step == "B") alter = 0
+    if (fifths < 1 && alter == -1 && step == "E") alter = 0
     if (fifths > 0 && alter == 1 && step == "F") alter = 0
     if (fifths > 1 && alter == 1 && step == "C") alter = 0
     if (fifths > 2 && alter == 1 && step == "G") alter = 0

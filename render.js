@@ -48,8 +48,8 @@ function createMeasure(element, color, melody, text, tieEnd) {
 
   let notes = []
   let ties = []
-  let tuplets = []
-  let inTuplet = false
+  let triplets = []
+  let inTriplet = false
   let noteWidth = 0
   for (let i = 0; i < codes.length; i += 1) {
 
@@ -114,14 +114,14 @@ function createMeasure(element, color, melody, text, tieEnd) {
 
     if (data[0] == "t") {
         data.shift()
-        if (inTuplet) {
-            tuplets[0].push(note)
+        if (inTriplet && triplets[0].length < 3) {
+            triplets[0].push(note)
         } else {
-            tuplets.unshift([note])
-            inTuplet = true
+            triplets.unshift([note])
+            inTriplet = true
         }
     } else {
-        inTuplet = false
+        inTriplet = false
     }
 
     mods.forEach(m => note.addModifier(m))
@@ -178,7 +178,7 @@ function createMeasure(element, color, melody, text, tieEnd) {
     tie.setContext(context).draw()
   })
 
-  tuplets.forEach(notes => {
+  triplets.forEach(notes => {
     let tuplet = new Vex.Flow.Tuplet(notes, {location: Vex.Flow.Tuplet.LOCATION_BOTTOM})
     tuplet.setContext(context).draw()
   })

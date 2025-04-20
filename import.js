@@ -87,9 +87,6 @@ function extractCode(epart, voice) {
         if (eattr) {
             const ekey = eattr.getElementsByTagName("key")[0]
             if (ekey) {
-                if (measures.length > 0) {
-                    console.log("ERROR: SECOND KEY", emeasure)
-                }
                 const efifths = ekey.getElementsByTagName("fifths")[0]
                 fifths = parseInt(efifths.innerHTML)
             }

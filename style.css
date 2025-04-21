@@ -32,16 +32,6 @@ select {
     padding: 20px;
 }
 
-textarea {
-    width: 100%;
-    height: 1em;
-    overflow-y: scroll;
-    scrollbar-width: none;
-    white-space: pre;
-    border: none;
-    resize: none;
-}
-
 #sheet {
     overflow-x: hidden;
 }
@@ -52,6 +42,22 @@ textarea {
 
 .frame {
     margin-bottom: -10px;
+}
+
+.measure textarea {
+    width: 100%;
+    height: 1em;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    white-space: pre;
+    border: none;
+    resize: none;
+}
+
+#editor {
+    width: 100%;
+    height: 600px;
+    white-space: pre;
 }
 
 @media (prefers-color-scheme: dark) {

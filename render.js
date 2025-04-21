@@ -15,6 +15,11 @@ function renderMeasure(frame, isDark, width, melody, tieEnd) {
     let inTriplet = false
 
     for (let code of melody.split(" ")) {
+
+      if (code == "|") {
+          inTriplet = false
+          continue
+      }
   
       const data = code.split("")
   
@@ -73,7 +78,7 @@ function renderMeasure(frame, isDark, width, melody, tieEnd) {
   
       if (data[0] == "t") {
           data.shift()
-          if (inTriplet && triplets[0].length < 3) {
+          if (inTriplet) {
               triplets[0].push(note)
           } else {
               triplets.unshift([note])
@@ -136,7 +141,7 @@ function renderMeasure(frame, isDark, width, melody, tieEnd) {
     })
   
     triplets.forEach(notes => {
-        const tuplet = new Vex.Flow.Tuplet(notes, {location: Vex.Flow.Tuplet.LOCATION_BOTTOM})
+        const tuplet = new Vex.Flow.Tuplet(notes, {num_notes: 3, location: Vex.Flow.Tuplet.LOCATION_BOTTOM})
         tuplet.setContext(context).draw()
     })
 }

@@ -63,7 +63,7 @@ function renderMeasure(frame, isDark, width, melody, tieEnd) {
       }
   
       if (degree == "0") {
-          pitch = "b/4"
+          pitch = duration == "w" ? "d/5" : "b/4"
           duration += "r"
       }
   

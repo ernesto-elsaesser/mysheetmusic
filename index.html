@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Sheet Music</title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="render.js?v=20250419"></script>
-    <link rel="stylesheet" href="style.css?v=20250419" />
+    <script src="render.js?v=20250421"></script>
+    <link rel="stylesheet" href="style.css?v=20250421" />
 </head>
 
 <body>
@@ -17,25 +17,23 @@
             <option>Loading ...</option>
         </select>
         <div id="verses"></div>
-        <button id="show" onclick="showCode()" hidden>CODE</button>
-        <button id="hide" onclick="hideCode()" hidden>BACK</button>
+        <button id="reset" onclick="resetSong()" hidden>RESET</button>
         <button id="save" onclick="saveSong()" hidden>SAVE</button>
     </div>
 
     <div id="content">
-        <textarea id="editor"></textarea>
         <div id="sheet"></div>
     </div>
 
     <script>
 
-        let picker = document.getElementById('picker')
-        let verses = document.getElementById('verses')
-        let showButton = document.getElementById('show')
-        let hideButton = document.getElementById('hide')
-        let saveButton = document.getElementById('save')
-        let editor = document.getElementById('editor')
-        let sheet = document.getElementById('sheet')
+        const picker = document.getElementById('picker')
+        const verses = document.getElementById('verses')
+        const resetButton = document.getElementById('reset')
+        const saveButton = document.getElementById('save')
+        const sheet = document.getElementById('sheet')
+
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 
         var songs = {}
 
@@ -67,56 +65,123 @@
 
         function selectSong() {
 
-            hideCode()
-
             window.location.hash = "#" + picker.value
-
-            const code = songs[picker.value]
-            editor.value = code
-
-            let dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-            let color = dark ? "white" : "black"
-
             verses.innerHTML = ""
-            const rowCount = renderCode(code, 1, sheet, color)
-            if (rowCount < 3) return
-            for (let i = 1; i < rowCount; i += 1) {
+            sheet.innerHTML = ""
+
+            const data = songs[picker.value]
+            const parts = data.replaceAll("\n\n~", "*\n\n~").split("\n\n")
+
+            let measures = []
+            let verseCount = 1
+
+            for (let part of parts) {
+                if (part == "") continue
+
+                let tieEnd = false
+                if (part.slice(-1) == "*") {
+                    tieEnd = true
+                    part = part.slice(0, -1)
+                }
+
+                let lines = part.split("\n")
+                const maxLength = Math.max(...lines.map((l) => l.length))
+                const width = maxLength * 8
+
+                const melody = lines.shift()
+                const text = lines.join("\n")
+                if (lines.length > verseCount) verseCount = lines.length
+
+                let measure = document.createElement("div")
+                measure.className = "measure"
+                measure.style.width = width.toString() + "px"
+
+                let frame = document.createElement("div")
+                frame.className = "frame"
+                measure.appendChild(frame)
+
+                let code = document.createElement("textarea")
+                code.className = "code"
+                code.value = melody
+                code.hidden = true
+                measure.appendChild(code)
+
+                let lyrics = document.createElement("textarea")
+                lyrics.className = "lyrics"
+                lyrics.value = text
+                measure.appendChild(lyrics)
+
+                let render = () => {
+                    try {
+                        renderMeasure(frame, isDark, width, code.value, tieEnd)
+                    } catch (error) {
+                        console.log(error)
+                        frame.innerText = error.toString()
+                        frame.style.color = "red"
+                    }
+                }
+
+                render()
+
+                code.onchange = showButtons
+
+                frame.onclick = () => {
+                    if (code.hidden) {
+                        code.hidden = false
+                        lyrics.hidden = true
+                    } else {
+                        code.hidden = true
+                        lyrics.hidden = false
+                        render()
+                    }
+                }
+
+                measures.push(measure)
+            }
+
+            sheet.replaceChildren(...measures)
+
+            if (verseCount == 1) return
+
+            for (let i = 0; i < verseCount; i += 1) {
                 const button = document.createElement("button")
-                button.innerText = i.toString()
-                button.onclick = () => renderCode(code, i, sheet, color)
+                button.innerText = (i + 1).toString()
+                button.onclick = () => scrollLyrics(i)
                 verses.appendChild(button)
             }
         }
 
-        function showCode() {
+        function scrollLyrics(index) {
 
-            showButton.hidden = true
-            hideButton.hidden = false
+            const textareas = document.getElementsByClassName("lyrics")
+            textareas.scroll(index) // TODO fix
+        }
+
+        function showButtons() {
+
+            resetButton.hidden = false
             saveButton.hidden = false
-            verses.hidden = true
-            editor.hidden = false
         }
 
-        function hideCode() {
+        function resetSong() {
 
-            showButton.hidden = false
-            hideButton.hidden = true
+            resetButton.hidden = true
             saveButton.hidden = true
-            verses.hidden = false
-            editor.hidden = true
-        }
-
-        function transposeSong(steps) {
-
-            editor.value = transposeCode(editor.value, steps)
+            selectSong()
         }
 
         async function saveSong() {
 
+            const name = picker.value
+            const measures = document.getElementsByClassName("measure")
+            const data = Array.from(measures).map((m) => {
+                m.childNodes[1].value + "\n" + m.childNodes[2].value
+            }).join("\n\n")
+
             const res = await fetch('songs.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: "name=" + picker.value + "&data=" + editor.value
+                body: "name=" + name + "&data=" + data
             })
 
             if (res.status == 201) loadSongs(picker.value)

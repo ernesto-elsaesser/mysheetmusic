@@ -34,9 +34,12 @@ select {
 
 textarea {
     width: 100%;
-    height: 400px;
-    overflow: scroll;
+    height: 1em;
+    overflow-y: scroll;
+    scrollbar-width: none;
     white-space: pre;
+    border: none;
+    resize: none;
 }
 
 #sheet {
@@ -47,14 +50,8 @@ textarea {
     float: left;
 }
 
-svg {
+.frame {
     margin-bottom: -10px;
-}
-
-.lyrics {
-    height: 21px;
-    padding-left: 10px;
-    white-space: nowrap;
 }
 
 @media (prefers-color-scheme: dark) {

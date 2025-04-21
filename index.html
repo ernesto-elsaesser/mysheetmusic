@@ -178,9 +178,12 @@
 
             const name = picker.value
             const measures = document.getElementsByClassName("measure")
-            const data = Array.from(measures).map((m) => {
-                m.childNodes[1].value + "\n" + m.childNodes[2].value
-            }).join("\n\n")
+            const parts = Array.from(measures).map((m) => {
+                let melody = m.childNodes[1].value
+                let text = m.childNodes[2].value
+                return text ? melody + "\n" + text : melody
+            })
+            const data = parts.join("\n\n")
 
             const res = await fetch('songs.php', {
                 method: 'POST',

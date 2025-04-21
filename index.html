@@ -85,7 +85,11 @@
                 }
 
                 let lines = part.split("\n")
-                const maxLength = Math.max(...lines.map((l) => l.length))
+
+                let maxLength = 5
+                lines.forEach((l) => {
+                    if (l.length > maxLength) maxLength = l.length
+                })
                 const width = maxLength * 8
 
                 const melody = lines.shift()

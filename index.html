@@ -101,7 +101,7 @@
                 lines.forEach((l) => {
                     if (l.length > maxLength) maxLength = l.length
                 })
-                const width = maxLength * 8
+                const width = (maxLength + 1) * 8
 
                 const melody = lines.shift()
                 const text = lines.join("\n")

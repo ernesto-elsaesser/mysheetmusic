@@ -72,7 +72,8 @@
 
             if (picker.value == "+") {
                 window.open("import.html", "_blank")
-                exit()
+                picker.value = decodeURIComponent(window.location.hash.slice(1))
+                return
             }
 
             window.location.hash = "#" + picker.value

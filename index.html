@@ -60,10 +60,20 @@
                 picker.appendChild(option)
             })
 
+            let option = document.createElement('option')
+            option.value = "+"
+            option.innerText = "+ Import MusicXML"
+            picker.appendChild(option)
+
             selectSong()
         }
 
         function selectSong() {
+
+            if (picker.value == "+") {
+                window.open("import.html", "_blank")
+                exit()
+            }
 
             window.location.hash = "#" + picker.value
             verses.innerHTML = ""

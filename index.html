@@ -62,7 +62,7 @@
 
             let option = document.createElement('option')
             option.value = "+"
-            option.innerText = "+ Import MusicXML"
+            option.innerText = "+ Add song"
             picker.appendChild(option)
 
             selectSong()
@@ -71,7 +71,7 @@
         function selectSong() {
 
             if (picker.value == "+") {
-                window.open("import.html", "_blank")
+                window.open("upload.html", "_blank")
                 picker.value = decodeURIComponent(window.location.hash.slice(1))
                 return
             }

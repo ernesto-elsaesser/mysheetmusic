@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MusicXML Import</title>
+    <title>Add Song</title>
     <script src="zip.js"></script>
     <script src="import.js?v=20250421"></script>
-    <link rel="stylesheet" href="style.css?v=20250421" />
+    <link rel="stylesheet" href="style.css?v=20250501" />
 </head>
 <body>
     <div id="content">
-        <input type="file" id="file" accept=".mxl">
-        <input type="text" id="name" size="48">
+        <label for="name">Title:</label> <input type="text" id="name" size="32">
         <input type="button" onclick="shiftUp()" value="+">
         <input type="button" onclick="shiftDown()" value="-">
-        <input type="button" onclick="saveCode()" value="UPLOAD">
-        <div id="parts"></div>
+        <input type="button" onclick="saveCode()" value="UPLOAD"><br/><br/>
         <textarea id="editor"></textarea>
+        <div id="parts"></div>
+        <label for="name">MusicXML Import:</label> <input type="file" id="file" accept=".mxl">
     </div>
 
     <script>

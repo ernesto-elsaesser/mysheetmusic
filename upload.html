@@ -13,17 +13,18 @@
         <label for="name">Title:</label> <input type="text" id="name" size="32">
         <input type="button" onclick="shiftUp()" value="+">
         <input type="button" onclick="shiftDown()" value="-">
-        <input type="button" onclick="saveCode()" value="UPLOAD"><br/><br/>
-        <textarea id="editor"></textarea>
+        <input type="button" onclick="saveCode()" value="UPLOAD"> <span id="status"></span>
+        <textarea id="editor" style="margin-top: 5px"></textarea>
         <div id="parts"></div>
         <label for="name">MusicXML Import:</label> <input type="file" id="file" accept=".mxl">
     </div>
 
     <script>
-const fileInput = document.getElementById('file')
 const nameInput = document.getElementById('name')
-const parts = document.getElementById('parts')
+const status = document.getElementById('status')
 const editor = document.getElementById('editor')
+const parts = document.getElementById('parts')
+const fileInput = document.getElementById('file')
 
 const parser = new DOMParser()
 
@@ -81,7 +82,7 @@ function saveCode() {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: "name=" + nameInput.value + "&data=" + editor.value
-    }).then((res) => window.alert(res.statusText))
+    }).then((res) => status.innerHTML = res.statusText)
 }
     </script>
 </body>

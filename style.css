@@ -53,6 +53,7 @@ select {
     white-space: pre;
     border: none;
     resize: none;
+    font-size: 12px;
 }
 
 #editor {

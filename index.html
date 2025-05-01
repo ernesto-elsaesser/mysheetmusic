@@ -170,7 +170,9 @@
         function scrollLyrics(index) {
 
             const textareas = document.getElementsByClassName("lyrics")
-            textareas.scroll(index) // TODO fix
+            for (let textarea of textareas) {
+                textarea.scrollTop = index * 15
+            }
         }
 
         function showButtons() {

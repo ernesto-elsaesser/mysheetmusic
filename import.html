@@ -12,6 +12,8 @@
     <div id="content">
         <input type="file" id="file" accept=".mxl">
         <input type="text" id="name" size="48">
+        <input type="button" onclick="shiftUp()" value="+">
+        <input type="button" onclick="shiftDown()" value="-">
         <input type="button" onclick="saveCode()" value="UPLOAD">
         <div id="parts"></div>
         <textarea id="editor"></textarea>
@@ -54,7 +56,6 @@ fileInput.addEventListener('change', (event) => {
                 srcButton.onclick = () => editor.value = epart.outerHTML
                 parts.appendChild(srcButton)
             }
-            addShiftButtons()
             editor.value = extractCode(eparts[0], "1")
         }
         await reader.close()
@@ -65,17 +66,14 @@ fileInput.addEventListener('change', (event) => {
     reader.readAsArrayBuffer(file)
 })
 
-function addShiftButtons() {
+function shiftUp() {
 
-    const buttonUp = document.createElement("button")
-    buttonUp.innerText = "+"
-    buttonUp.onclick = () => editor.value = transposeCode(editor.value, true)
-    parts.appendChild(buttonUp)
-    
-    const buttonDown = document.createElement("button")
-    buttonDown.innerText = "-"
-    buttonDown.onclick = () => editor.value = transposeCode(editor.value, false)
-    parts.appendChild(buttonDown)
+    editor.value = transposeCode(editor.value, true)
+}
+
+function shiftDown() {
+
+    editor.value = transposeCode(editor.value, false)
 }
 
 function saveCode() {

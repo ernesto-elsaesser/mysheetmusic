@@ -12,26 +12,30 @@
 
 <body>
 
-    <div id="toolbar">
-        <button id="select" onclick="showSongs()">SONGS</button>
-        <button id="add" onclick="addSong()">ADD</button>
-        <div id="verses"></div>
-        <button id="reset" onclick="resetSong()" hidden>RESET</button>
-        <button id="save" onclick="saveSong()" hidden>SAVE</button>
-    </div>
+    <div id="title"></div>
+
+    <button id="menu" class="leftbtn" onclick="showSongs()">SONGS</button>
+    <button id="reset" class="leftbtn" onclick="resetSong()" hidden>RESET</button>
+    <button id="save" class="rightbtn" onclick="saveSong()" hidden>SAVE</button>
+    <button id="add" class="rightbtn" onclick="addSong()">ADD</button>
 
     <div id="content">
         <div id="sheet"></div>
     </div>
 
+    <div id="verses"></div>
+
     <div id="picker" hidden></div>
 
     <script>
 
-        const verses = document.getElementById('verses')
+        const title = document.getElementById('title')
+        const menuButton = document.getElementById('menu')
         const resetButton = document.getElementById('reset')
         const saveButton = document.getElementById('save')
+        const addButton = document.getElementById('add')
         const sheet = document.getElementById('sheet')
+        const verses = document.getElementById('verses')
         const picker = document.getElementById('picker')
 
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -60,7 +64,8 @@
                 picker.appendChild(button)
             })
 
-            selectSong(names[0])
+            if (!names.includes(selected)) selected = names[0]
+            selectSong(selected)
         }
 
         function addSong() {
@@ -75,11 +80,11 @@
 
         function selectSong(name) {
 
-            picker.hidden = true
-
             window.location.hash = "#" + name
-            verses.innerHTML = ""
+            title.innerHTML = name
+            picker.hidden = true
             sheet.innerHTML = ""
+            verses.innerHTML = ""
 
             const data = songs[name]
             const parts = data.replaceAll("\n\n~", "*\n\n~").split("\n\n")
@@ -139,8 +144,8 @@
 
                 render()
 
-                code.onchange = showButtons
-                lyrics.onchange = showButtons
+                code.onchange = () => toggleEditMode(true)
+                lyrics.onchange = () => toggleEditMode(true)
 
                 frame.onclick = () => {
                     if (code.hidden) {
@@ -176,22 +181,23 @@
             }
         }
 
-        function showButtons() {
+        function toggleEditMode(edit) {
 
-            resetButton.hidden = false
-            saveButton.hidden = false
+            menuButton.hidden = edit
+            resetButton.hidden = !edit
+            saveButton.hidden = !edit
+            addButton.hidden = edit
         }
 
         function resetSong() {
 
-            resetButton.hidden = true
-            saveButton.hidden = true
-            selectSong()
+            toggleEditMode(false)
+            selectSong(title.innerHTML)
         }
 
         async function saveSong() {
 
-            const name = picker.value
+            const name = title.innerHTML
             const measures = document.getElementsByClassName("measure")
             const parts = Array.from(measures).map((m) => {
                 let melody = m.childNodes[1].value
@@ -206,8 +212,13 @@
                 body: "name=" + name + "&data=" + data
             })
 
-            if (res.status == 201) loadSongs(picker.value)
-            else window.alert(res.statusText)
+            if (res.status == 201) {
+                window.alert(res.statusText)
+                return
+            }
+
+            toggleEditMode(false)
+            loadSongs(name)
         }
 
         const anchor = decodeURIComponent(window.location.hash.slice(1))

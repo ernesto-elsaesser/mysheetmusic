@@ -212,7 +212,7 @@
                 body: "name=" + name + "&data=" + data
             })
 
-            if (res.status == 201) {
+            if (res.status != 201) {
                 window.alert(res.statusText)
                 return
             }

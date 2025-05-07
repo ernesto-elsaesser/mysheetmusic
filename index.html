@@ -7,15 +7,14 @@
     <title>My Sheet Music</title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
     <script src="render.js?v=20250421"></script>
-    <link rel="stylesheet" href="style.css?v=20250501" />
+    <link rel="stylesheet" href="style.css?v=20250507" />
 </head>
 
 <body>
 
     <div id="toolbar">
-        <select id="picker" class="toolbar" onchange="selectSong()">
-            <option>Loading ...</option>
-        </select>
+        <button id="select" onclick="showSongs()">SONGS</button>
+        <button id="add" onclick="addSong()">ADD</button>
         <div id="verses"></div>
         <button id="reset" onclick="resetSong()" hidden>RESET</button>
         <button id="save" onclick="saveSong()" hidden>SAVE</button>
@@ -25,13 +24,15 @@
         <div id="sheet"></div>
     </div>
 
+    <div id="picker" hidden></div>
+
     <script>
 
-        const picker = document.getElementById('picker')
         const verses = document.getElementById('verses')
         const resetButton = document.getElementById('reset')
         const saveButton = document.getElementById('save')
         const sheet = document.getElementById('sheet')
+        const picker = document.getElementById('picker')
 
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 
@@ -53,34 +54,34 @@
             const names = Object.keys(songs).sort()
 
             names.forEach((name) => {
-                let option = document.createElement('option')
-                option.value = name
-                option.innerText = name
-                option.selected = name == selected
-                picker.appendChild(option)
+                let button = document.createElement('button')
+                button.innerText = name
+                button.onclick = () => selectSong(name)
+                picker.appendChild(button)
             })
 
-            let option = document.createElement('option')
-            option.value = "+"
-            option.innerText = "+ Add song"
-            picker.appendChild(option)
-
-            selectSong()
+            selectSong(names[0])
         }
 
-        function selectSong() {
+        function addSong() {
 
-            if (picker.value == "+") {
-                window.open("upload.html", "_blank")
-                picker.value = decodeURIComponent(window.location.hash.slice(1))
-                return
-            }
+            window.open("upload.html", "_blank")
+        }
 
-            window.location.hash = "#" + picker.value
+        function showSongs() {
+
+            picker.hidden = !picker.hidden
+        }
+
+        function selectSong(name) {
+
+            picker.hidden = true
+
+            window.location.hash = "#" + name
             verses.innerHTML = ""
             sheet.innerHTML = ""
 
-            const data = songs[picker.value]
+            const data = songs[name]
             const parts = data.replaceAll("\n\n~", "*\n\n~").split("\n\n")
 
             let measures = []

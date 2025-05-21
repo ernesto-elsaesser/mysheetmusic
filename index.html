@@ -102,12 +102,8 @@
                 }
 
                 let lines = part.split("\n")
-
-                let maxLength = 5
-                lines.forEach((l) => {
-                    if (l.length > maxLength) maxLength = l.length
-                })
-                const width = (maxLength + 1) * 8
+                const lengths = lines.map((l) => l.length)
+                const maxLength = Math.max(...lengths)
 
                 const melody = lines.shift()
                 const text = lines.join("\n")
@@ -115,7 +111,6 @@
 
                 let measure = document.createElement("div")
                 measure.className = "measure"
-                measure.style.width = width.toString() + "px"
 
                 let frame = document.createElement("div")
                 frame.className = "frame"
@@ -133,6 +128,9 @@
                 measure.appendChild(lyrics)
 
                 let render = () => {
+                    const length = Math.max(maxLength, code.value.length)
+                    const width = (length + 1) * 8
+                    measure.style.width = width.toString() + "px"
                     try {
                         renderMeasure(frame, isDark, width, code.value, tieEnd)
                     } catch (error) {

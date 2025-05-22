@@ -134,7 +134,7 @@
 
                 let render = () => {
                     const length = Math.max(maxLength, code.value.length)
-                    const width = (length + 1) * 8
+                    const width = Math.max((length + 1) * 8, 40)
                     measure.style.width = width.toString() + "px"
                     try {
                         renderMeasure(frame, isDark, width, code.value, tieEnd)

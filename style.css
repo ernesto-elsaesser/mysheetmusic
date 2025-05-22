@@ -11,6 +11,7 @@ button {
     height: 32px;
     padding: 0 10px;
     background-color: #eee;
+    font-size: 14px;
 }
 
 #title {
@@ -63,14 +64,14 @@ button {
 #picker {
     position: absolute;
     top: 38px;
-    left: 0;
+    left: 4px;
     right: 0;
+    background-color: #222;
     overflow-y: scroll;
 }
 
 #picker button {
     float: left;
-    width: 200px;
 }
 
 #verses {

@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Sheet Music</title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="render.js?v=20250421"></script>
-    <link rel="stylesheet" href="style.css?v=20250507" />
+    <script src="render.js?v=20250522"></script>
+    <link rel="stylesheet" href="style.css?v=20250522" />
 </head>
 
 <body>
@@ -57,12 +57,17 @@
 
             const names = Object.keys(songs).sort()
 
-            names.forEach((name) => {
+            let initial = ""
+            for (const name of names) {
                 let button = document.createElement('button')
                 button.innerText = name
                 button.onclick = () => selectSong(name)
+                if (name[0] != initial) {
+                    button.style.clear = "both"
+                    initial = name[0]
+                }
                 picker.appendChild(button)
-            })
+            }
 
             if (!names.includes(selected)) selected = names[0]
             selectSong(selected)

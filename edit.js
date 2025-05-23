@@ -225,7 +225,7 @@ function extractCode(epart, voice) {
     return measures.map((m) => m.join("\n")).join("\n\n")
 }
 
-function transposeCode(code, up) {
+function transposeCode(code, steps) {
 
     let measures = code.split("\n\n")
 
@@ -234,23 +234,46 @@ function transposeCode(code, up) {
         if (measure == "") continue
         let lines = measure.split("\n")
         let notes = lines[0].split(" ")
-        notes = notes.map((note) => {
-            let head = note.slice(0, 1)
-            if (head == "0") return note
-            let mark = note.slice(1, 2)
-            let tail = note.slice(2)
-            if(head == "~") {
-                head = note.slice(0, 2)
-                mark = note.slice(2, 3)
-                tail = note.slice(3)
-            }
-            if (up && mark != ",") head += "'" + mark
-            if (!up && mark != "'") head += "," + mark
-            return head + tail
-        })
-        lines[0] = notes.join(" ")
+        lines[0] = notes.map((n) => transposeNote(n, steps)).join(" ")
         measures[i] = lines.join("\n")
     }
 
     return measures.join("\n\n")
+}
+
+const DEGREES = ["1", "2", "3", "4", "5", "6", "7"]
+
+function transposeNote(note, steps) {
+
+    let transposed = ""
+
+    for (let i = 0; i < note.length; i += 1) {
+        let c = note[i]
+        let index = DEGREES.indexOf(c)
+        if (index == -1) {
+            transposed += c
+            continue
+        }
+        index += steps
+        let suffix = null
+        if (index < 0) {
+            index += DEGREES.length
+            if (note[i+1] == "'") {
+                i += 1
+            } else {
+                suffix = ","
+            }
+        } else if (index >= DEGREES.length) {
+            index -= DEGREES.length
+            if (note[i+1] == ",") {
+                i += 1
+            } else {
+                suffix = "'"
+            }
+        }
+        transposed += DEGREES[index]
+        if (suffix) transposed += suffix
+    }
+
+    return transposed
 }

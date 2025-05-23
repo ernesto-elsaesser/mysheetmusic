@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Song</title>
     <script src="zip.js"></script>
-    <script src="import.js?v=20250421"></script>
+    <script src="edit.js?v=20250523"></script>
     <link rel="stylesheet" href="style.css?v=20250501" />
 </head>
 <body>
     <div id="content">
         <label for="name">Title:</label> <input type="text" id="name" size="32">
-        <input type="button" onclick="shiftUp()" value="+">
-        <input type="button" onclick="shiftDown()" value="-">
-        <input type="button" onclick="saveCode()" value="UPLOAD"> <span id="status"></span>
+        <input type="button" onclick="loadCode()" value="LOAD">
+        <input type="button" onclick="shiftCode(-7)" value="-7">
+        <input type="button" onclick="shiftCode(-1)" value="-1">
+        <input type="button" onclick="shiftCode(1)" value="+1">
+        <input type="button" onclick="shiftCode(7)" value="+7">
+        <input type="button" onclick="saveCode()" value="SAVE"> <span id="status"></span>
         <textarea id="editor" style="margin-top: 5px"></textarea>
         <div id="parts"></div>
         <label for="name">MusicXML Import:</label> <input type="file" id="file" accept=".mxl">
@@ -67,22 +70,23 @@ fileInput.addEventListener('change', (event) => {
     reader.readAsArrayBuffer(file)
 })
 
-function shiftUp() {
-
-    editor.value = transposeCode(editor.value, true)
+async function loadCode() {
+    const res = await fetch('songs.php')
+    const songs = await res.json()
+    editor.value = songs[nameInput.value] ?? ""
 }
 
-function shiftDown() {
-
-    editor.value = transposeCode(editor.value, false)
+function shiftCode(steps) {
+    editor.value = transposeCode(editor.value, steps)
 }
 
-function saveCode() {
-    fetch('songs.php', {
+async function saveCode() {
+    const res = await fetch('songs.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: "name=" + nameInput.value + "&data=" + editor.value
-    }).then((res) => status.innerHTML = res.statusText)
+    })
+    status.innerHTML = res.statusText
 }
     </script>
 </body>

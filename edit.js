@@ -203,11 +203,11 @@ function extractCode(epart, voice) {
             notes.push(code)
 
             const elyrics = node.getElementsByTagName("lyric")
-            while (elyrics.length > lines.length) lines.push("")
             for (const elyric of elyrics) {
                 const index = parseInt(elyric.attributes["number"].nodeValue) - 1
                 const syllabic = elyric.getElementsByTagName("syllabic")[0].innerHTML
                 const text = elyric.getElementsByTagName("text")[0].innerHTML
+                while (index >= lines.length) lines.push("")
                 let line = lines[index]
                 if (line.endsWith("-")) line = line.slice(0, -1)
                 line += text

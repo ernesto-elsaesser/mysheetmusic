@@ -258,17 +258,21 @@ function transposeNote(note, steps) {
         let suffix = null
         if (index < 0) {
             index += DEGREES.length
-            if (note[i+1] == "'") {
-                i += 1
-            } else {
-                suffix = ","
+            if (i == 0) {
+                if (note[1] == "'") {
+                    i = 1
+                } else {
+                    suffix = ","
+                }
             }
         } else if (index >= DEGREES.length) {
             index -= DEGREES.length
-            if (note[i+1] == ",") {
-                i += 1
-            } else {
-                suffix = "'"
+            if (i == 0) {
+                if (note[1] == ",") {
+                    i = 1
+                } else {
+                    suffix = "'"
+                }
             }
         }
         transposed += DEGREES[index]

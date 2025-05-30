@@ -6,7 +6,7 @@
     <title>Add Song</title>
     <script src="zip.js"></script>
     <script src="edit.js?v=20250523"></script>
-    <link rel="stylesheet" href="style.css?v=20250501" />
+    <link rel="stylesheet" href="style.css?v=20250530" />
 </head>
 <body>
     <div id="content">
@@ -81,12 +81,21 @@ function shiftCode(steps) {
 }
 
 async function saveCode() {
+    const name = nameInput.value
     const res = await fetch('songs.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: "name=" + nameInput.value + "&data=" + editor.value
+        body: "name=" + name + "&data=" + editor.value
     })
-    status.innerHTML = res.statusText
+    if (res.status >= 300) {
+        status.innerHTML = res.statusText
+        return
+    }
+    const now = new Date()
+    const time = now.toLocaleTimeString()
+    const anchor = encodeURIComponent(name)
+    status.innerHTML = '<a href="index.html#' + anchor + '" target="_blank">' + time + '</a>'
+    
 }
     </script>
 </body>

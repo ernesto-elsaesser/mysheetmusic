@@ -246,6 +246,10 @@ const DEGREES = ["1", "2", "3", "4", "5", "6", "7"]
 function transposeNote(note, steps) {
 
     let transposed = ""
+    if (note[0] == "~") {
+        transposed = "~"
+        note = note.slice(1)
+    }
 
     for (let i = 0; i < note.length; i += 1) {
         let c = note[i]

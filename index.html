@@ -353,7 +353,9 @@
         }
 
         function shiftSong(steps) {
+
             code.value = transposeCode(code.value, steps)
+            toggleEditMode(true)
         }
 
         async function deleteSong() {

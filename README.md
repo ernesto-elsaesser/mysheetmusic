@@ -1,8 +1,8 @@
 # MySheetMusic
 
-This web app manages a collection of song files, which are plain text files in a
+This one-page web app manages a collection of song files, which are plain text files in a
 [custom format](#file-format). The format was designed to capture a single voice
-of a musical score, with melody, text and harmony (i.e. chord) - basically
+of a musical score, with melody, text and harmony (i.e. chords) - basically
 **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
 
 ## Frontend

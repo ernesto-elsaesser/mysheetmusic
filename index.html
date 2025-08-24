@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Sheet Music</title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="render.js?v=20250522"></script>
+    <script src="render.js?v=20250824"></script>
+    <script src="edit.js?v=20250523"></script>
     <link rel="stylesheet" href="style.css?v=20250824" />
 </head>
 
@@ -14,29 +15,66 @@
 
     <div id="title"></div>
 
-    <button id="menu" class="leftbtn" onclick="showSongs()">SONGS</button>
-    <button id="reset" class="leftbtn" onclick="resetSong()" hidden>RESET</button>
-    <button id="save" class="rightbtn" onclick="saveSong()" hidden>SAVE</button>
-    <button id="add" class="rightbtn" onclick="addSong()">ADD</button>
+    <button id="songs" class="lbtn" onclick="showSongs()">SONGS</button>
+    <button id="reset" class="lbtn" onclick="resetSong()" hidden>RESET</button>
+    <button id="save" class="rbtn" onclick="saveSong()" hidden>SAVE</button>
+    <button id="tabs" class="rbtn" onclick="showTabs()">MENU</button>
 
     <div id="content">
-        <div id="sheet"></div>
+        <div id="sheet" class="tab"></div>
+        <div id="raw" class="tab" hidden>
+            <input type="button" onclick="shiftSong(-7)" value="OCTAVE DOWN">
+            <input type="button" onclick="shiftSong(7)" value="OCTAVE UP">
+            <input type="button" onclick="shiftSong(-1)" value="STEP DOWN">
+            <input type="button" onclick="shiftSong(1)" value="STEP UP">
+            <textarea id="code"></textarea>
+        </div>
+        <div id="create" class="tab" hidden>
+            <form>
+                <label for="name">Title:</label> <input type="text" id="name" size=32>
+                <input type="button" onclick="createSong()" value="Create">
+            </form>
+        </div>
+        <div id="import" class="tab" hidden>
+            <form>
+                <label for="file">MusicXML Import:</label><br/><br/>
+                <input type="file" id="file" accept=".mxl"><br/><br/>
+                <label for="filename">Title:</label> <input type="text" id="filename" size=32>
+                <p>Select which part to import:</p>
+                <div id="parts"></div>
+            </form>
+        </div>
+    </div>
     </div>
 
     <div id="verses"></div>
 
-    <div id="picker" hidden></div>
+    <div id="songmenu" class="menu" hidden></div>
+    <div id="tabmenu" class="menu" hidden>
+        <button class="tabbtn" onclick="selectTab('sheet')">Sheet Music</button>
+        <button class="tabbtn" onclick="selectTab('raw')">Text Editor</button>
+        <button class="tabbtn" onclick="selectTab('create')">New Song</button>
+        <button class="tabbtn" onclick="selectTab('import')">MusicXML Import</button>
+    </div>
 
     <script>
 
         const title = document.getElementById('title')
-        const menuButton = document.getElementById('menu')
+        const content = document.getElementById('content')
+        const songButton = document.getElementById('songs')
         const resetButton = document.getElementById('reset')
         const saveButton = document.getElementById('save')
-        const addButton = document.getElementById('add')
+        const tabButton = document.getElementById('tabs')
         const sheet = document.getElementById('sheet')
+        const raw = document.getElementById('raw')
+        const code = document.getElementById('code')
+        const nameInput = document.getElementById('name')
+        const fileNameInput = document.getElementById('filename')
+        const fileInput = document.getElementById('file')
+        const parts = document.getElementById('parts')
         const verses = document.getElementById('verses')
-        const picker = document.getElementById('picker')
+        const songMenu = document.getElementById('songmenu')
+        const tabMenu = document.getElementById('tabmenu')
 
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 
@@ -53,7 +91,7 @@
 
             songs = await res.json()
 
-            picker.innerHTML = ""
+            songMenu.innerHTML = ""
 
             const names = Object.keys(songs).sort()
 
@@ -61,38 +99,53 @@
             for (const name of names) {
                 let button = document.createElement('button')
                 button.innerText = name
+                button.className = "songbtn"
                 button.onclick = () => selectSong(name)
                 if (name[0] != initial) {
                     button.style.clear = "both"
                     initial = name[0]
                 }
-                picker.appendChild(button)
+                songMenu.appendChild(button)
             }
 
             if (!names.includes(selected)) selected = names[0]
             selectSong(selected)
         }
 
-        function addSong() {
+        function showTabs() {
 
-            window.open("editor.html", "_blank")
+            tabMenu.hidden = !tabMenu.hidden
+            content.hidden = !tabMenu.hidden
+        }
+
+        function selectTab(tabId) {
+
+            const tabs = document.getElementsByClassName("tab")
+            for (let tab of tabs) {
+                tab.hidden = tab.id != tabId
+            }
+            tabMenu.hidden = true
+            content.hidden = false
+            verses.hidden = tabId != "sheet"
         }
 
         function showSongs() {
 
-            picker.hidden = !picker.hidden
+            songMenu.hidden = !songMenu.hidden
+            content.hidden = !songMenu.hidden
         }
 
         function selectSong(name) {
 
             window.location.hash = "#" + name
-            title.innerHTML = name
-            picker.hidden = true
+            title.innerText = name
+            songMenu.hidden = true
+            content.hidden = false
             sheet.innerHTML = ""
             verses.innerHTML = ""
 
-            const data = songs[name]
-            const parts = data.replaceAll("\n\n~", "*\n\n~").split("\n\n")
+            code.value = songs[name]
+            const parts = code.value.replaceAll("\n\n~", "*\n\n~").split("\n\n")
 
             let measures = []
             let verseCount = 1
@@ -121,11 +174,11 @@
                 frame.className = "frame"
                 measure.appendChild(frame)
 
-                let code = document.createElement("textarea")
-                code.className = "code"
-                code.value = melody
-                code.hidden = true
-                measure.appendChild(code)
+                let rawtext = document.createElement("textarea")
+                rawtext.className = "code"
+                rawtext.value = melody
+                rawtext.hidden = true
+                measure.appendChild(rawtext)
 
                 let lyrics = document.createElement("textarea")
                 lyrics.className = "lyrics"
@@ -133,11 +186,11 @@
                 measure.appendChild(lyrics)
 
                 let render = () => {
-                    const length = Math.max(maxLength, code.value.length)
+                    const length = Math.max(maxLength, rawtext.value.length)
                     const width = Math.max((length + 1) * 8, 40)
                     measure.style.width = width.toString() + "px"
                     try {
-                        renderMeasure(frame, isDark, width, code.value, tieEnd)
+                        renderMeasure(frame, isDark, width, rawtext.value, tieEnd)
                     } catch (error) {
                         console.log(error)
                         frame.innerText = error.toString()
@@ -147,15 +200,15 @@
 
                 render()
 
-                code.onchange = () => toggleEditMode(true)
-                lyrics.onchange = () => toggleEditMode(true)
+                rawtext.oninput = () => toggleEditMode(true)
+                lyrics.oninput = () => toggleEditMode(true)
 
                 frame.onclick = () => {
-                    if (code.hidden) {
-                        code.hidden = false
+                    if (rawtext.hidden) {
+                        rawtext.hidden = false
                         lyrics.hidden = true
                     } else {
-                        code.hidden = true
+                        rawtext.hidden = true
                         lyrics.hidden = false
                         render()
                     }
@@ -186,28 +239,40 @@
 
         function toggleEditMode(edit) {
 
-            menuButton.hidden = edit
+            songButton.hidden = edit
             resetButton.hidden = !edit
             saveButton.hidden = !edit
-            addButton.hidden = edit
+            tabButton.hidden = edit
         }
 
         function resetSong() {
 
-            toggleEditMode(false)
-            selectSong(title.innerHTML)
+            const name = title.innerText
+            if (name in songs) {
+                selectSong(name)
+                toggleEditMode(false)
+            }
+            else {
+                code.value = ""
+            }
         }
 
         async function saveSong() {
 
-            const name = title.innerHTML
-            const measures = document.getElementsByClassName("measure")
-            const parts = Array.from(measures).map((m) => {
-                let melody = m.childNodes[1].value
-                let text = m.childNodes[2].value
-                return text ? melody + "\n" + text : melody
-            })
-            const data = parts.join("\n\n")
+            const name = title.innerText
+
+            let data
+            if (sheet.hidden) {
+                data = code.value
+            } else {
+                const measures = document.getElementsByClassName("measure")
+                const parts = Array.from(measures).map((m) => {
+                    let melody = m.childNodes[1].value
+                    let text = m.childNodes[2].value
+                    return text ? melody + "\n" + text : melody
+                })
+                data = parts.join("\n\n")
+            }
 
             const res = await fetch('songs.php', {
                 method: 'POST',
@@ -223,11 +288,72 @@
             toggleEditMode(false)
             loadSongs(name)
         }
+            
+        fileInput.addEventListener('change', (event) => {
 
+            const file = event.target.files[0]
+            if (file == null) return
+
+            fileNameInput.value = file.name.split(".")[0].replaceAll("_", " ")
+            parts.innerHTML = ""
+
+            const parser = new DOMParser()
+            const reader = new FileReader()
+            reader.onload = async (event) => {
+                const array = new Uint8Array(event.target.result)
+                const rawReader = new zip.Uint8ArrayReader(array)
+                const reader = new zip.ZipReader(rawReader)
+                const entries = await reader.getEntries()
+                for (let entry of entries) {
+                    if (entry.filename.startsWith("META-INF")) continue
+                    const writer = new zip.TextWriter()
+                    const xml = await entry.getData(writer)
+                    const doc = parser.parseFromString(xml, "text/xml")
+                    const eparts = doc.getElementsByTagName("part")
+                    for (let epart of eparts) {
+                        const button = document.createElement("button")
+                        button.innerText = epart.id
+                        button.onclick = () => importSong(epart)
+                        parts.appendChild(button)
+                    }
+                }
+                await reader.close()
+            }
+            reader.onerror = () => {
+                window.alert("Failed to parse " + file.name)
+            }
+            reader.readAsArrayBuffer(file)
+        })
+
+        function createSong() {
+
+            title.innerText = nameInput.value
+            nameInput.value = ""
+            code.value = ""
+            selectTab("raw")
+            toggleEditMode(true)
+        }
+
+        function importSong(epart) {
+
+            title.innerText = fileNameInput.value
+            fileNameInput.value = ""
+            parts.innerHTML = ""
+            code.value = extractCode(epart, "1")
+            selectTab("raw")
+            toggleEditMode(true)
+        }
+
+        function shiftSong(steps) {
+            code.value = transposeCode(code.value, steps)
+        }
+
+        code.oninput = () => toggleEditMode(true)
+        
         const anchor = decodeURIComponent(window.location.hash.slice(1))
         loadSongs(anchor)
 
     </script>
+    <script src="zip.js"></script>
 </body>
-
 </html>

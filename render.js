@@ -1,4 +1,4 @@
-const PITCHES = {
+const PITCH_MAP = {
     "1,": "c/3", "2,": "d/3", "3,": "e/3", "4,": "f/3", "5,": "g/3", "6,": "a/3", "7,": "b/3",
     "1": "c/4", "2": "d/4", "3": "e/4", "4": "f/4", "5": "g/4", "6": "a/4", "7": "b/4",
     "1'": "c/5", "2'": "d/5", "3'": "e/5", "4'": "f/5", "5'": "g/5", "6'": "a/5", "7'": "b/5",
@@ -33,7 +33,7 @@ function renderMeasure(frame, isDark, width, melody, tieEnd) {
         while ((data[0] == "'") || (data[0] == ",")) {
             degree += data.shift()
         }
-        let pitch = PITCHES[degree]
+        let pitch = PITCH_MAP[degree]
 
         let mods = []
 
@@ -103,7 +103,7 @@ function renderMeasure(frame, isDark, width, melody, tieEnd) {
         if (data.length == 0) continue
 
         const chordDegree = data.shift()
-        let chord = PITCHES[chordDegree].slice(0, 1).toUpperCase()
+        let chord = PITCH_MAP[chordDegree].slice(0, 1).toUpperCase()
         chord += data.join("")
 
         let symbol = new Vex.Flow.ChordSymbol()

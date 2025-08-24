@@ -14,7 +14,7 @@ button {
     font-size: 14px;
 }
 
-textarea, a {
+textarea {
     color: #222;
 }
 
@@ -40,6 +40,23 @@ form {
     position: absolute;
     top: 4px;
     right: 4px;
+}
+
+.menu {
+    position: absolute;
+    top: 38px;
+    left: 4px;
+    right: 4px;
+    overflow-y: scroll;
+}
+
+.songbtn {
+    float: left;
+}
+
+.tabbtn {
+    float: right;
+    clear: both;
 }
 
 #content {
@@ -69,34 +86,17 @@ form {
     font-size: 12px;
 }
 
-.menu {
-    position: absolute;
-    top: 38px;
-    left: 4px;
-    right: 4px;
-    overflow-y: scroll;
-}
-
-.songbtn {
-    float: left;
-}
-
-.tabbtn {
-    float: right;
-    clear: both;
+#code {
+    width: 100%;
+    height: 600px;
+    margin-top: 5px;
+    white-space: pre;
 }
 
 #verses {
     position: fixed;
     bottom: 0;
     right: 0;
-}
-
-#code {
-    width: 100%;
-    height: 600px;
-    margin-top: 5px;
-    white-space: pre;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -114,10 +114,6 @@ form {
     textarea {
         color: white;
         background-color: #222;
-    }
-
-    a {
-        color: white;
     }
 
     .menu {

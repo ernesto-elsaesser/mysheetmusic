@@ -61,10 +61,10 @@ sea. And he
 - A bar consists of a note line and one or more lyrics lines
 - The notes in the notes line are separated by spaces
 - Each note indicates (in order):
-  1. Pitch
-  2. Octave (optional)
-  3. Duration
-  4. Chord (optional)
+  - Pitch
+  - Octave (optional)
+  - Duration
+  - Chord (optional)
 - The pitch is notated as degree relativ to the tonic of the (major) scale
   - In C major: `1`=C, `2`=D, `3`=E, `4`=F, `5`=G, `6`=A, `7`=B
 - The pitch can be modified by a `#` or a `b` (e.g. `4#`)
@@ -72,7 +72,7 @@ sea. And he
 - The octave is notated as shift from "middle" (e.g. middle C)
   - each `,` after the pitch shifts the note one octave down
   - each `'` after the pitch shifts the note one octave down
-- The duration uses predefined symbols with modifiers:
+- The duration uses predefined symbols:
   - `w` = whole
   - `h` = half
   - `q` = quarter
@@ -102,4 +102,4 @@ a `|` character can be used to mark the break:
 1ot 1ot 1ot | 2ot 2ot 2ot
 ```
 
-The file format was inspired by VexFlow's [EasyScore](https://github.com/0xfe/vexflow/wiki/Using-EasyScore), but it is (in my opinion) even easier!
+The file format was inspired by VexFlow's [EasyScore](https://github.com/0xfe/vexflow/wiki/Using-EasyScore), but it is - in my opinion - even easier!

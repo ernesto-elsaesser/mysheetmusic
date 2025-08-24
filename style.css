@@ -70,7 +70,7 @@ textarea, a {
     top: 38px;
     left: 4px;
     right: 0;
-    background-color: #222;
+    background-color: white;
     overflow-y: scroll;
 }
 
@@ -109,5 +109,9 @@ textarea, a {
 
     a {
         color: white;
+    }
+
+    #picker {
+        background-color: #222;
     }
 }

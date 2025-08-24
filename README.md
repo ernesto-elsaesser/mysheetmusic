@@ -57,7 +57,7 @@ sea. And he
 ...
 ```
 
-![](example.png)
+![](assets/vexflow.png)
 
 - Each row represents a bar, separated by empty lines
 - A bar consists of a note line and one or more lyrics lines

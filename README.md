@@ -13,8 +13,8 @@ The idea is to open the page on some mobile device to play along.
 Switching between songs is quick and easy, with an alphabetically sorted song list.
 Both notes and lyrics can be edited in-line for quick adjustments (don't forget to save).
 
-View the menu, it is also possible to edit the song as plain text, to create
-new songs, delete existing ones, and to import from MusicXML files.
+Via the menu, it is also possible to edit a song as plain text, to create
+new songs, delete existing ones, or to import songs from [MusicXML](https://en.wikipedia.org/wiki/MusicXML) files.
 
 Manually entering the notes for a new song requires some familiarity with
 the [file format](#file-format) described below.

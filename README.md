@@ -1,32 +1,33 @@
 # MySheetMusic
 
-This one-page web app manages a collection of song files, which are plain text files in a
-[custom format](#file-format). The format was designed to capture a single voice
-of a musical score, with melody, text and harmony (i.e. chords) - basically
-**[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
+This single-page web app manages a collection of song files, which are plain text
+files in a [custom format](#file-format). The format was designed to capture a
+single voice of a musical score, with melody, text and harmony (i.e. chords) - basically **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
 
 ## Frontend
 
-The [index.html](index.html) page renders a single song file, using [VexFlow](https://www.vexflow.com/). The UI is very simplistic, but designed to work well on all screen sizes.
+The [index.html](index.html) page renders a single song file, using [VexFlow](https://www.vexflow.com/).
+The UI is very simplistic, but designed to work well on all screen sizes.
 The idea is to open the page on some mobile device to play along.
 
 Switching between songs is quick and easy, with an alphabetically sorted song list.
 Both notes and lyrics can be edited in-line for quick adjustments (don't forget to save).
 
-The [editor.html](editor.html) page allows adding new songs or editing existing
-ones. Songs can be typed in manually or imported from MusicXML files. There are
-basic controls to shift the full song by whole steps or octaves. Right now,
-this page is not very user friendly, and of course requires some familiarity with
+View the menu, it is also possible to edit the song as plain text, to create
+new songs, delete existing ones, and to import from MusicXML files.
+
+Manually entering the notes for a new song requires some familiarity with
 the [file format](#file-format) described below.
 
 ## Backend
 
 [songs.php](songs.php) is a small PHP script that allows the frontend
-to create and modify text files on the server. This is a very simple solution
-for setups with an existing web server (Apache2, nginx, etc.). This could be
-replaced by some JavaScript code that stores the song files in a Google Drive
-folder or similar. I am considering to add such a feature in the future to allow
-serverless setups.
+to create, edit, delete and fetch text files on the server. This is a straight-forward
+solution when hosting the web app on a traditional web server (Apache2, nginx, etc.).
+
+For a serverless setup, the PHP script could be replaced by some JavaScript code
+that stores song files in a Google Drive folder or similar. I am considering to
+add such a feature in the future.
 
 ## File Format
 

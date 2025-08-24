@@ -6,23 +6,30 @@ with melody, text and harmony indicated by chord symbols - basically **[lead she
 
 ## Frontend
 
-The [index.html](index.html) page renders a sinlge song file, using [VexFlow](https://www.vexflow.com/). The UI is very simplistic, but designed to work well on all screen sizes.
-The idea is to open the page on some mobile device to play along. Switching between
-songs is quick and easy, with an alphabetically sorted song list. Both notes
-and lyrics can be edited in-line for quick adjustments (don't forget to save).
+The [index.html](index.html) page renders a single song file, using [VexFlow](https://www.vexflow.com/). The UI is very simplistic, but designed to work well on all screen sizes.
+The idea is to open the page on some mobile device to play along.
+
+Switching between songs is quick and easy, with an alphabetically sorted song list.
+Both notes and lyrics can be edited in-line for quick adjustments (don't forget to save).
 
 The [editor.html](editor.html) page allows adding new songs or editing existing
-ones. Songs can be typed in manually or imported from MusicXML files.
+ones. Songs can be typed in manually or imported from MusicXML files. There are
+basic controls to shift the full song by whole steps or octaves. Right now,
+this page is not very user friendly, and of course requires some familiarity with
+the [file format](#file-format) described below.
 
 ## Backend
 
-The [songs.php](songs.php) is a super simple PHP script to allow the frontend
-to create and modify files on the server. However, this requires some sort of
-web server (e.g. apache2) to host the web app.
+[songs.php](songs.php) is a small PHP script that allows the frontend
+to create and modify text files on the server. This is a very simple solution
+for setups with an existing web server (Apache2, nginx, etc.). This could be
+replaced by some JavaScript code that stores the song files in a Google Drive
+folder or similar. I am considering to add such a feature in the future to allow
+serverless setups.
 
 ## File Format
 
-The core concept behind this web app is an extremely lightweight file format
+The core idea behind this web app is an extremely lightweight file format
 that is both human and machine readable. It has three tracks, to indicate to
 a single pianist what to do with his/her left and right hand, and optionally
 what to sing along.
@@ -95,4 +102,4 @@ a `|` character can be used to mark the break:
 1ot 1ot 1ot | 2ot 2ot 2ot
 ```
 
-
+The file format was inspired by VexFlow's [EasyScore](https://github.com/0xfe/vexflow/wiki/Using-EasyScore), but it is (in my opinion) even easier!

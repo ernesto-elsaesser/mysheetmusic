@@ -8,9 +8,18 @@ if (!is_writable($DIR)) {
 
 if (isset($_POST['name'])) {
     $file = $DIR . '/' . $_POST['name'] . '.txt';
-    $count = file_put_contents($file, $_POST['data']);
-    chmod($file, 0666);
-    http_response_code($count ? 201 : 401);
+    if (isset($_POST['data'])) {
+        file_put_contents($file, $_POST['data']);
+        $success = chmod($file, 0666);
+    } else {
+        $success = unlink($file);
+    }
+    http_response_code($success ? 200 : 500);
+    if (!$success) {
+        $error = error_get_last();
+        echo $error['message'];
+    }
+    exit;
 }
 
 $files = scandir($DIR);

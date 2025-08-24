@@ -44,6 +44,12 @@
                 <div id="parts"></div>
             </form>
         </div>
+        <div id="delete" class="tab" hidden>
+            <form>
+                <p>Do you really want to delete this song?</p>
+                <input type="button" onclick="deleteSong()" value="Delete">
+            </form>
+        </div>
     </div>
     </div>
 
@@ -53,8 +59,9 @@
     <div id="tabmenu" class="menu" hidden>
         <button class="tabbtn" onclick="selectTab('sheet')">Sheet Music</button>
         <button class="tabbtn" onclick="selectTab('raw')">Text Editor</button>
-        <button class="tabbtn" onclick="selectTab('create')">New Song</button>
+        <button class="tabbtn" onclick="selectTab('create')">Create Song</button>
         <button class="tabbtn" onclick="selectTab('import')">MusicXML Import</button>
+        <button class="tabbtn" onclick="selectTab('delete')">Delete Song</button>
     </div>
 
     <script>
@@ -280,7 +287,7 @@
                 body: "name=" + name + "&data=" + data
             })
 
-            if (res.status != 201) {
+            if (res.status != 200) {
                 window.alert(res.statusText)
                 return
             }
@@ -346,6 +353,25 @@
 
         function shiftSong(steps) {
             code.value = transposeCode(code.value, steps)
+        }
+
+        async function deleteSong() {
+
+            const name = title.innerText
+
+            const res = await fetch('songs.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: "name=" + name
+            })
+
+            if (res.status != 200) {
+                window.alert(res.statusText)
+                return
+            }
+
+            selectTab("sheet")
+            loadSongs("")
         }
 
         code.oninput = () => toggleEditMode(true)

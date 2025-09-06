@@ -63,6 +63,7 @@
         <button class="tabbtn" onclick="selectTab('create')">Create Song</button>
         <button class="tabbtn" onclick="selectTab('import')">MusicXML Import</button>
         <button class="tabbtn" onclick="selectTab('delete')">Delete Song</button>
+        <button class="tabbtn" onclick="reloadSongs()">Reload Songs</button>
     </div>
 
     <script>
@@ -88,7 +89,7 @@
 
         var songs = {}
 
-        async function loadSongs(selected) {
+        async function loadSongs() {
 
             const res = await fetch("songs.php")
 
@@ -116,8 +117,15 @@
                 songMenu.appendChild(button)
             }
 
+            return names
+        }
+
+        async function reloadSongs() {
+
+            const names = await loadSongs()
+            let selected = decodeURIComponent(window.location.hash.slice(1))
             if (!names.includes(selected)) selected = names[0]
-            selectSong(selected)
+            loadSong(selected)
         }
 
         function showTabs() {
@@ -147,10 +155,16 @@
 
         function selectSong(name) {
 
-            window.location.hash = "#" + name
-            title.innerText = name
             songMenu.hidden = true
             content.hidden = false
+
+            loadSong(name)
+        }
+
+        function loadSong(name) {
+
+            window.location.hash = "#" + name
+            title.innerText = name
             sheet.innerHTML = ""
             verses.innerHTML = ""
 
@@ -259,10 +273,9 @@
 
             const name = title.innerText
             if (name in songs) {
-                selectSong(name)
+                loadSong(name)
                 toggleEditMode(false)
-            }
-            else {
+            } else {
                 code.value = ""
             }
         }
@@ -296,9 +309,12 @@
             }
 
             toggleEditMode(false)
-            loadSongs(name)
+
+            await loadSongs()
+
+            loadSong(name)
         }
-            
+
         fileInput.addEventListener('change', (event) => {
 
             const file = event.target.files[0]
@@ -376,13 +392,14 @@
             }
 
             selectTab("sheet")
-            loadSongs("")
+
+            const names = await loadSongs()
+            loadSong(names[0])
         }
 
         code.oninput = () => toggleEditMode(true)
         
-        const anchor = decodeURIComponent(window.location.hash.slice(1))
-        loadSongs(anchor)
+        reloadSongs()
 
     </script>
     <script src="js/zip.js"></script>

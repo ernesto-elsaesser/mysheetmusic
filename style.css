@@ -83,6 +83,7 @@ form {
     border: none;
     resize: none;
     font-size: 12px;
+    line-height: 16px;
 }
 
 #code {

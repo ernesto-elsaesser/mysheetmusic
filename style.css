@@ -14,7 +14,7 @@ button {
     font-size: 14px;
 }
 
-textarea {
+textarea, a {
     color: #222;
 }
 
@@ -115,7 +115,7 @@ form {
         background-color: #555;
     }
 
-    textarea {
+    textarea, a {
         color: white;
         background-color: #222;
     }

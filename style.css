@@ -50,3 +50,7 @@ form {
     margin-top: 5px;
     white-space: pre;
 }
+
+#footer {
+    text-align: center;
+}

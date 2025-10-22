@@ -74,7 +74,7 @@ for($i = 0; $i < $n; $i += 1) {
         </div>
     </div>
 
-    <div style="margin: 10px; text-align: center">
+    <div id="footer">
 <?php
 echo "<a href=\"edit.php?name=$name\">EDIT</a>";
 for ($v = 1; $v <= $verse_count; $v += 1) {

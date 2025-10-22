@@ -6,7 +6,7 @@
     $name = $_GET['name'];
     $file = 'songs/' . $name . '.txt';
 
-if ($method == "POST") {
+if ($method == 'POST') {
     file_put_contents($file, $_POST['code']);
     $success = chmod($file, 0666);
     if (!$success) {
@@ -14,7 +14,7 @@ if ($method == "POST") {
         echo $error['message'];
         exit;
     }
-} else if ($method == "DELETE") {
+} else if ($method == 'DELETE') {
     $success = unlink($file);
     if ($success) {
         echo "Deleted.";
@@ -65,6 +65,8 @@ if ($method == "POST") {
         echo "<script>vx($i, $width, \"$melody\", $tieEnd);</script>";
         echo "</div>";
     }
+
+    # TODO link to other verses
 ?>
         </div>
     </div>

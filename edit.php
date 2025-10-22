@@ -25,6 +25,7 @@
             <input type="button" onclick="shiftSong(1)" value="+ STEP" />
             <input type="button" onclick="shiftSong(7)" value="+ OCT" />
             <input type="submit" value="SAVE" />
+            <a href="<?php echo "song.php?name=$name"; ?>">VIEW</a>
             <textarea id="code"><?php echo $song; ?></textarea>
         </form>
         <label for="file">MusicXML: </label><input type="file" id="file" accept=".mxl">

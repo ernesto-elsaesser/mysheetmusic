@@ -73,13 +73,13 @@ $n = count($parts);
 
     <div style="margin: 10px; text-align: center">
 <?php
+    echo "<a href=\"edit.php?name=$name\">EDIT</a>";
     for ($v = 1; $v <= $verse_count; $v += 1) {
         if ($v != $verse) {
-            echo "<a href=\"song.php?name=$name&verse=$v\">Verse $v</a>";
-            echo "&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;";
+            echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
+            echo "<a href=\"song.php?name=$name&verse=$v\">VERSE $v</a>";
         }
     }
-    echo "<a href=\"edit.php?name=$name\">Edit</a>";
 ?>
     </div>
 </body>

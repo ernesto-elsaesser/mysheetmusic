@@ -5,6 +5,12 @@ const PITCH_MAP = {
     "1''": "c/6", "2''": "d/6", "3''": "e/6", "4''": "f/6", "5''": "g/6",
 }
 
+function vx(id, width, melody, tieEnd) {
+    const frame = document.getElementById("p" + id.toString())
+    renderMeasure(frame, true, width, melody, tieEnd == 1)
+
+}
+
 function renderMeasure(frame, isDark, width, melody, tieEnd) {
 
     frame.innerHTML = ""

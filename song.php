@@ -59,7 +59,7 @@ for($i = 0; $i < $n; $i += 1) {
 
     $text = $lines[$verse];
     $maxlen = max(strlen($melody), strlen($text));
-    $width = max($maxlen * 9, 40);
+    $width = max(($maxlen + 1) * 9, 40);
 
     $tieEnd = 0;
     if ($i + 1 < $n && $parts[$i + 1][0] == "~") $tieEnd = 1;

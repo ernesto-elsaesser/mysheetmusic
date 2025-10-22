@@ -20,14 +20,13 @@
 <body>
     <div id="content">
         <form id="editor" method="POST" action="<?php echo "song.php?name=$name"; ?>">
-            <input type="button" onclick="shiftSong(-7)" value="OCTAVE DOWN">
-            <input type="button" onclick="shiftSong(7)" value="OCTAVE UP">
-            <input type="button" onclick="shiftSong(-1)" value="STEP DOWN">
-            <input type="button" onclick="shiftSong(1)" value="STEP UP">
-            <textarea id="code"><?php echo $song; ?></textarea>
+            <input type="button" onclick="shiftSong(-7)" value="- OCT" />
+            <input type="button" onclick="shiftSong(-1)" value="- STEP" />
+            <input type="button" onclick="shiftSong(1)" value="+ STEP" />
+            <input type="button" onclick="shiftSong(7)" value="+ OCT" />
             <input type="submit" value="SAVE" />
+            <textarea id="code"><?php echo $song; ?></textarea>
         </form>
-        <br/>
         <label for="file">MusicXML: </label><input type="file" id="file" accept=".mxl">
         <div id="parts"></div>
     </div>

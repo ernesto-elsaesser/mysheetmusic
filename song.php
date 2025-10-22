@@ -4,18 +4,18 @@
 <?php
 $method = $_SERVER['REQUEST_METHOD'];
 $name = $_GET['name'];
-$text_file = 'songs/' . $name . '.txt';
+$file = "songs/$name.txt";
 
 if ($method == 'POST') {
-    file_put_contents($text_file, $_POST['code']);
-    $success = chmod($text_file, 0666);
+    file_put_contents($file, $_POST['code']);
+    $success = chmod($file, 0666);
     if (!$success) {
         $error = error_get_last();
         echo $error['message'];
         exit;
     }
 } else if ($method == 'DELETE') {
-    $success = unlink($text_file);
+    $success = unlink($file);
     if ($success) {
         echo "Deleted.";
     } else {
@@ -28,7 +28,7 @@ if ($method == 'POST') {
 $verse = 1;
 if (isset($_GET['verse'])) $verse = intval($_GET['verse']);
 
-$song = file_get_contents($text_file);
+$song = file_get_contents($file);
 $parts = explode("\n\n", $song);
 $n = count($parts);
 ?>
@@ -47,7 +47,6 @@ $n = count($parts);
         <div id="sheet">
 <?php
 $verse_count = 1;
-$use_snapshot = $_GET['snap'];
 for($i = 0; $i < $n; $i += 1) {
     $part = $parts[$i];
     if ($part == "") continue;
@@ -71,34 +70,28 @@ for($i = 0; $i < $n; $i += 1) {
     echo "<script>vx($i, $width, \"$melody\", $tieEnd);</script>";
     echo "</div>";
 }
-
-if ($use_snapshot) {
-    $html_file = 'rendered/' . $name . '.html';
-    $html = file_get_contents($html_file);
-    echo $html;
-}
 ?>
         </div>
     </div>
 
     <div style="margin: 10px; text-align: center">
 <?php
-    echo "<a href=\"edit.php?name=$name\">EDIT</a>";
-    for ($v = 1; $v <= $verse_count; $v += 1) {
-        if ($v != $verse) {
-            echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
-            echo "<a href=\"song.php?name=$name&verse=$v\">VERSE $v</a>";
-        }
-    }
+echo "<a href=\"edit.php?name=$name\">EDIT</a>";
+for ($v = 1; $v <= $verse_count; $v += 1) {
+    if ($v != $verse) {
         echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
-        echo "<a onclick=\"snapshot()\">SNAP</a>";
+        echo "<a href=\"song.php?name=$name&verse=$v\">VERSE $v</a>";
+    }
+}
+echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
+echo "<a href=\"#\" onclick=\"snapshot()\">SNAP</a>";
 ?>
     </div>
     <script>
         function snapshot() {
             const sheet = document.getElementById("sheet")
             const html = sheet.innerHTML
-            fetch('<?php echo "render.php?name=$name"; ?>', {
+            fetch('<?php echo "snap.php?name=$name"; ?>', {
                 method: 'POST',
                 body: html
             }).then((res) => window.alert(res.statusText))

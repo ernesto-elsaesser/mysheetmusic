@@ -3,7 +3,7 @@
 
 <?php
     $name = $_GET['name'];
-    $file = 'songs/' . $name . '.txt';
+    $file = "songs/$name.txt";
     $song = "";
     if (file_exists($file)) $song = file_get_contents($file);
 ?>

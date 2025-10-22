@@ -9,19 +9,20 @@
 </head>
 
 <body>
-
     <div id="songs">
 <?php
     $files = scandir("songs");
     $songs = array();
-    foreach( $files as $file ) {
+    foreach($files as $file) {
         $dotpos = strrpos($file, '.');
         $ext = substr($file, $dotpos + 1);
         $name = substr($file, 0, $dotpos);
         if ($ext != 'txt') continue;
         $name = substr($file, 0, -4);
-        $song = file_get_contents($DIR . '/' . $file);
-        print("<a target=\"_blank\" href=\"song.php?name=$name\">$name</a><br/>");
+        print("<a target=\"_blank\" href=\"song.php?name=$name\">$name</a>");
+        if (file_exists("snaps/$name.html"))
+            print(" (<a target=\"_blank\" href=\"snap.php?name=$name\">snap</a>)");
+        print("<br/>");
     }
 ?>
     </div>

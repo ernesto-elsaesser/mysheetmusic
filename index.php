@@ -21,7 +21,7 @@
         if ($ext != 'txt') continue;
         $name = substr($file, 0, -4);
         $song = file_get_contents($DIR . '/' . $file);
-        print("<a href=\"song.php?name=$name\">$name</a><br/>");
+        print("<a target=\"_blank\" href=\"song.php?name=$name\">$name</a><br/>");
     }
 ?>
     </div>

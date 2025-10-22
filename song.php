@@ -24,6 +24,13 @@ if ($method == 'POST') {
     }
     exit;
 }
+
+$verse = 1;
+if (isset($_GET['verse'])) $verse = intval($_GET['verse']);
+
+$song = file_get_contents($file);
+$parts = explode("\n\n", $song);
+$n = count($parts);
 ?>
 
 <head>
@@ -39,19 +46,14 @@ if ($method == 'POST') {
     <div id="content">
         <div id="sheet">
 <?php
-    $verse = 1;
-    if (isset($_GET['verse'])) $verse = intval($_GET['verse']);
-
-    $song = file_get_contents($file);
-    $parts = explode("\n\n", $song);
-    $n = count($parts);
-
+    $verse_count = 1;
     for($i = 0; $i < $n; $i += 1) {
         $part = $parts[$i];
         if ($part == "") continue;
 
         $lines = explode("\n", $part);
         $melody = $lines[0];
+        $verse_count = max($verse_count, count($lines) - 1);
         $text = $lines[$verse];
         $maxlen = max(strlen($melody), strlen($text));
         $width = max(($maxlen + 1) * 8, 40);
@@ -65,10 +67,20 @@ if ($method == 'POST') {
         echo "<script>vx($i, $width, \"$melody\", $tieEnd);</script>";
         echo "</div>";
     }
-
-    # TODO link to other verses
 ?>
         </div>
+    </div>
+
+    <div style="margin: 10px; text-align: center">
+<?php
+    for ($v = 1; $v <= $verse_count; $v += 1) {
+        if ($v != $verse) {
+            echo "<a href=\"song.php?name=$name&verse=$v\">Verse $v</a>";
+            echo "&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;";
+        }
+    }
+    echo "<a href=\"edit.php?name=$name\">Edit</a>";
+?>
     </div>
 </body>
 </html>

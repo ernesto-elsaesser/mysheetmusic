@@ -18,6 +18,10 @@ textarea, a {
     color: #222;
 }
 
+a {
+    text-decoration: none;
+}
+
 form {
     text-align: center;
 }

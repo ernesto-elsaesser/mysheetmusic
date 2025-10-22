@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Songs</title>
-    <link rel="stylesheet" href="style.css#20251022" />
+    <link rel="stylesheet" href="style.css#1" />
 </head>
 
 <body>

@@ -7,8 +7,7 @@ const PITCH_MAP = {
 
 function vx(id, width, melody, tieEnd) {
     const frame = document.getElementById("p" + id.toString())
-    renderMeasure(frame, true, width, melody, tieEnd == 1)
-
+    renderMeasure(frame, false, width, melody, tieEnd == 1)
 }
 
 function renderMeasure(frame, isDark, width, melody, tieEnd) {

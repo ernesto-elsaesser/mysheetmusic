@@ -12,9 +12,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $name; ?></title>
-    <script src="js/transpose.js#20250824"></script>
-    <script src="js/import.js#20250824"></script>
-    <link rel="stylesheet" href="style.css#20250913" />
+    <script src="js/transpose.js#1"></script>
+    <script src="js/import.js#1"></script>
+    <link rel="stylesheet" href="style.css#1" />
 </head>
 
 <body>

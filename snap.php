@@ -4,6 +4,7 @@
 <?php
 $method = $_SERVER['REQUEST_METHOD'];
 $name = $_GET['name'];
+$mode = $_GET['mode'];
 $file = "snaps/$name.html";
 
 if ($method == 'POST') {
@@ -25,7 +26,7 @@ if ($method == 'POST') {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $name; ?></title>
-    <link rel="stylesheet" href="style.css#20251022" />
+    <link rel="stylesheet" href="style.css#1" />
 </head>
 
 <body>
@@ -33,6 +34,8 @@ if ($method == 'POST') {
         <div id="sheet">
 <?php
 $html = file_get_contents($file);
+if ($mode == "dark") $html = str_replace("", "", $html);
+else if ($mode == "light") $html = str_replace("", "", $html);
 echo $html;
 ?>
         </div>

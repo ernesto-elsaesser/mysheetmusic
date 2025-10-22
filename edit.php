@@ -25,9 +25,10 @@
             <input type="button" onclick="shiftSong(-1)" value="STEP DOWN">
             <input type="button" onclick="shiftSong(1)" value="STEP UP">
             <textarea id="code"><?php echo $song; ?></textarea>
-            <input type="submit">SAVE</input>
+            <input type="submit" value="SAVE" />
         </form>
-        <label for="file">MusicXML:</label><input type="file" id="mxl" accept=".mxl">
+        <br/>
+        <label for="file">MusicXML: </label><input type="file" id="file" accept=".mxl">
         <div id="parts"></div>
     </div>
     <script>

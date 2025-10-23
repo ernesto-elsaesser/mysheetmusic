@@ -30,7 +30,7 @@ if (isset($_GET['verse'])) $verse = intval($_GET['verse']);
 
 $song = file_get_contents($file);
 $parts = explode("\n\n", $song);
-$n = count($parts);
+$part_count = count($parts);
 ?>
 
 <head>
@@ -47,14 +47,14 @@ $n = count($parts);
         <div id="sheet">
 <?php
 $verse_count = 1;
-for($i = 0; $i < $n; $i += 1) {
+for($i = 0; $i < $part_count; $i += 1) {
     $part = $parts[$i];
     if ($part == "") continue;
 
     $lines = explode("\n", $part);
-    $melody = $lines[0];
     $line_count = count($lines);
 
+    $melody = $lines[0];
     $text = "";
     if ($line_count > 1) {
         $verse_count = max($verse_count, $line_count - 1);
@@ -66,7 +66,7 @@ for($i = 0; $i < $n; $i += 1) {
     $width = max(($maxlen + 1) * 9, 40);
 
     $tieEnd = 0;
-    if ($i + 1 < $n && $parts[$i + 1][0] == "~") $tieEnd = 1;
+    if ($i + 1 < $part_count && $parts[$i + 1][0] == "~") $tieEnd = 1;
 
     echo "<div class=\"measure\" style=\"width: ${width}px\">";
     echo "<div id=\"p$i\" class=\"frame\"></div>";

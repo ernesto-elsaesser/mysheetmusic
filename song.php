@@ -80,7 +80,7 @@ echo "<a href=\"edit.php?name=$name\">EDIT</a>";
 for ($v = 1; $v <= $verse_count; $v += 1) {
     if ($v != $verse) {
         echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
-        echo "<a href=\"song.php?name=$name&verse=$v\">VERSE $v</a>";
+        echo "<a href=\"song.php?name=$name&verse=$v\">$v</a>";
     }
 }
 echo "&nbsp;&nbsp;|&nbsp;&nbsp;";

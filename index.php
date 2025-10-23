@@ -27,6 +27,10 @@
     }
 ?>
         </div>
+        <form action="edit.php" target="_blank">
+            <input type="text" name="name" />
+            <input type="submit" value="Create" />
+        </form>
     </div>
 </body>
 </html>

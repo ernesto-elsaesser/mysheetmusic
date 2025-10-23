@@ -53,11 +53,15 @@ for($i = 0; $i < $n; $i += 1) {
 
     $lines = explode("\n", $part);
     $melody = $lines[0];
-    $verse_count = max($verse_count, count($lines) - 1);
+    $line_count = count($lines);
 
-    if ($use_snapshot) continue;
+    $text = "";
+    if ($line_count > 1) {
+        $verse_count = max($verse_count, $line_count - 1);
+        if ($verse < $line_count) $text = $lines[$verse];
+        else $text = $lines[1];
+    }
 
-    $text = $lines[$verse];
     $maxlen = max(strlen($melody), strlen($text));
     $width = max(($maxlen + 1) * 9, 40);
 

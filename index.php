@@ -9,7 +9,8 @@
 </head>
 
 <body>
-    <div id="songs">
+    <div id="content">
+        <div id="songlist">
 <?php
     $files = scandir("songs");
     $songs = array();
@@ -25,6 +26,7 @@
         print("<br/>");
     }
 ?>
+        </div>
     </div>
 </body>
 </html>

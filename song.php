@@ -96,7 +96,7 @@ echo "<a href=\"#\" onclick=\"snapshot()\">SNAP</a>";
         function snapshot() {
             const sheet = document.getElementById("sheet")
             const html = sheet.innerHTML
-            fetch('<?php echo "snap.php?name=$name"; ?>', {
+            fetch("<?php echo "snap.php?name=$name"; ?>", {
                 method: 'POST',
                 body: html
             }).then((res) => window.alert(res.statusText))

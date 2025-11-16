@@ -69,9 +69,9 @@ a {
 
 #footer li:not(:first-child):before {
   content: "|";
-  margin-right: 15px; /* Space between the item text and the separator */
-  margin-left: -5px; /* Pull the separator back a bit to save space */
-  font-weight: bold; /* Make the bar stand out */
+  margin-right: 15px;
+  margin-left: -5px;
+  font-weight: bold;
 }
 
 [hidden] {

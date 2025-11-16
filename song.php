@@ -40,7 +40,7 @@ $part_count = count($parts);
     <title><?php echo $name; ?></title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
     <script src="js/render.js#1"></script>
-    <link rel="stylesheet" href="style.css#1" />
+    <link rel="stylesheet" href="style.css#2" />
 </head>
 
 <body>
@@ -79,27 +79,35 @@ for($i = 0; $i < $part_count; $i += 1) {
         </div>
     </div>
 
-    <div id="footer">
+    <ul id="footer">
 <?php
-echo "<a href=\"edit.php?name=$name\">EDIT</a>";
+echo "<li><a href=\"edit.php?name=$name\">EDIT</a></li>";
 for ($v = 1; $v <= $verse_count; $v += 1) {
     if ($v != $verse) {
-        echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
-        echo "<a href=\"song.php?name=$name&verse=$v\">$v</a>";
+        echo "<li><a href=\"song.php?name=$name&verse=$v\">$v</a></li>";
     }
 }
-echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
-echo "<a href=\"#\" onclick=\"snapshot()\">SNAP</a>";
+echo "<li onclick=\"snapshot()\">SNAP</li>";
+echo "<li id=\"compat\"";
+if (!file_exists("snaps/$name.html"))
+    echo " hidden";
+echo "><a href=\"snap.php?name=$name\">BARE</a></li>";
 ?>
-    </div>
+    </ul>
     <script>
         function snapshot() {
+            const btn = document.getElementById("compat")
             const sheet = document.getElementById("sheet")
             const html = sheet.innerHTML
+            btn.hidden = true
             fetch("<?php echo "snap.php?name=$name"; ?>", {
                 method: 'POST',
                 body: html
-            }).then((res) => window.alert(res.statusText))
+            }).then((res) => {
+                if (res.status == 200) {
+                    btn.hidden = false
+                }
+            })
         }
     </script>
 </body>

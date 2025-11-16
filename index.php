@@ -20,10 +20,7 @@
         $name = substr($file, 0, $dotpos);
         if ($ext != 'txt') continue;
         $name = substr($file, 0, -4);
-        print("<a target=\"_blank\" href=\"song.php?name=$name\">$name</a>");
-        if (file_exists("snaps/$name.html"))
-            print(" (<a target=\"_blank\" href=\"snap.php?name=$name\">snap</a>)");
-        print("<br/>");
+        echo "<a target=\"_blank\" href=\"song.php?name=$name\">$name</a><br/>";
     }
 ?>
         </div>

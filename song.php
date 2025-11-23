@@ -215,8 +215,6 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         function showSnap() {
             window.location.href = "snap.php?name=" + name;
         }
-
-        renderSong()
     </script>
     <script src="js/zip.js"></script>
 </body>

@@ -5,12 +5,7 @@ const PITCH_MAP = {
     "1''": "c/6", "2''": "d/6", "3''": "e/6", "4''": "f/6", "5''": "g/6",
 }
 
-function vx(id, width, melody, tieEnd) {
-    const frame = document.getElementById("p" + id.toString())
-    renderMeasure(frame, false, width, melody, tieEnd == 1)
-}
-
-function renderMeasure(frame, isDark, width, melody, tieEnd) {
+function renderMeasure(frame, color, width, melody, tieEnd) {
 
     frame.innerHTML = ""
 
@@ -131,7 +126,6 @@ function renderMeasure(frame, isDark, width, melody, tieEnd) {
     let context = renderer.getContext()
     context.scale(0.8, 0.8)
 
-    const color = isDark ? "white" : "black"
     context.setFillStyle(color)
     context.setStrokeStyle(color)
 

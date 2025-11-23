@@ -43,7 +43,11 @@ a {
 
 .lyrics {
     padding-left: 8px;
-    height: 32px;
+    width: 100%;
+    height: 20px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    line-height: 20px;
 }
 
 #code {

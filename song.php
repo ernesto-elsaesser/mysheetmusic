@@ -76,8 +76,8 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     </div>
     <div id="footer">
         <input type="button" onclick="editSong()" value="EDIT" />
-        <input type="button" onclick="prevVerse()" value="<" />
-        <input type="button" onclick="nextVerse()" value=">" />
+        <input type="button" onclick="scrollText(-1)" value="<" />
+        <input type="button" onclick="scrollText(1)" value=">" />
     </ul>
     <script>
         const name = "<?php echo $name ?>"
@@ -88,16 +88,15 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         const fileInput = document.getElementById('file')
         const parts = document.getElementById('parts')
 
-        var verse = 1
+        var lyricsOffset = 0
 
-        function nextVerse() {
-            verse += 1
-            renderSong()
-        }
-
-        function prevVerse() {
-            if (verse > 1) verse -= 1
-            renderSong()
+        function scrollText(lines) {
+            lyricsOffset += lines * 20
+            if (lyricsOffset < 0) lyricsOffset = 0
+            const textareas = document.getElementsByClassName("lyrics")
+            for (let textarea of textareas) {
+                textarea.scrollTop = lyricsOffset
+            }
         }
 
         function editSong() {
@@ -154,34 +153,29 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
                 const part = parts[i]
                 if (part == "") continue;
 
+                const tieEnd = i + 1 < parts.length && parts[i + 1][0] == "~"
+
                 const lines = part.split("\n")
-                const melody = lines[0]
-                let text = ""
-                if (lines.length > 1) {
-                    text = lines[Math.min(verse, lines.length - 1)]
-                }
-
-                const maxLen = Math.max(melody.length, text.length)
-                const width = Math.max((maxLen + 1) * 9, 40)
-
-                let tieEnd = false
-                if (i + 1 < parts.length && parts[i + 1][0] == "~") tieEnd = true
+                const lengths = lines.map((l) => l.length)
+                const maxLength = Math.max(...lengths)
+                const width = Math.max((maxLength + 1) * 9, 40)
+                const melody = lines.shift()
+                const text = lines.join("<br>")
 
                 const measure = document.createElement("div")
                 measure.className = "measure"
                 measure.style.width = width.toString() + "px"
+                sheet.appendChild(measure)
 
                 const frame = document.createElement("div")
                 frame.className = "frame"
-                const lyrics = document.createElement("div")
-                lyrics.className = "lyrics"
-                lyrics.innerText = text
-
-                sheet.appendChild(measure)
                 measure.appendChild(frame)
-                measure.appendChild(lyrics)
-
                 renderMeasure(frame, "black", width, melody, tieEnd)
+
+                let lyrics = document.createElement("div")
+                lyrics.className = "lyrics"
+                lyrics.innerHTML = text
+                measure.appendChild(lyrics)
             }
         }
 

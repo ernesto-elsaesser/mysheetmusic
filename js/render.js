@@ -55,10 +55,10 @@ function renderMeasure(frame, color, width, melody, tieEnd) {
         duration = duration.replace("z", "32")
 
         let dots = 0
-        if (data[0] == ".") {
+        while (data[0] == ".") {
             let dot = new Vex.Flow.Dot()
             mods.push(dot)
-            dots = 1
+            dots += 1
             data.shift()
         }
 

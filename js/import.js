@@ -32,8 +32,10 @@ const OCTAVES = {
 
 const DURATIONS = {
     96: "w",
+    84: "h..",
     72: "h.",
     48: "h",
+    42: "q..",
     36: "q.",
     24: "q",
     18: "o.",
@@ -171,7 +173,7 @@ function extractCode(epart, voice) {
                 duration = "?"
                 const edot = node.getElementsByTagName("dot")[0]
                 if (edot) duration += "."
-                console.log("ERROR: UNMAPPED DURATION", node)
+                console.log("ERROR: UNMAPPED DURATION " + length, node)
             }
             code += duration
 

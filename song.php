@@ -7,7 +7,7 @@ $name = $_GET['name'];
 $file = "songs/$name.txt";
 $snap = "snaps/$name.txt";
 
-if ($method == 'POST') {
+if ($method == 'PUT') {
     file_put_contents($file, $_POST['code']);
     $success = chmod($file, 0666);
     if ($success) {
@@ -34,13 +34,14 @@ if ($method == 'POST') {
     exit;
 }
 
-if (!file_exists($file)) {
+$song = "";
+if (file_exists($file)) {
+    $song = file_get_contents($file);
+} else if ($method == 'GET') {
     http_response_code(404);
     echo "Not found.";
     exit;
 }
-
-$song = file_get_contents($file);
 
 $sheet = "";
 if (file_exists($snap)) $sheet = file_get_contents($snap);
@@ -198,7 +199,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             formData.append('sheet', sheet.innerHTML);
 
             const res = await fetch("song.php?name=" + name, {
-                method: 'POST',
+                method: 'PUT',
                 body: formData,
             })
 

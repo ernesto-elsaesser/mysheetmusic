@@ -24,7 +24,7 @@
     }
 ?>
         </div>
-        <form action="song.php" method="POST" target="_blank">
+        <form action="song.php" target="_blank">
             <input type="text" name="name" />
             <input type="submit" value="Create" />
         </form>

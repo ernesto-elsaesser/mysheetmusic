@@ -8,7 +8,8 @@ $file = "songs/$name.txt";
 $snap = "snaps/$name.txt";
 
 if ($method == 'POST') {
-    file_put_contents($file, $_POST['code']);
+    $code = str_replace("\r", "", $_POST['code']);
+    file_put_contents($file, $code);
     $success = chmod($file, 0666);
     if ($success) {
         file_put_contents($snap, $_POST['sheet']);

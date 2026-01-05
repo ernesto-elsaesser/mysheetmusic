@@ -140,41 +140,6 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             reader.readAsArrayBuffer(file)
         })
 
-        function renderSong() {
-
-            sheet.innerHTML = ""
-
-            const parts = code.value.split("\n\n")
-            for(let i = 0; i < parts.length; i += 1) {
-                const part = parts[i]
-                if (part == "") continue;
-
-                const tieEnd = i + 1 < parts.length && parts[i + 1][0] == "~"
-
-                const lines = part.split("\n")
-                const lengths = lines.map((l) => l.length)
-                const maxLength = Math.max(...lengths)
-                const width = Math.max((maxLength + 1) * 9, 40)
-                const melody = lines.shift()
-                const text = lines.join("<br>")
-
-                const measure = document.createElement("div")
-                measure.className = "measure"
-                measure.style.width = width.toString() + "px"
-                sheet.appendChild(measure)
-
-                const frame = document.createElement("div")
-                frame.className = "frame"
-                measure.appendChild(frame)
-                renderMeasure(frame, "black", width, melody, tieEnd)
-
-                let lyrics = document.createElement("div")
-                lyrics.className = "lyrics"
-                lyrics.innerHTML = text
-                measure.appendChild(lyrics)
-            }
-        }
-
         function importSong(epart) {
             parts.innerHTML = ""
             code.value = extractCode(epart, "1")
@@ -187,7 +152,27 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         }
 
         async function saveSong() {
-            renderSong()
+
+            sheet.innerHTML = ""
+
+            const parts = code.value.split("\n\n")
+            let errors = ""
+
+            for(let i = 0; i < parts.length; i += 1) {
+                const part = parts[i]
+                if (part == "") continue;
+                const tieEnd = i + 1 < parts.length && parts[i + 1][0] == "~"
+                try {
+                    renderPart(part, tieEnd)
+                } catch (error) {
+                    errors += part + "\n\n" + error.toString() + "\n\n"
+                }
+            }
+
+            if (errors != "") {
+                window.alert(errors)
+                return
+            }
 
             const formData = new FormData()
             formData.append('code', code.value.replaceAll("\r\n", "\n"));
@@ -202,9 +187,31 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             else window.alert(res.statusText)
         }
 
-        function showSnap() {
-            window.location.href = "snap.php?name=" + name;
+        function renderPart(part, tieEnd) {
+
+            const lines = part.split("\n")
+            const lengths = lines.map((l) => l.length)
+            const maxLength = Math.max(...lengths)
+            const width = Math.max((maxLength + 1) * 9, 40)
+            const melody = lines.shift()
+            const text = lines.join("<br>")
+
+            const measure = document.createElement("div")
+            measure.className = "measure"
+            measure.style.width = width.toString() + "px"
+            sheet.appendChild(measure)
+
+            const frame = document.createElement("div")
+            frame.className = "frame"
+            measure.appendChild(frame)
+            renderMeasure(frame, "black", width, melody, tieEnd)
+
+            let lyrics = document.createElement("div")
+            lyrics.className = "lyrics"
+            lyrics.innerHTML = text
+            measure.appendChild(lyrics)
         }
+
     </script>
     <script src="js/zip.js"></script>
 </body>

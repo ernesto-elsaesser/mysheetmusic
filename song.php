@@ -49,6 +49,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
     <script src="js/parse.js?v=1"></script>
     <script src="js/render.js?v=2"></script>
+    <script src="js/synthesize.js?v=1"></script>
     <script src="js/transpose.js?v=1"></script>
     <script src="js/import.js?v=1"></script>
     <link rel="stylesheet" href="style.css?v=1" />
@@ -72,6 +73,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         </div>
     </div>
     <div id="footer">
+        <input type="button" onclick="playSong()" value="PLAY" />
         <input type="button" onclick="editSong()" value="EDIT" />
         <input type="button" onclick="scrollText(-1)" value="<" />
         <input type="button" onclick="scrollText(1)" value=">" />
@@ -150,6 +152,12 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             sheet.hidden = false
             editor.hidden = true
             footer.hidden = false
+        }
+
+        function playSong() {
+
+            const song = parseCode(code.value)
+            synthesizeMelody(song)
         }
 
         async function saveSong() {

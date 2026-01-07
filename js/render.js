@@ -1,121 +1,88 @@
-const PITCH_MAP = {
-    "1,": "c/3", "2,": "d/3", "3,": "e/3", "4,": "f/3", "5,": "g/3", "6,": "a/3", "7,": "b/3",
-    "1": "c/4", "2": "d/4", "3": "e/4", "4": "f/4", "5": "g/4", "6": "a/4", "7": "b/4",
-    "1'": "c/5", "2'": "d/5", "3'": "e/5", "4'": "f/5", "5'": "g/5", "6'": "a/5", "7'": "b/5",
-    "1''": "c/6", "2''": "d/6", "3''": "e/6", "4''": "f/6", "5''": "g/6",
-}
+const C_SCALE_DEGREES = [null, "C", "D", "E", "F", "G", "A", "B"]
 
-function renderMeasure(frame, color, width, melody, tieEnd) {
+function renderStave(frame, color, width, notes, tieEnd) {
 
     frame.innerHTML = ""
 
-    let notes = []
+    let staveNotes = []
     let tieOptions = []
     let tripletNotes = []
-    let inTriplet = false
 
-    for (let code of melody.split(" ")) {
-
-        if (code == "|") {
-            inTriplet = false
-            continue
-        }
-
-        const data = code.split("")
-
-        let tie = false
-        if (data[0] == "~") {
-            tie = true
-            data.shift()
-        }
-
-        let degree = data.shift()
-        while ((data[0] == "'") || (data[0] == ",")) {
-            degree += data.shift()
-        }
-        let pitch = PITCH_MAP[degree]
+    for (let note of notes) {
 
         let mods = []
 
-        if (data[0] == "#") {
-            const sharp = new Vex.Flow.Accidental("#")
-            mods.push(sharp)
-            data.shift()
+        for (let acc of note.accs) {
+            if (acc == "#") {
+                const sharp = new Vex.Flow.Accidental("#")
+                mods.push(sharp)
+            } else if (dacc == "b") {
+                let flat = new Vex.Flow.Accidental("b")
+                mods.push(flat)
+            }
         }
 
-        if (data[0] == "b") {
-            let flat = new Vex.Flow.Accidental("b")
-            mods.push(flat)
-            data.shift()
+        for (i = 0; i < note.dots; i += 1) {
+            let dot = new Vex.Flow.Dot()
+            mods.push(dot)
         }
 
-        var duration = data.shift()
+        let duration = note.duration
         duration = duration.replace("o", "8")
         duration = duration.replace("x", "16")
         duration = duration.replace("z", "32")
 
-        let dots = 0
-        while (data[0] == ".") {
-            let dot = new Vex.Flow.Dot()
-            mods.push(dot)
-            dots += 1
-            data.shift()
-        }
-
-        if (degree == "0") {
+        let pitch = ""
+        if (note.degree == 0) { // rest
             pitch = duration == "w" ? "d/5" : "b/4"
             duration += "r"
+        } else {
+            pitch = C_SCALE_DEGREES[note.degree].toLowerCase() + "/" + note.octave.toString()
         }
 
-        let note = new Vex.Flow.StaveNote({
+        const staveNote = new Vex.Flow.StaveNote({
             clef: "treble",
             keys: [pitch],
             duration: duration,
-            dots: dots,
+            dots: note.dots,
             auto_stem: true,
         })
 
-        mods.forEach(m => note.addModifier(m))
+        mods.forEach(m => staveNote.addModifier(m))
 
-        if (tie) {
+        if (note.isTied) {
             tieOptions.push({
-                first_note: notes[notes.length - 1],
-                last_note: note,
+                first_note: staveNotes[staveNotes.length - 1],
+                last_note: staveNote,
                 first_indices: [0],
                 last_indices: [0],
             })
         }
 
-        notes.push(note)
+        staveNotes.push(staveNote)
 
-        if (data[0] == "t") {
-            data.shift()
-            if (inTriplet) {
-                tripletNotes[0].push(note)
+        if (note.isTriplet) {
+            if (tripletNotes.length == 0 || tripletNotes[0].length == 3) {
+                tripletNotes.unshift([staveNote])
             } else {
-                tripletNotes.unshift([note])
-                inTriplet = true
+                tripletNotes[0].push(staveNote)
             }
-        } else {
-            inTriplet = false
         }
 
-        if (data.length == 0) continue
-
-        const chordDegree = data.shift()
-        let chord = PITCH_MAP[chordDegree].slice(0, 1).toUpperCase()
-        chord += data.join("")
-
-        let symbol = new Vex.Flow.ChordSymbol()
-        symbol.setHorizontal('center')
-        symbol.setFontSize(14)
-        symbol.addText(chord)
-        note.addModifier(symbol)
+        if (note.chordDegree > 0) {
+            let chord = C_SCALE_DEGREES[note.chordDegree]
+            chord += note.chordSuffix
+            let symbol = new Vex.Flow.ChordSymbol()
+            symbol.setHorizontal('center')
+            symbol.setFontSize(14)
+            symbol.addText(chord)
+            staveNote.addModifier(symbol)
+        }
     }
 
     if (tieEnd) {
         tieOptions.push({
-            first_note: notes[notes.length - 1],
+            first_note: staveNotes[staveNotes.length - 1],
             first_indices: [0],
         })
     }
@@ -145,7 +112,7 @@ function renderMeasure(frame, color, width, melody, tieEnd) {
         return tie
     })
 
-    Vex.Flow.Formatter.FormatAndDraw(context, stave, notes, true)
+    Vex.Flow.Formatter.FormatAndDraw(context, stave, staveNotes, true)
 
     ties.forEach(t => t.draw())
     tuplets.forEach(t => t.draw())

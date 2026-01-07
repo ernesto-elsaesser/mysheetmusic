@@ -47,7 +47,8 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $name; ?></title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="js/render.js?v=1"></script>
+    <script src="js/parse.js?v=1"></script>
+    <script src="js/render.js?v=2"></script>
     <script src="js/transpose.js?v=1"></script>
     <script src="js/import.js?v=1"></script>
     <link rel="stylesheet" href="style.css?v=1" />
@@ -153,21 +154,8 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
 
         async function saveSong() {
 
-            sheet.innerHTML = ""
-
-            const parts = code.value.split("\n\n")
-            let errors = ""
-
-            for(let i = 0; i < parts.length; i += 1) {
-                const part = parts[i]
-                if (part == "") continue;
-                const tieEnd = i + 1 < parts.length && parts[i + 1][0] == "~"
-                try {
-                    renderPart(part, tieEnd)
-                } catch (error) {
-                    errors += part + "\n\n" + error.toString() + "\n\n"
-                }
-            }
+            const song = parseCode(code.value)
+            const errors = renderSong(song)
 
             if (errors != "") {
                 window.alert(errors)
@@ -187,29 +175,44 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             else window.alert(res.statusText)
         }
 
-        function renderPart(part, tieEnd) {
+        function renderSong(song) {
 
-            const lines = part.split("\n")
-            const lengths = lines.map((l) => l.length)
-            const maxLength = Math.max(...lengths)
-            const width = Math.max((maxLength + 1) * 9, 40)
-            const melody = lines.shift()
-            const text = lines.join("<br>")
+            sheet.innerHTML = ""
 
-            const measure = document.createElement("div")
-            measure.className = "measure"
-            measure.style.width = width.toString() + "px"
-            sheet.appendChild(measure)
+            let errors = ""
 
-            const frame = document.createElement("div")
-            frame.className = "frame"
-            measure.appendChild(frame)
-            renderMeasure(frame, "black", width, melody, tieEnd)
+            for(let i = 0; i < song.length; i += 1) {
 
-            let lyrics = document.createElement("div")
-            lyrics.className = "lyrics"
-            lyrics.innerHTML = text
-            measure.appendChild(lyrics)
+                const part = song[i]
+
+                try {
+
+                    const tieEnd = i + 1 < song.length && song[i + 1].notes[0].isTied
+                    const textLengths = part.lyrics.map((l) => l.length)
+                    const maxLength = Math.max(part.source.length, ...textLengths)
+                    const width = Math.max((maxLength + 1) * 9, 40)
+
+                    const measure = document.createElement("div")
+                    measure.className = "measure"
+                    measure.style.width = width.toString() + "px"
+                    sheet.appendChild(measure)
+
+                    const frame = document.createElement("div")
+                    frame.className = "frame"
+                    measure.appendChild(frame)
+                    renderStave(frame, "black", width, part.notes, tieEnd)
+
+                    let lyrics = document.createElement("div")
+                    lyrics.className = "lyrics"
+                    lyrics.innerHTML = part.lyrics.join("<br>")
+                    measure.appendChild(lyrics)
+
+                } catch (error) {
+                    errors += part.source + "\n\n" + error.toString() + "\n\n"
+                }
+            }
+
+            return errors
         }
 
     </script>

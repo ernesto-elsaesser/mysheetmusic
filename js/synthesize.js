@@ -9,6 +9,8 @@ const DURATION_FACTORS = {
 }
 const TEMPO = 0.5
 
+// TODO: ties, chords, triplets
+
 function synthesizeMelody(song) {
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)()

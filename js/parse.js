@@ -18,12 +18,13 @@ function parseCode(code) {
                 degree: 0,
                 octave: 4,
                 duration: "",
-                accs: "",
+                acc: "",
                 dots: 0,
                 transFrom: null,
                 transTo: null,
                 inTriplet: false,
                 chordDegree: 0,
+                chordAcc: "",
                 chordSuffix: "",
             }
 
@@ -46,12 +47,10 @@ function parseCode(code) {
             }
 
             if (data[0] == "#") {
-                note.accs += "#"
+                note.acc = "#"
                 data.shift()
-            }
-
-            if (data[0] == "b") {
-                note.accs += "b"
+            } else if (data[0] == "b") {
+                note.acc = "b"
                 data.shift()
             }
 
@@ -73,6 +72,16 @@ function parseCode(code) {
             if (data.length == 0) continue
 
             note.chordDegree = parseInt(data.shift())
+
+            if (data[0] == "#") {
+                note.chordAcc == "#"
+                data.shift()
+            }
+            else if (data[0] == "b") {
+                note.chordAcc == "b"
+                data.shift()
+            }
+
             note.chordSuffix = data.join("")
         }
 

@@ -12,14 +12,9 @@ function renderStave(frame, color, width, notes) {
 
         let mods = []
 
-        for (let acc of note.accs) {
-            if (acc == "#") {
-                const sharp = new Vex.Flow.Accidental("#")
-                mods.push(sharp)
-            } else if (dacc == "b") {
-                let flat = new Vex.Flow.Accidental("b")
-                mods.push(flat)
-            }
+        if (note.acc != "") {
+            const acc = new Vex.Flow.Accidental(note.acc)
+            mods.push(acc)
         }
 
         for (i = 0; i < note.dots; i += 1) {

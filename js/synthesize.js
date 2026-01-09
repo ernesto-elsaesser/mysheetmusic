@@ -50,22 +50,22 @@ function extractMelody(song) {
                 sounds.push({
                     level: level,
                     gain: 0.1,
-                    offsetStart: offset,
-                    offsetEnd: offset + length,
+                    offset: offset,
+                    length: length,
                 })
             }
 
             if (note.chordDegree > 0) {
                 if (prevChord != null) {
-                    prevChord.forEach(s => s.offsetEnd = offset)
+                    prevChord.forEach(s => s.length = offset - s.offset)
                 }
                 const level = getA4Shift(note.chordDegree, 3, note.chordAcc)
                 const chordSounds = CHORD_STEPS[note.chordSuffix].map(step => {
                     return {
                         level: level + step,
                         gain: 0.03,
-                        offsetStart: offset,
-                        offsetEnd: null, // set later
+                        offset: offset,
+                        length: 0, // set later
                     }
                 })
                 sounds.push(...chordSounds)
@@ -89,14 +89,16 @@ function playMelody(sounds, tempo) {
     let now = audioCtx.currentTime
 
     sounds.forEach(sound => {
-        const start = now + tempo * sound.offsetStart
-        const end = now + tempo * sound.offsetEnd
+        const start = now + tempo * sound.offset
+        const end = start + tempo * sound.length
+
+        const ramp = sound.length * 0.1
 
         // envelope
         const gainNode = audioCtx.createGain()
         gainNode.gain.setValueAtTime(0, start)
-        gainNode.gain.linearRampToValueAtTime(sound.gain, start + 0.02)
-        gainNode.gain.setValueAtTime(sound.gain, end - 0.2)
+        gainNode.gain.linearRampToValueAtTime(sound.gain, start + ramp)
+        gainNode.gain.setValueAtTime(sound.gain, end - ramp)
         gainNode.gain.linearRampToValueAtTime(0, end)
         gainNode.connect(audioCtx.destination)
 

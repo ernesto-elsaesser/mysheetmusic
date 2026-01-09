@@ -1,6 +1,8 @@
 
 function parseCode(code) {
 
+    let prevNote = null
+
     return code.split("\n\n").map((measure) => {
 
         let lyrics = measure.split("\n")
@@ -18,8 +20,9 @@ function parseCode(code) {
                 duration: "",
                 accs: "",
                 dots: 0,
-                isTied: false,
-                isTriplet: false,
+                transFrom: null,
+                transTo: null,
+                inTriplet: false,
                 chordDegree: 0,
                 chordSuffix: "",
             }
@@ -27,7 +30,8 @@ function parseCode(code) {
             const data = token.split("")
 
             if (data[0] == "~") {
-                note.isTied = true
+                note.transFrom = prevNote
+                prevNote.transTo = note
                 data.shift()
             }
 
@@ -64,6 +68,7 @@ function parseCode(code) {
             }
 
             notes.push(note)
+            prevNote = note
 
             if (data.length == 0) continue
 

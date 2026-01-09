@@ -1,6 +1,6 @@
 const C_SCALE_DEGREES = [null, "C", "D", "E", "F", "G", "A", "B"]
 
-function renderStave(frame, color, width, notes, tieEnd) {
+function renderStave(frame, color, width, notes) {
 
     frame.innerHTML = ""
 
@@ -50,7 +50,7 @@ function renderStave(frame, color, width, notes, tieEnd) {
 
         mods.forEach(m => staveNote.addModifier(m))
 
-        if (note.isTied) {
+        if (note.transFrom) {
             tieOptions.push({
                 first_note: staveNotes[staveNotes.length - 1],
                 last_note: staveNote,
@@ -61,7 +61,7 @@ function renderStave(frame, color, width, notes, tieEnd) {
 
         staveNotes.push(staveNote)
 
-        if (note.isTriplet) {
+        if (note.inTriplet) {
             if (tripletNotes.length == 0 || tripletNotes[0].length == 3) {
                 tripletNotes.unshift([staveNote])
             } else {
@@ -80,7 +80,7 @@ function renderStave(frame, color, width, notes, tieEnd) {
         }
     }
 
-    if (tieEnd) {
+    if (notes[notes.length - 1].transTo) {
         tieOptions.push({
             first_note: staveNotes[staveNotes.length - 1],
             first_indices: [0],

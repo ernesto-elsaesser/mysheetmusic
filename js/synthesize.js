@@ -9,21 +9,28 @@ const DURATION_FACTORS = {
 }
 const TEMPO = 0.5
 
-// TODO: ties, chords, triplets
+// TODO: chords, triplets
 
 function synthesizeMelody(song) {
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
     let startTime = audioCtx.currentTime
 
-    song.forEach((part) => {
-        part.notes.forEach((note) => {
+    for (let part of song) {
+        let pendingFactor = 0
+        for (let note of part.notes) {
 
             let factor = DURATION_FACTORS[note.duration]
             if (note.dots == 1) factor *= 1.5
             else if (note.dots == 2) factor *= 1.75
 
-            const endTime = startTime + TEMPO * factor
+            if (note.transTo && (note.transTo.degree == note.degree) && (note.transTo.octave == note.octave)) {
+                pendingFactor += factor
+                continue
+            }
+
+            const endTime = startTime + TEMPO * (factor + pendingFactor)
+            pendingFactor = 0
 
             if (note.degree > 0) {
                 let exp = A4_DELTAS[note.degree]
@@ -47,8 +54,8 @@ function synthesizeMelody(song) {
                 osc.stop(endTime)
             }
             startTime = endTime
-        })
-    })
+        }
+    }
 
     return audioCtx
 }

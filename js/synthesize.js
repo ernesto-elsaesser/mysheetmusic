@@ -49,4 +49,6 @@ function synthesizeMelody(song) {
             startTime = endTime
         })
     })
+
+    return audioCtx
 }

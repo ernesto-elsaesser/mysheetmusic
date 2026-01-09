@@ -87,6 +87,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         const fileInput = document.getElementById('file')
         const parts = document.getElementById('parts')
 
+        var activeAudioContext = null
         var lyricsOffset = 0
 
         function scrollText(lines) {
@@ -156,8 +157,13 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
 
         function playSong() {
 
-            const song = parseCode(code.value)
-            synthesizeMelody(song)
+            if (activeAudioContext == null) {
+                const song = parseCode(code.value)
+                activeAudioContext = synthesizeMelody(song)
+            } else {
+                activeAudioContext.close()
+                activeAudioContext = null
+            }
         }
 
         async function saveSong() {

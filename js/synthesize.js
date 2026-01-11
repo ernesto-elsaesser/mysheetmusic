@@ -12,7 +12,7 @@ const CHORD_STEPS = {
     "m": [0, 3/12, 7/12],
     "sus": [0, 5/12, 7/12],
 }
-const TEMPO = 0.5
+const TEMPO = 0.4
 
 // TODO: slurs
 
@@ -49,7 +49,7 @@ function extractMelody(song) {
                 const level = getA4Shift(note.degree, note.octave, note.acc)
                 sounds.push({
                     level: level,
-                    gain: 0.1,
+                    gain: 0.3,
                     offset: offset,
                     length: length,
                 })
@@ -63,7 +63,7 @@ function extractMelody(song) {
                 const chordSounds = CHORD_STEPS[note.chordSuffix].map(step => {
                     return {
                         level: level + step,
-                        gain: 0.03,
+                        gain: 0.1,
                         offset: offset,
                         length: 0, // set later
                     }

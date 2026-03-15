@@ -20,7 +20,7 @@ if ($method == 'POST') {
     } else {
         $error = error_get_last();
         http_response_code(500);
-        echo $error['message'];
+        echo json_encode($error);
     }
     exit;
 } else if ($method == 'DELETE') {
@@ -30,7 +30,7 @@ if ($method == 'POST') {
     } else {
         $error = error_get_last();
         http_response_code(500);
-        echo $error['message'];
+        echo json_encode($error);
     }
     exit;
 }

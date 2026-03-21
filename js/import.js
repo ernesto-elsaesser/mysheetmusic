@@ -22,14 +22,6 @@ const DOWNSHIFTS = {
     "5": 6,
 }
 
-const OCTAVES = {
-    2: ",,",
-    3: ",",
-    4: "",
-    5: "'",
-    6: "''",
-}
-
 const DURATIONS = {
     96: "w",
     84: "h..",
@@ -71,9 +63,9 @@ function parseNote(step, octave, alter, fifths) {
 
     let degree = PITCHES.indexOf(step) + 1 - DOWNSHIFTS[fifths]
     
-    let sharp = false
+    let acc = ""
     if (alter != 0) {
-        sharp = true
+        acc = "#"
         if (alter == -1) degree -= 1
     }
     if (degree < 1) {
@@ -83,17 +75,18 @@ function parseNote(step, octave, alter, fifths) {
     return {
         degree: degree,
         octave: octave,
-        sharp: sharp,
+        acc: acc,
     }
 }
 
-function extractCode(epart, voice) {
+function extractSong(epart, voice) {
 
     const emeasures = epart.getElementsByTagName("measure")
 
     let baseLength = 6
     let fifths = 0
-    let measures = []
+    let song = []
+    let prevNote = null
     for (const emeasure of emeasures) {
 
         const eattr = emeasure.getElementsByTagName("attributes")[0]
@@ -110,7 +103,7 @@ function extractCode(epart, voice) {
         }
 
         let notes = []
-        let lines = []
+        let lyrics = []
         let chord = null
         let inSlur = false
         for (const node of emeasure.childNodes) {
@@ -126,10 +119,9 @@ function extractCode(epart, voice) {
                 const ealter = eroot.getElementsByTagName("root-alter")[0]
                 const ekind = node.getElementsByTagName("kind")[0]
                 const alter = ealter ? parseInt(ealter.innerHTML) : 0
-                const note = parseNote(estep.innerHTML, 0, alter, fifths)
-                chord = note.degree.toString()
-                if (chord.sharp) chord += "#"
-                if (ekind.innerHTML == "minor") chord += "m"
+                chord = parseNote(estep.innerHTML, 0, alter, fifths)
+                if (ekind.innerHTML == "minor") chord.suffix += "m"
+                else chord.suffix = ""
                 continue
             }
 
@@ -147,8 +139,21 @@ function extractCode(epart, voice) {
             const eduration = node.getElementsByTagName("duration")[0]
             if (eduration == undefined) continue
 
+            let note = {
+                degree: 0,
+                octave: 4,
+                duration: "",
+                acc: "",
+                dots: 0,
+                transFrom: null,
+                transTo: null,
+                inTriplet: false,
+                chordDegree: 0,
+                chordAcc: "",
+                chordSuffix: "",
+            }
+
             const epitch = node.getElementsByTagName("pitch")[0]
-            let code = "0"
             if (epitch == undefined) {
                 const erest = node.getElementsByTagName("rest")[0]
                 if (erest == undefined) {
@@ -161,21 +166,25 @@ function extractCode(epart, voice) {
 
                 const octave = parseInt(eoctave.innerHTML)
                 const alter = ealter ? parseInt(ealter.innerHTML) : 0
-                const note = parseNote(estep.innerHTML, octave, alter, fifths)
+                const info = parseNote(estep.innerHTML, octave, alter, fifths)
 
-                code = note.degree.toString() + OCTAVES[note.octave]
-                if (note.sharp) code += "#"
+                note.degree = info.degree
+                note.octave = info.octave
+                note.acc = info.acc
             }
 
             const length = parseInt(eduration.innerHTML) * baseLength
             let duration = DURATIONS[length]
             if (duration == undefined) {
-                duration = "?"
+                note.duration = "?"
                 const edot = node.getElementsByTagName("dot")[0]
-                if (edot) duration += "."
+                if (edot) note.dots = 1
                 console.log("ERROR: UNMAPPED DURATION " + length, node)
+            } else {
+                note.duration = duration[0]
+                if (duration.includes("t")) notes.inTriplet = true
+                else note.dots = duration.length - 1
             }
-            code += duration
 
             let isTied = inSlur
 
@@ -195,34 +204,37 @@ function extractCode(epart, voice) {
                 if (type == "stop") isTied = true
             }
 
-            if (isTied) code = "~" + code
+            if (isTied) {
+                note.transFrom = prevNote
+                prevNote.transTo = note
+            }
 
             if (chord) {
-                code += chord
+                note.chordDegree = chord.degree
+                note.chordAcc = chord.acc
+                note.chordSuffix = chord.suffix
                 chord = null
             }
 
-            notes.push(code)
+            notes.push(note)
+            prevNote = note
 
             const elyrics = node.getElementsByTagName("lyric")
             for (const elyric of elyrics) {
                 const index = parseInt(elyric.attributes["number"].nodeValue) - 1
                 const syllabic = elyric.getElementsByTagName("syllabic")[0].innerHTML
                 const text = elyric.getElementsByTagName("text")[0].innerHTML
-                while (index >= lines.length) lines.push("")
-                let line = lines[index]
+                while (index >= lyrics.length) lyrics.push("")
+                let line = lyrics[index]
                 if (line.endsWith("-")) line = line.slice(0, -1)
                 line += text
                 line += INFIXES[syllabic]
-                lines[index] = line
+                lyrics[index] = line.trim()
             }
         }
 
-        lines = lines.map((l) => l.trim())
-        const melody = notes.join(" ")
-        lines.unshift(melody)
-        measures.push(lines)
+        song.push({notes: notes, lyrics: lyrics})
     }
 
-    return measures.map((m) => m.join("\n")).join("\n\n")
+    return song
 }

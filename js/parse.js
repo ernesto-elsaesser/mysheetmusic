@@ -1,5 +1,5 @@
 
-function parseCode(code) {
+function decodeSong(code) {
 
     let prevNote = null
 
@@ -88,4 +88,31 @@ function parseCode(code) {
         return {notes: notes, source: melody, lyrics: lyrics}
 
     }).filter((l) => l.notes.length > 0)
+}
+
+const OCTAVES = {
+    2: ",,",
+    3: ",",
+    4: "",
+    5: "'",
+    6: "''",
+}
+
+function encodeSong(song) {
+
+    return song.map((measure) => {
+        const melody = measure.notes.map(encodeNote).join(" ")
+        return [melody, ...measure.lyrics].join("\n")
+    }.join("\n\n")
+}
+
+function encodeNote(note) {
+
+    let code = note.degree.toString() + OCTAVES[note.octave] + note.acc + duration
+    for (let i = 0; i < note.dots; i += 1) code += "."
+    if (note.chordDegree > 0) {
+        code += note.chordDegree.toString() + note.chordAcc + note.chordSuffix
+    }
+    if (note.transFrom) code = "~" + code
+    return code
 }

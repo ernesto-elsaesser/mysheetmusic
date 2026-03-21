@@ -50,7 +50,6 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     <script src="js/parse.js?v=1"></script>
     <script src="js/render.js?v=2"></script>
     <script src="js/synthesize.js?v=2"></script>
-    <script src="js/transpose.js?v=1"></script>
     <script src="js/import.js?v=1"></script>
     <link rel="stylesheet" href="style.css?v=1" />
 </head>
@@ -106,7 +105,26 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         }
 
         function shiftSong(steps) {
-            code.value = transposeCode(code.value, steps)
+            const song = decodeSong(code.value)
+            for (let measure of song) {
+                for (let note of measure.notes) {
+                    note.degree += steps
+                    if (note.degree > 7) {
+                        note.degree -= 7
+                        note.octave += 1
+                    } else if (note.degree < 1) {
+                        note.degree += 7
+                        note.octave -= 1
+                    }
+                    note.chordDegree += steps
+                    if (note.chordDegree > 7) {
+                        note.chordDegree -= 7
+                    } else if (note.chordDegree < 1) {
+                        note.chordDegree += 7
+                    }
+                }
+            }
+            code.value = encodeSong(songs)
         }
 
         fileInput.addEventListener('change', (event) => {
@@ -146,7 +164,8 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
 
         function importSong(epart) {
             parts.innerHTML = ""
-            code.value = extractCode(epart, "1")
+            let song = extractSong(epart, "1")
+            code.value = encodeSong(song)
         }
 
         function cancelEdit() {
@@ -158,7 +177,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         function playSong() {
 
             if (activeAudioContext == null) {
-                const song = parseCode(code.value)
+                const song = decodeCode(code.value)
                 activeAudioContext = synthesizeMelody(song)
             } else {
                 activeAudioContext.close()
@@ -168,7 +187,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
 
         async function saveSong() {
 
-            const song = parseCode(code.value)
+            const song = decodeCode(code.value)
             const errors = renderSong(song)
 
             if (errors != "") {

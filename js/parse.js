@@ -103,12 +103,12 @@ function encodeSong(song) {
     return song.map((measure) => {
         const melody = measure.notes.map(encodeNote).join(" ")
         return [melody, ...measure.lyrics].join("\n")
-    }.join("\n\n")
+    }).join("\n\n")
 }
 
 function encodeNote(note) {
 
-    let code = note.degree.toString() + OCTAVES[note.octave] + note.acc + duration
+    let code = note.degree.toString() + OCTAVES[note.octave] + note.acc + note.duration
     for (let i = 0; i < note.dots; i += 1) code += "."
     if (note.chordDegree > 0) {
         code += note.chordDegree.toString() + note.chordAcc + note.chordSuffix

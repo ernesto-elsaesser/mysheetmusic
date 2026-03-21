@@ -124,7 +124,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
                     }
                 }
             }
-            code.value = encodeSong(songs)
+            code.value = encodeSong(song)
         }
 
         fileInput.addEventListener('change', (event) => {

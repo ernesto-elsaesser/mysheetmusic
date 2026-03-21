@@ -47,11 +47,11 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $name; ?></title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="js/parse.js?v=1"></script>
-    <script src="js/render.js?v=2"></script>
-    <script src="js/synthesize.js?v=2"></script>
-    <script src="js/import.js?v=1"></script>
-    <link rel="stylesheet" href="style.css?v=1" />
+    <script src="js/parse.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/synthesize.js"></script>
+    <script src="js/import.js"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -72,6 +72,11 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         </div>
     </div>
     <div id="footer">
+        <select id="speed">
+            <option value="0.8">SLOW</option>
+            <option value="0.6" selected>MEDI</option>
+            <option value="0.4">FAST</option>
+        </select>
         <input type="button" onclick="playSong()" value="PLAY" />
         <input type="button" onclick="editSong()" value="EDIT" />
         <input type="button" onclick="scrollText(-1)" value="<" />
@@ -80,6 +85,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     <script>
         const name = "<?php echo $name ?>"
         const sheet = document.getElementById('sheet')
+        const speed = document.getElementById('speed')
         const editor = document.getElementById('editor')
         const footer = document.getElementById('footer')
         const code = document.getElementById('code')
@@ -177,8 +183,9 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         function playSong() {
 
             if (activeAudioContext == null) {
-                const song = decodeCode(code.value)
-                activeAudioContext = synthesizeMelody(song)
+                const tempo = parseFloat(speed.value)
+                const song = decodeSong(code.value)
+                activeAudioContext = synthesizeMelody(song, tempo)
             } else {
                 activeAudioContext.close()
                 activeAudioContext = null
@@ -187,7 +194,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
 
         async function saveSong() {
 
-            const song = decodeCode(code.value)
+            const song = decodeSong(code.value)
             const errors = renderSong(song)
 
             if (errors != "") {

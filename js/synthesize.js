@@ -12,14 +12,13 @@ const CHORD_STEPS = {
     "m": [0, 3/12, 7/12],
     "sus": [0, 5/12, 7/12],
 }
-const TEMPO = 0.4
 
 // TODO: slurs
 
-function synthesizeMelody(song) {
+function synthesizeMelody(song, tempo) {
 
     const sounds = extractMelody(song)
-    return playMelody(sounds, TEMPO)
+    return playMelody(sounds, tempo)
 }
 
 function extractMelody(song) {

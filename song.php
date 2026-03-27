@@ -5,7 +5,7 @@
 $method = $_SERVER['REQUEST_METHOD'];
 $name = $_GET['name'];
 $file = "songs/$name.txt";
-$snap = "snaps/$name.txt";
+$snap = "songs/$name.html";
 
 if ($method == 'POST') {
     $code = str_replace("\r", "", $_POST['code']);

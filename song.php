@@ -51,7 +51,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     <script src="js/render.js"></script>
     <script src="js/synthesize.js"></script>
     <script src="js/import.js"></script>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="sheet.css" />
 </head>
 
 <body>

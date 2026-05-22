@@ -27,7 +27,9 @@ if ($method == 'POST') {
 } else if ($method == 'DELETE') {
     $success = unlink($file);
     if ($success) {
-        unlink($snap);
+      $success = unlink($snap);
+    }
+    if ($success) {
         echo "Deleted.";
     } else {
         $error = error_get_last();

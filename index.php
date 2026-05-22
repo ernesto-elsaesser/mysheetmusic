@@ -35,10 +35,12 @@
 
 <body>
 <?php
-  $GROUPS = ['Pop', 'Traditional', 'Children', 'Soundtrack', 'Classical', 'Blues'];
-  foreach($GROUPS as $group) {
-    echo "<div class=\"col\"><h2>$group</h2>";
+  $groups = explode("\n", file_get_contents('songs/groups.txt'));
+  foreach($groups as $group) {
+    if ($group == "") continue;
     $files = scandir("songs/$group");
+    if (count($files) == 0) continue;
+    echo "<div class=\"col\"><h2>$group</h2>";
     foreach($files as $file) {
       $dotpos = strrpos($file, '.');
       $ext = substr($file, $dotpos + 1);

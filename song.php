@@ -4,8 +4,9 @@
 <?php
 $method = $_SERVER['REQUEST_METHOD'];
 $name = $_GET['name'];
-$file = "songs/$name.txt";
-$snap = "songs/$name.html";
+$group = $_GET['group'];
+$file = "songs/$group/$name.txt";
+$snap = "songs/$group/$name.html";
 
 if ($method == 'POST') {
     $code = str_replace("\r", "", $_POST['code']);
@@ -83,7 +84,6 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         <input type="button" onclick="scrollText(1)" value=">" />
     </ul>
     <script>
-        const name = "<?php echo $name ?>"
         const sheet = document.getElementById('sheet')
         const speed = document.getElementById('speed')
         const editor = document.getElementById('editor')
@@ -206,7 +206,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             formData.append('code', code.value.replaceAll("\r\n", "\n"));
             formData.append('sheet', sheet.innerHTML);
 
-            const res = await fetch("song.php?name=" + name, {
+            const res = await fetch(window.location.href, {
                 method: 'POST',
                 body: formData,
             })

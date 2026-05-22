@@ -35,9 +35,8 @@
 
 <body>
 <?php
-  $groups = scandir("songs");
-  foreach($groups as $group) {
-    if ($group[0] == '.') continue;
+  $GROUPS = ['Pop', 'Traditional', 'Children', 'Soundtrack', 'Classical', 'Blues'];
+  foreach($GROUPS as $group) {
     echo "<div class=\"col\"><h2>$group</h2>";
     $files = scandir("songs/$group");
     foreach($files as $file) {

@@ -117,19 +117,23 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             const song = decodeSong(code.value)
             for (let measure of song) {
                 for (let note of measure.notes) {
-                    note.degree += steps
-                    if (note.degree > 7) {
-                        note.degree -= 7
-                        note.octave += 1
-                    } else if (note.degree < 1) {
-                        note.degree += 7
-                        note.octave -= 1
+                    if (note.degree > 0) {
+                      note.degree += steps
+                      if (note.degree > 7) {
+                          note.degree -= 7
+                          note.octave += 1
+                      } else if (note.degree < 1) {
+                          note.degree += 7
+                          note.octave -= 1
+                      }
                     }
-                    note.chordDegree += steps
-                    if (note.chordDegree > 7) {
-                        note.chordDegree -= 7
-                    } else if (note.chordDegree < 1) {
-                        note.chordDegree += 7
+                    if (note.chordDegree > 0) {
+                      note.chordDegree += steps
+                      if (note.chordDegree > 7) {
+                          note.chordDegree -= 7
+                      } else if (note.chordDegree < 1) {
+                          note.chordDegree += 7
+                      }
                     }
                 }
             }

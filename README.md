@@ -1,18 +1,18 @@
 # MySheetMusic
 
-A web app that manages a collection of song, stored as plain text files in a
-[custom format](#file-format). The format is designed to capture a single
-voice of a musical score, with melody, text and harmony (i.e. chords) -
-basically **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
+A web app that manages a personal collection of sheet music, stored as plain
+text files in a [custom format](#file-format). The format is designed to capture
+a single voice of a musical score, with melody, text and harmony -
+think **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
 
-## Frontend
+## Interface
 
 The [index.php](index.php) page shows a list of all songs, with one column per
 group. It also allows to add new songs.
 
-The [song.php](song.php) displays a single song. The UI is very minimal and
-works well on every screen size (e.g. to view sheet music on a tablet on a
-music stand or piano).
+The [song.php](song.php) renders the score for a single song. The UI is very
+minimal and should work well on any screen size (e.g. to view sheet music on a
+tablet on a music stand or piano).
 
 Via the editor, it is possible to directly edit a song (see [file format](#file-format)),
 or to import a voice from a [MusicXML](https://en.wikipedia.org/wiki/MusicXML) file.
@@ -20,6 +20,10 @@ or to import a voice from a [MusicXML](https://en.wikipedia.org/wiki/MusicXML) f
 When saving a song, the [VexFlow](https://www.vexflow.com/) library is used to
 pre-render sheet music based on the plain text notation. The generated HTML
 is stored for quick, JavaScript free loading / viewing on any device.
+
+The song page also allows playing the song via a very basic synthsizer,
+but this feature is still very limited and not designed to generate a
+musical rendition, but more as a quick check if the notated melody is correct.
 
 ## File Format
 

@@ -40,7 +40,7 @@ const DURATIONS = {
     3: "z",
 }
 
-const INFIXES = {
+const CONNECTORS = {
     "single": " ",
     "begin": "-",
     "middle": "-",
@@ -226,10 +226,11 @@ function extractSong(epart, voice) {
                 const text = elyric.getElementsByTagName("text")[0].innerHTML
                 while (index >= lyrics.length) lyrics.push("")
                 let line = lyrics[index]
+                // contract hyphenated words within measure
                 if (line.endsWith("-")) line = line.slice(0, -1)
-                line += text
-                line += INFIXES[syllabic]
-                lyrics[index] = line.trim()
+                line += text.trim()
+                line += CONNECTORS[syllabic]
+                lyrics[index] = line
             }
         }
 

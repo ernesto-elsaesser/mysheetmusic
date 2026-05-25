@@ -5,7 +5,7 @@ text files in a [custom format](#file-format). The format is designed to capture
 a single voice of a musical score, with melody, text and harmony -
 think **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
 
-## Interface
+## User Interface
 
 The [index.php](index.php) page shows a list of all songs, with one column per
 group. It also allows to add new songs.
@@ -105,3 +105,4 @@ a `|` character can be used to mark the break:
 The file format was inspired by VexFlow's [EasyScore](https://github.com/0xfe/vexflow/wiki/Using-EasyScore),
 but adapted to capture the essential parts of a musical score (for e.g. a solo
 pianist) in as few characters as possible.
+

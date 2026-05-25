@@ -1,40 +1,32 @@
 # MySheetMusic
 
-This single-page web app manages a collection of song files, which are plain text
-files in a [custom format](#file-format). The format was designed to capture a
-single voice of a musical score, with melody, text and harmony (i.e. chords) - basically **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
+A web app that manages a collection of song, stored as plain text files in a
+[custom format](#file-format). The format is designed to capture a single
+voice of a musical score, with melody, text and harmony (i.e. chords) -
+basically **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
 
 ## Frontend
 
-The [index.html](index.html) page renders a single song file, using [VexFlow](https://www.vexflow.com/).
-The UI is very simplistic, but designed to work well on all screen sizes.
-The idea is to open the page on some mobile device to play along.
+The [index.php](index.php) page shows a list of all songs, with one column per
+group. It also allows to add new songs.
 
-Switching between songs is quick and easy, with an alphabetically sorted song list.
-Both notes and lyrics can be edited in-line for quick adjustments (don't forget to save).
+The [song.php](song.php) displays a single song. The UI is very minimal and
+works well on every screen size (e.g. to view sheet music on a tablet on a
+music stand or piano).
 
-Via the menu, it is also possible to edit a song as plain text, to create
-new songs, delete existing ones, or to import songs from [MusicXML](https://en.wikipedia.org/wiki/MusicXML) files.
+Via the editor, it is possible to directly edit a song (see [file format](#file-format)),
+or to import a voice from a [MusicXML](https://en.wikipedia.org/wiki/MusicXML) file.
 
-Manually entering the notes for a new song requires some familiarity with
-the [file format](#file-format) described below.
-
-## Backend
-
-[songs.php](songs.php) is a small PHP script that allows the frontend
-to create, edit, delete and fetch text files on the server. This is a straight-forward
-solution when hosting the web app on a traditional web server (Apache2, nginx, etc.).
-
-For a serverless setup, the PHP script could be replaced by some JavaScript code
-that stores song files in a Google Drive folder or similar. I am considering to
-add such a feature in the future.
+When saving a song, the [VexFlow](https://www.vexflow.com/) library is used to
+pre-render sheet music based on the plain text notation. The generated HTML
+is stored for quick, JavaScript free loading / viewing on any device.
 
 ## File Format
 
-The core idea behind this web app is an extremely lightweight file format
-that is both human and machine readable. It has three tracks, to indicate to
-a single pianist what to do with his/her left and right hand, and optionally
-what to sing along.
+The central idea behind this web app is an extremely simple text format to store
+the core information of a musical piece in a format that is both human- and
+machine readable. A song is represented as a list of measures, each of which
+with a "music" line for the melody (and chords) and any number of lyrics lines.
 
 Here is an example for the start of "Yellow Submarine" by the Beatles:
 
@@ -57,21 +49,26 @@ sea. And he
 ...
 ```
 
+Notes and chords are notated as scale degrees (1-7). For rendering, the
+degrees are translated into the C major scale:
+
 ![](assets/vexflow.png)
 
-- Each row represents a bar, separated by empty lines
-- A bar consists of a note line and one or more lyrics lines
+### Specification
+
+- Each row represents a measure, separated by empty lines
+- A measure consists of a note line and one or more lyrics lines
 - The notes in the notes line are separated by spaces
 - Each note indicates (in order):
   - Pitch
   - Octave (optional)
   - Duration
   - Chord (optional)
-- The pitch is notated as degree relativ to the tonic of the (major) scale
+- The pitch is notated as degree relative to the tonic of the scale
   - In C major: `1`=C, `2`=D, `3`=E, `4`=F, `5`=G, `6`=A, `7`=B
 - The pitch can be modified by a `#` or a `b` (e.g. `4#`)
 - Pauses are notated as pitch `0`
-- The octave is notated as shift from "middle" (e.g. middle C)
+- The octave is notated as shift from the default octave (e.g. middle C)
   - each `,` after the pitch shifts the note one octave down
   - each `'` after the pitch shifts the note one octave down
 - The duration uses predefined symbols:
@@ -81,22 +78,19 @@ sea. And he
   - `o` = 8th
   - `x` = 16th
   - `z` = 32th
-- The duration symbol might be followed by a `.` to indicated dotted notes
-- The chord is indicated by its base note (as common), but as scale degree
-- The chord degree can be followed by an arbitrary string, e.g. "m" or "sus4"
-  - In C major: `1`=C, `6m`=Am, `5sus`=Gsus
-
-This notation could be mapped to any scale, but the frontend will always
-render songs in C major (for now).
+- The duration symbol might be followed by dots (`.`) for dotted notes
+- The chord is notated as the scale degree of its root note
+- The chord degree can be followed by an arbitrary string, e.g. "m", "7" or "sus4"
+  - In C major: `1`=C, `57`=G7, `6m`=Am, `5sus`=Gsus
 
 There are two special notations:
 
 A `~` before a note (that is, in front of the pitch degree) indicates that the
-note is **tied** to the previous one. This also works for the first note of the bar
-(even though the VexFlow rendering is not optimal).
+note is **tied** to the previous one. This also works for the first note of a
+measure, tying it to the last note of the previous measure.
 
 A `t` at the very end of a note indicates that this note is part of a **tuplet**.
-The consecutive number of notes with a `t` decide the size of the tuplet, i.e.
+The consecutive number of notes with a `t` decides the size of the tuplet, i.e.
 three `t` notes form a triplet. In the rare case of two directly adjacent tuplets,
 a `|` character can be used to mark the break:
 
@@ -104,4 +98,6 @@ a `|` character can be used to mark the break:
 1ot 1ot 1ot | 2ot 2ot 2ot
 ```
 
-The file format was inspired by VexFlow's [EasyScore](https://github.com/0xfe/vexflow/wiki/Using-EasyScore), but it is - in my opinion - even easier!
+The file format was inspired by VexFlow's [EasyScore](https://github.com/0xfe/vexflow/wiki/Using-EasyScore),
+but adapted to capture the essential parts of a musical score (for e.g. a solo
+pianist) in as few characters as possible.

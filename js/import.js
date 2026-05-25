@@ -228,11 +228,14 @@ function extractSong(epart, voice) {
                 let line = lyrics[index]
                 // contract hyphenated words within measure
                 if (line.endsWith("-")) line = line.slice(0, -1)
-                line += text.trim()
+                line += text
                 line += CONNECTORS[syllabic]
                 lyrics[index] = line
             }
         }
+
+        // remove trailing spaces
+        lyrics = lyrics.map(l => l.trim())
 
         song.push({notes: notes, lyrics: lyrics})
     }

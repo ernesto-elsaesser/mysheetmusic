@@ -74,11 +74,11 @@ function decodeSong(code) {
             note.chordDegree = parseInt(data.shift())
 
             if (data[0] == "#") {
-                note.chordAcc == "#"
+                note.chordAcc = "#"
                 data.shift()
             }
             else if (data[0] == "b") {
-                note.chordAcc == "b"
+                note.chordAcc = "b"
                 data.shift()
             }
 

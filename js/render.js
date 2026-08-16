@@ -66,6 +66,7 @@ function renderStave(frame, color, width, notes) {
 
         if (note.chordDegree > 0) {
             let chord = C_SCALE_DEGREES[note.chordDegree]
+            chord += note.chordAcc
             chord += note.chordSuffix
             let symbol = new Vex.Flow.ChordSymbol()
             symbol.setHorizontal('center')

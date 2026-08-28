@@ -120,7 +120,7 @@ function extractSong(epart, voice) {
                 const ekind = node.getElementsByTagName("kind")[0]
                 const alter = ealter ? parseInt(ealter.innerHTML) : 0
                 chord = parseNote(estep.innerHTML, 0, alter, fifths)
-                if (ekind.innerHTML == "minor") chord.suffix += "m"
+                if (ekind.innerHTML == "minor") chord.suffix = "m"
                 else chord.suffix = ""
                 continue
             }

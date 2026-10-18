@@ -76,6 +76,17 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         </div>
     </div>
     <div id="footer">
+        <select id="scale">
+            <option value="Ab">Ab Major (4b)</option>
+            <option value="Eb">Eb Major (3b)</option>
+            <option value="B">B Major (2b)</option>
+            <option value="F">F Major (1b)</option>
+            <option value="C" selected>C Major</option>
+            <option value="G">G Major (1#)</option>
+            <option value="D">D Major (2#)</option>
+            <option value="A">A Major (3#)</option>
+            <option value="E">E Major (4#)</option>
+        </select>
         <select id="speed">
             <option value="0.8">SLOW</option>
             <option value="0.6" selected>MEDI</option>
@@ -85,12 +96,13 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         <input type="button" onclick="editSong()" value="EDIT" />
         <input type="button" onclick="scrollText(-1)" value="<" />
         <input type="button" onclick="scrollText(1)" value=">" />
-    </ul>
+    </div>
     <script>
         const sheet = document.getElementById('sheet')
         const speed = document.getElementById('speed')
         const editor = document.getElementById('editor')
         const footer = document.getElementById('footer')
+        const scale = document.getElementById('scale')
         const code = document.getElementById('code')
         const fileInput = document.getElementById('file')
         const parts = document.getElementById('parts')
@@ -228,13 +240,12 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
 
             let errors = ""
 
-            for(let i = 0; i < song.length; i += 1) {
+            for (let i = 0; i < song.length; i += 1) {
 
                 const part = song[i]
 
                 try {
 
-                    const tieEnd = i + 1 < song.length && song[i + 1].notes[0].isTied
                     const textLengths = part.lyrics.map((l) => l.length)
                     const maxLength = Math.max(part.source.length, ...textLengths)
                     const width = Math.max((maxLength + 1) * 9, 40)
@@ -247,7 +258,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
                     const frame = document.createElement("div")
                     frame.className = "frame"
                     measure.appendChild(frame)
-                    renderStave(frame, "black", width, part.notes, tieEnd)
+                    renderStave(frame, "black", width, part.notes, scale.value)
 
                     let lyrics = document.createElement("div")
                     lyrics.className = "lyrics"
@@ -261,6 +272,12 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
 
             return errors
         }
+
+        scale.addEventListener('change', () => {
+            const song = decodeSong(code.value)
+            const errors = renderSong(song)
+            if (errors != "") window.alert(errors)
+        })
 
     </script>
     <script src="js/zip.js"></script>

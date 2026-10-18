@@ -77,15 +77,15 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     </div>
     <div id="footer">
         <select id="scale">
-            <option value="Ab">Ab Major (4b)</option>
-            <option value="Eb">Eb Major (3b)</option>
-            <option value="Bb">Bb Major (2b)</option>
-            <option value="F">F Major (1b)</option>
             <option value="C" selected>C Major</option>
             <option value="G">G Major (1#)</option>
+            <option value="F">F Major (1b)</option>
             <option value="D">D Major (2#)</option>
+            <option value="Bb">Bb Major (2b)</option>
             <option value="A">A Major (3#)</option>
+            <option value="Eb">Eb Major (3b)</option>
             <option value="E">E Major (4#)</option>
+            <option value="Ab">Ab Major (4b)</option>
         </select>
         <select id="speed">
             <option value="0.8">SLOW</option>

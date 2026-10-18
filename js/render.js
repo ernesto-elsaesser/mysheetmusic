@@ -180,11 +180,11 @@ function renderStave(frame, color, width, notes, scale) {
             let degreeInfo = scaleInfo[note.degree]
             if (degreeInfo.acc === "#") {
                 if (noteAcc == "#") noteAcc = "##"
-                if (noteAcc === "b") noteAcc =  ""
+                if (noteAcc === "b") noteAcc =  "n"
             }
             if (degreeInfo.acc === "b") {
                 if (noteAcc === "b") noteAcc = "bb"
-                if (noteAcc === "#") noteAcc =  ""
+                if (noteAcc === "#") noteAcc =  "n"
             }
             let octave = note.octave + degreeInfo.octaveOffset
             pitch = degreeInfo.step + "/" + octave.toString()

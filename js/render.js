@@ -1,3 +1,13 @@
+const SHIFTS = {  // up step | up octave offset | down step | down octave offset
+    "c": ["d", 0, "b", 1],
+    "d": ["e", 0, "c", 0],
+    "e": ["f", 0, "d", 0],
+    "f": ["g", 0, "e", 0],
+    "g": ["a", 0, "f", 0],
+    "a": ["b", 0, "g", 0],
+    "b": ["c", 1, "a", 0],
+}
+
 const MAJOR_SCALES = {
     "C": [
         null,
@@ -171,23 +181,36 @@ function renderStave(frame, color, width, notes, scale) {
         duration = duration.replace("z", "32")
 
         let pitch = ""
-        let noteAcc = note.acc
+        let noteAcc = ""
 
         if (note.degree == 0) { // rest
             pitch = duration == "w" ? "d/5" : "b/4"
             duration += "r"
         } else {
             let degreeInfo = scaleInfo[note.degree]
-            if (degreeInfo.acc === "#") {
-                if (noteAcc == "#") noteAcc = "##"
-                if (noteAcc === "b") noteAcc =  "n"
-            }
-            if (degreeInfo.acc === "b") {
-                if (noteAcc === "b") noteAcc = "bb"
-                if (noteAcc === "#") noteAcc =  "n"
-            }
+            let step = degreeInfo.step
             let octave = note.octave + degreeInfo.octaveOffset
-            pitch = degreeInfo.step + "/" + octave.toString()
+            const shift = SHIFTS[step]
+
+            if (note.acc === "#") {
+                if (degreeInfo.acc === "#") {
+                    step = shift[0]
+                    octave += shift[1]
+                } else if (degreeInfo.acc === "") {
+                    noteAcc = "#"
+                }
+            } else if (note.acc === "b") {
+                if (degreeInfo.acc === "b") {
+                    step = shift[2]
+                    octave -= shift[3]
+                } else if (degreeInfo.acc === "") {
+                    noteAcc = "b"
+                }
+            } else {
+                noteAcc = degreeInfo.acc
+            }
+
+            pitch = step + "/" + octave.toString()
         }
 
         if (noteAcc !== "") {

@@ -64,10 +64,10 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             <?php echo $sheet ?>
         </div>
         <div id="editor" hidden>
-            <input type="button" onclick="shiftSong(-7)" value="- OCT" />
-            <input type="button" onclick="shiftSong(-1)" value="- STEP" />
-            <input type="button" onclick="shiftSong(1)" value="+ STEP" />
-            <input type="button" onclick="shiftSong(7)" value="+ OCT" />
+            <input type="button" onclick="shiftSheet(-7)" value="- OCT" />
+            <input type="button" onclick="shiftSheet(-1)" value="- STEP" />
+            <input type="button" onclick="shiftSheet(1)" value="+ STEP" />
+            <input type="button" onclick="shiftSheet(7)" value="+ OCT" />
             <input type="button" onclick="cancelEdit()" value="CANCEL" />
             <input type="button" onclick="saveSong()" value="SAVE" />
             <textarea id="code"><?php echo $song ?></textarea>
@@ -125,8 +125,8 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             footer.hidden = true
         }
 
-        function shiftSong(steps) {
-            const song = decodeSong(code.value)
+        function shiftNotes(song, steps) {
+
             for (let measure of song) {
                 for (let note of measure.notes) {
                     if (note.degree > 0) {
@@ -149,6 +149,12 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
                     }
                 }
             }
+        }
+
+        function shiftSheet(steps) {
+
+            const song = decodeSong(code.value)
+            shiftNotes(song, steps)
             code.value = encodeSong(song)
         }
 
@@ -275,6 +281,8 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
 
         scale.addEventListener('change', () => {
             const song = decodeSong(code.value)
+            // TODO: UI
+            if (scale.value == "G") shiftNotes(song, -7)
             const errors = renderSong(song)
             if (errors != "") window.alert(errors)
         })

@@ -89,6 +89,9 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             <option value="Ab">Ab Major (4b)</option>
         </select>
         |
+        <input type="button" onclick="scrollText(-1)" value="&#708;" />
+        <input type="button" onclick="scrollText(1)" value="&#709;" />
+        |
         <select id="speed">
             <option value="60">60 BPM</option>
             <option value="70">70 BPM</option>
@@ -105,10 +108,9 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             <option value="200">200 BPM</option>
         </select>
         <input type="button" onclick="playSong()" value="PLAY" />
+
         |
         <input type="button" onclick="editSong()" value="EDIT" />
-        <input type="button" onclick="scrollText(-1)" value="<" />
-        <input type="button" onclick="scrollText(1)" value=">" />
     </div>
     <script>
         const sheet = document.getElementById('sheet')

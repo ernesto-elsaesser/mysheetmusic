@@ -51,7 +51,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $name; ?></title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
     <script src="js/parse.js"></script>
     <script src="js/render.js"></script>
     <script src="js/synthesize.js"></script>

@@ -51,6 +51,7 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $name; ?></title>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <script src="js/parse.js"></script>
     <script src="js/render.js"></script>
     <script src="js/synthesize.js"></script>
@@ -107,7 +108,8 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
         const fileInput = document.getElementById('file')
         const parts = document.getElementById('parts')
 
-        var activeAudioContext = null
+        var stopPlayback = null
+        var isStartingPlayback = false
         var lyricsOffset = 0
 
         function scrollText(lines) {
@@ -205,15 +207,24 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             footer.hidden = false
         }
 
-        function playSong() {
+        async function playSong() {
 
-            if (activeAudioContext == null) {
-                const tempo = parseFloat(speed.value)
-                const song = decodeSong(code.value)
-                activeAudioContext = synthesizeMelody(song, tempo)
+            if (isStartingPlayback) return
+
+            if (stopPlayback == null) {
+                isStartingPlayback = true
+                try {
+                    const tempo = parseFloat(speed.value)
+                    const song = decodeSong(code.value)
+                    stopPlayback = await synthesizeMelody(song, tempo, () => {
+                        stopPlayback = null
+                    })
+                } finally {
+                    isStartingPlayback = false
+                }
             } else {
-                activeAudioContext.close()
-                activeAudioContext = null
+                stopPlayback()
+                stopPlayback = null
             }
         }
 

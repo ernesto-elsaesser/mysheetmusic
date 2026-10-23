@@ -63,14 +63,14 @@ function getPianoSampler() {
     return pianoSampler
 }
 
-async function synthesizeMelody(song, tempo, onFinished) {
+async function synthesizeMelody(song, bpm, onFinished) {
 
     await Tone.start()
     getPianoSampler()
     await Tone.loaded()
 
     const sounds = extractMelody(song)
-    return playMelody(sounds, tempo, onFinished)
+    return playMelody(sounds, bpm, onFinished)
 }
 
 function extractMelody(song) {
@@ -137,21 +137,23 @@ function extractMelody(song) {
     return sounds
 }
 
-function playMelody(sounds, tempo, onFinished) {
+function playMelody(sounds, bpm, onFinished) {
 
     Tone.Transport.stop()
     Tone.Transport.cancel()
     Tone.Transport.position = 0
+    Tone.Transport.bpm.value = bpm
 
+    const secondsPerBeat = 60 / bpm
     const sampler = getPianoSampler()
     let maxEnd = 0
 
     sounds.forEach(sound => {
         const midi = 69 + Math.round(sound.level * 12)
         const note = Tone.Frequency(midi, "midi").toNote()
-        const timeOffset = sound.offset * tempo
+        const timeOffset = sound.offset * secondsPerBeat
         const soundLength = sound.length > 0 ? sound.length : (sound.offsetEnd ? sound.offsetEnd - sound.offset : 1.0)
-        const duration = Math.max(0.1, soundLength * tempo)
+        const duration = Math.max(0.1, soundLength * secondsPerBeat)
         const velocity = Math.min(1, (sound.gain || 0.3) * 2.5)
 
         Tone.Transport.schedule(time => {

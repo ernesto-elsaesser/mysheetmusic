@@ -89,9 +89,19 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             <option value="Ab">Ab Major (4b)</option>
         </select>
         <select id="speed">
-            <option value="0.8">SLOW</option>
-            <option value="0.6" selected>MEDI</option>
-            <option value="0.4">FAST</option>
+            <option value="60">60 BPM</option>
+            <option value="70">70 BPM</option>
+            <option value="80">80 BPM</option>
+            <option value="90">90 BPM</option>
+            <option value="100" selected>100 BPM</option>
+            <option value="110">110 BPM</option>
+            <option value="120">120 BPM</option>
+            <option value="130">130 BPM</option>
+            <option value="140">140 BPM</option>
+            <option value="150">150 BPM</option>
+            <option value="160">160 BPM</option>
+            <option value="180">180 BPM</option>
+            <option value="200">200 BPM</option>
         </select>
         <input type="button" onclick="playSong()" value="PLAY" />
         <input type="button" onclick="editSong()" value="EDIT" />
@@ -214,9 +224,9 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
             if (stopPlayback == null) {
                 isStartingPlayback = true
                 try {
-                    const tempo = parseFloat(speed.value)
+                    const bpm = parseFloat(speed.value)
                     const song = decodeSong(code.value)
-                    stopPlayback = await synthesizeMelody(song, tempo, () => {
+                    stopPlayback = await synthesizeMelody(song, bpm, () => {
                         stopPlayback = null
                     })
                 } finally {

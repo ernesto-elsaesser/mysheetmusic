@@ -12,7 +12,9 @@ const bucket = storage.bucket(BUCKET_NAME);
 app.use(express.json());
 app.use(express.static('public'));
 
-async function renderIndex() {
+
+app.get('/', async (req, res) => {
+
   const groupsMap = new Map();
   const [files] = await bucket.getFiles();
 
@@ -42,47 +44,35 @@ async function renderIndex() {
       `<input type="submit" value="+" /></form></div>\n`;
   }
 
-  return fs.readFileSync('index.html', 'utf-8').replace('{{COLUMNS}}', colsHtml);
-}
+  const html = fs.readFileSync('index.html', 'utf-8')
+    .replace('{{COLUMNS}}', colsHtml);
 
-function renderSongPage(name, group, songCode) {
-  return fs.readFileSync('song.html', 'utf-8')
-    .replace('{{NAME}}', name)
-    .replace('{{CODE}}', songCode);
-}
-
-// Routes
-app.get('/', async (req, res) => {
-  res.send(await renderIndex());
+  res.send(html);
 });
 
 app.get('/song', async (req, res) => {
   const { group, name } = req.query;
   const file = bucket.file(`${group}/${name}`);
   const [exists] = await file.exists();
-  const song = exists ? (await file.download())[0].toString('utf-8') : '';
-  res.send(renderSongPage(name, group, song));
+  let song = '';
+  if (exists) {
+    const snapshot = await file.download();
+    song = snapshot[0].toString('utf-8');
+  }
+  const html = fs.readFileSync('song.html', 'utf-8')
+    .replace('{{NAME}}', name)
+    .replace('{{CODE}}', song);
+  res.send(html);
 });
 
 app.post('/song', async (req, res) => {
   const { group, name } = req.query;
-  await bucket.file(`${group}/${name}`).save(req.body.code.replace(/\r/g, ''), {
+  const file = bucket.file(`${group}/${name}`);
+  await file.save(req.body.code.replace(/\r/g, ''), {
     contentType: 'text/plain; charset=utf-8',
     resumable: false
   });
   res.send('Saved.');
-});
-
-app.delete('/song', async (req, res) => {
-  const { group, name } = req.query;
-  const file = bucket.file(`${group}/${name}`);
-  const [exists] = await file.exists();
-  if (exists) {
-    await file.delete();
-    res.send('Deleted.');
-  } else {
-    res.status(404).send('Not Found');
-  }
 });
 
 if (require.main === module) {

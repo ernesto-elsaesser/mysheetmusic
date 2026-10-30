@@ -1,49 +1,57 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const { Storage } = require('@google-cloud/storage');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const SONGS_DIR = path.join(__dirname, 'songs');
+const PORT = process.env.PORT || 8080;
+const BUCKET_NAME = process.env.BUCKET_NAME || 'erns-songs';
 const PUBLIC_DIR = path.join(__dirname, 'public');
+
+const storage = new Storage();
+const bucket = storage.bucket(BUCKET_NAME);
 
 app.use(express.json());
 app.use(express.static(PUBLIC_DIR));
 
-function safeSongPath(group, name, ext) {
+
+function getSongKey(group, name) {
   if (!group || !name) return null;
-  const cleanGroup = path.basename(String(group).trim());
-  const cleanName = path.basename(String(name).trim());
-  if (!cleanGroup || !cleanName || cleanGroup === '.' || cleanName === '.' ||
-      cleanGroup === '..' || cleanName === '..') {
-    return null;
-  }
-  return path.join(SONGS_DIR, cleanGroup, cleanName + ext);
+  const cleanGroup = String(group).trim();
+  const cleanName = String(name).trim();
+  if (!cleanGroup || !cleanName) return null;
+  return `${group}/${name}`;
 }
 
-function renderIndex() {
-  let groups = [];
+async function renderIndex() {
+  const groupsMap = new Map();
+
   try {
-    groups = fs.readdirSync(SONGS_DIR).filter(item => {
-      try { return fs.statSync(path.join(SONGS_DIR, item)).isDirectory(); } catch { return false; }
-    });
-  } catch { groups = []; }
+    const [files] = await bucket.getFiles();
+    for (const file of files) {
+      if (file.name.endsWith('/')) continue;
+      const slashIndex = file.name.indexOf('/');
+      if (slashIndex === -1) continue;
+      const group = file.name.substring(0, slashIndex);
+      const name = file.name.substring(slashIndex + 1);
+      if (!group || !name) continue;
+
+      if (!groupsMap.has(group)) {
+        groupsMap.set(group, []);
+      }
+      groupsMap.get(group).push(name);
+    }
+  } catch (err) {
+    console.error('Error fetching files from bucket:', err);
+  }
+
+  const sortedGroups = Array.from(groupsMap.keys()).sort();
 
   let colsHtml = '';
-  for (let group of groups) {
-    group = group.replace(/\r/g, '').trim();
-    if (!group) continue;
-    const groupDir = path.join(SONGS_DIR, group);
-    if (!fs.existsSync(groupDir)) continue;
-
-    let files = [];
-    try { files = fs.readdirSync(groupDir).sort(); } catch { continue; }
-    if (files.length === 0) continue;
-
+  for (const group of sortedGroups) {
+    const songNames = groupsMap.get(group).sort();
     let linksHtml = '';
-    for (const file of files) {
-      if (!file.endsWith('.txt')) continue;
-      const songName = file.slice(0, -4);
+    for (const songName of songNames) {
       linksHtml += `<a target="_blank" href="song?group=${encodeURIComponent(group)}&name=${encodeURIComponent(songName)}">${songName}</a><br/>\n`;
     }
 
@@ -60,44 +68,57 @@ function renderIndex() {
 function renderSongPage(name, group, songCode) {
   const template = fs.readFileSync(path.join(__dirname, 'song.html'), 'utf-8');
   return template
-    .replace('{{NAME}}', escapeHtml(name))
-    .replace('{{CODE}}', escapeHtml(songCode));
+    .replace('{{NAME}}', name)
+    .replace('{{CODE}}', songCode);
 }
 
 // Routes
-app.get(['/', '/index', '/index.html', '/index.php'], (req, res) => {
-  res.send(renderIndex());
-});
-
-app.get(['/song', '/song.php'], (req, res) => {
-  const group = req.query.group || '';
-  const name = req.query.name || '';
-  let song = '';
-  const filePath = safeSongPath(group, name, '.txt');
-  if (filePath && fs.existsSync(filePath)) {
-    try { song = fs.readFileSync(filePath, 'utf-8'); } catch (_) {}
+app.get('/', async (req, res, next) => {
+  try {
+    const html = await renderIndex();
+    res.send(html);
+  } catch (err) {
+    next(err);
   }
-  res.send(renderSongPage(name, group, song));
 });
 
-app.post(['/song', '/song.php'], (req, res) => {
+app.get('/song', async (req, res, next) => {
+  try {
+    const group = req.query.group || '';
+    const name = req.query.name || '';
+    let song = '';
+    const key = getSongKey(group, name);
+
+    if (key) {
+      const file = bucket.file(key);
+      const [exists] = await file.exists();
+      if (exists) {
+        const [content] = await file.download();
+        song = content.toString('utf-8');
+      }
+    }
+    res.send(renderSongPage(name, group, song));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/song', async (req, res) => {
   const group = req.query.group || req.body.group || '';
   const name = req.query.name || req.body.name || '';
-  const filePath = safeSongPath(group, name, '.txt');
+  const key = getSongKey(group, name);
 
-  if (!filePath) {
+  if (!key) {
     return res.status(400).send('Missing or invalid group/name');
   }
 
   try {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
     const code = (req.body.code != null ? String(req.body.code) : '').replace(/\r/g, '');
-    fs.writeFileSync(filePath, code, 'utf-8');
-    try { fs.chmodSync(filePath, 0o666); } catch (_) {}
+    const file = bucket.file(key);
+    await file.save(code, {
+      contentType: 'text/plain; charset=utf-8',
+      resumable: false
+    });
 
     res.send('Saved.');
   } catch (err) {
@@ -105,23 +126,20 @@ app.post(['/song', '/song.php'], (req, res) => {
   }
 });
 
-app.delete(['/song', '/song.php'], (req, res) => {
+app.delete('/song', async (req, res) => {
   const group = req.query.group || '';
   const name = req.query.name || '';
-  const filePath = safeSongPath(group, name, '.txt');
-  const snapPath = safeSongPath(group, name, '.html');
+  const key = getSongKey(group, name);
+
+  if (!key) {
+    return res.status(400).send('Missing or invalid group/name');
+  }
 
   try {
-    let deleted = false;
-    if (filePath && fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      deleted = true;
-    }
-    if (snapPath && fs.existsSync(snapPath)) {
-      fs.unlinkSync(snapPath);
-      deleted = true;
-    }
-    if (deleted) {
+    const file = bucket.file(key);
+    const [exists] = await file.exists();
+    if (exists) {
+      await file.delete();
       res.send('Deleted.');
     } else {
       res.status(404).send('Not Found');

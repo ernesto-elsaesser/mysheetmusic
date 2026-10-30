@@ -1,16 +1,15 @@
 # MySheetMusic
 
-A web app that manages a personal collection of sheet music, stored as plain
-text files in a [custom format](#file-format). The format is designed to capture
+A web app that manages a personal collection of sheet music, stored in the cloud in a [custom format](#file-format). The format is designed to capture
 a single voice of a musical score, with melody, text and harmony -
 think **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
 
 ## User Interface
 
-The [index.html](index.html) page shows a list of all songs, with one column per
+The [index.html](public/index.html) page shows a list of all songs, with one column per
 group. It also allows to add new songs.
 
-The [song.html](song.html) page renders the score for a single song. The UI is very
+The [song.html](public/song.html) page renders the score for a single song. The UI is very
 minimal and should work well on any screen size (e.g. to view sheet music on a
 tablet on a music stand or piano).
 

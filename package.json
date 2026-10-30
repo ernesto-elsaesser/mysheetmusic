@@ -1,0 +1,10 @@
+{
+  "name": "mysheetmusic",
+  "version": "1.0.0",
+  "description": "A web app that manages a personal collection of sheet music",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Ernesto Elsäßer"
+}

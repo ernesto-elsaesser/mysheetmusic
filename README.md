@@ -7,10 +7,10 @@ think **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
 
 ## User Interface
 
-The [index.php](index.php) page shows a list of all songs, with one column per
+The index page shows a list of all songs, with one column per
 group. It also allows to add new songs.
 
-The [song.php](song.php) renders the score for a single song. The UI is very
+The song page renders the score for a single song. The UI is very
 minimal and should work well on any screen size (e.g. to view sheet music on a
 tablet on a music stand or piano).
 

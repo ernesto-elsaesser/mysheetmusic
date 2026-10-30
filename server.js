@@ -77,7 +77,7 @@ app.post('/song', async (req, res) => {
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`MySheetMusic server running at http://localhost:${PORT}/`);
+    console.log(`listening at http://localhost:${PORT}/`);
   });
 }
 

@@ -17,13 +17,10 @@ tablet on a music stand or piano).
 Via the editor, it is possible to directly edit a song (see [file format](#file-format)),
 or to import a voice from a [MusicXML](https://en.wikipedia.org/wiki/MusicXML) file.
 
-When saving a song, the [VexFlow](https://www.vexflow.com/) library is used to
-pre-render sheet music based on the plain text notation. The generated HTML
-is stored for quick, JavaScript free loading / viewing on any device.
+The [VexFlow](https://www.vexflow.com/) library is used to render sheet
+music dynamically on page load based on the plain text notation.
 
-The song page also allows playing the song via a very basic synthsizer,
-but this feature is still very limited and not designed to generate a
-musical rendition, but more as a quick check if the notated melody is correct.
+The song page also allows playing the song via a piano synthesizer (Tone.js).
 
 ## File Format
 

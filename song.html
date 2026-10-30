@@ -16,9 +16,7 @@
 
 <body>
     <div id="content">
-        <div id="sheet">
-            {{SHEET}}
-        </div>
+        <div id="sheet"></div>
         <div id="editor" hidden>
             <input type="button" onclick="shiftSheet(-7)" value="- OCT" />
             <input type="button" onclick="shiftSheet(-1)" value="- STEP" />
@@ -211,8 +209,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    code: code.value.replaceAll("\r\n", "\n"),
-                    sheet: sheet.innerHTML
+                    code: code.value.replaceAll("\r\n", "\n")
                 })
             })
 
@@ -266,6 +263,11 @@
             const errors = renderSong(song)
             if (errors != "") window.alert(errors)
         })
+
+        // Render sheet on initial page load
+        if (code.value) {
+            renderSong(decodeSong(code.value))
+        }
 
     </script>
     <script src="js/zip.js"></script>

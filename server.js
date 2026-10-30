@@ -57,42 +57,35 @@ function renderIndex() {
   return template.replace('{{COLUMNS}}', colsHtml);
 }
 
-function renderSongPage(name, group, songCode, sheetHtml) {
+function renderSongPage(name, group, songCode) {
   const template = fs.readFileSync(path.join(__dirname, 'song.html'), 'utf-8');
   return template
-    .replace('{{NAME}}', name)
-    .replace('{{SHEET}}', sheetHtml)
-    .replace('{{CODE}}', songCode);
+    .replace('{{NAME}}', escapeHtml(name))
+    .replace('{{CODE}}', escapeHtml(songCode));
 }
 
 // Routes
-app.get('/', (req, res) => {
+app.get(['/', '/index', '/index.html', '/index.php'], (req, res) => {
   res.send(renderIndex());
 });
 
-app.get('/song', (req, res) => {
+app.get(['/song', '/song.php'], (req, res) => {
   const group = req.query.group || '';
   const name = req.query.name || '';
   let song = '';
-  let sheet = '';
   const filePath = safeSongPath(group, name, '.txt');
-  const snapPath = safeSongPath(group, name, '.html');
   if (filePath && fs.existsSync(filePath)) {
     try { song = fs.readFileSync(filePath, 'utf-8'); } catch (_) {}
   }
-  if (snapPath && fs.existsSync(snapPath)) {
-    try { sheet = fs.readFileSync(snapPath, 'utf-8'); } catch (_) {}
-  }
-  res.send(renderSongPage(name, group, song, sheet));
+  res.send(renderSongPage(name, group, song));
 });
 
-app.post('/song', (req, res) => {
+app.post(['/song', '/song.php'], (req, res) => {
   const group = req.query.group || req.body.group || '';
   const name = req.query.name || req.body.name || '';
   const filePath = safeSongPath(group, name, '.txt');
-  const snapPath = safeSongPath(group, name, '.html');
 
-  if (!filePath || !snapPath) {
+  if (!filePath) {
     return res.status(400).send('Missing or invalid group/name');
   }
 
@@ -106,18 +99,13 @@ app.post('/song', (req, res) => {
     fs.writeFileSync(filePath, code, 'utf-8');
     try { fs.chmodSync(filePath, 0o666); } catch (_) {}
 
-    if (req.body.sheet != null) {
-      fs.writeFileSync(snapPath, String(req.body.sheet), 'utf-8');
-      try { fs.chmodSync(snapPath, 0o666); } catch (_) {}
-    }
-
     res.send('Saved.');
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.delete('/song', (req, res) => {
+app.delete(['/song', '/song.php'], (req, res) => {
   const group = req.query.group || '';
   const name = req.query.name || '';
   const filePath = safeSongPath(group, name, '.txt');

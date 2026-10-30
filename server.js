@@ -44,91 +44,14 @@ function safeSongPath(group, name, ext) {
   return path.join(SONGS_DIR, cleanGroup, cleanName + ext);
 }
 
-function parseMultipart(buffer, boundary) {
-  const fields = {};
-  const boundaryBuf = Buffer.from('--' + boundary);
-  let pos = 0;
-
-  while (pos < buffer.length) {
-    const idx = buffer.indexOf(boundaryBuf, pos);
-    if (idx === -1) break;
-
-    const afterBoundary = idx + boundaryBuf.length;
-    // Closing boundary '--'
-    if (buffer.length >= afterBoundary + 2 &&
-        buffer[afterBoundary] === 45 && buffer[afterBoundary + 1] === 45) {
-      break;
-    }
-
-    const nextIdx = buffer.indexOf(boundaryBuf, afterBoundary);
-    if (nextIdx === -1) break;
-
-    let partStart = afterBoundary;
-    if (buffer[partStart] === 13 && buffer[partStart + 1] === 10) {
-      partStart += 2;
-    } else if (buffer[partStart] === 10) {
-      partStart += 1;
-    }
-
-    let partEnd = nextIdx;
-    if (partEnd >= partStart + 2 && buffer[partEnd - 2] === 13 && buffer[partEnd - 1] === 10) {
-      partEnd -= 2;
-    } else if (partEnd >= partStart + 1 && buffer[partEnd - 1] === 10) {
-      partEnd -= 1;
-    }
-
-    const part = buffer.slice(partStart, partEnd);
-
-    let headerEnd = part.indexOf(Buffer.from('\r\n\r\n'));
-    let bodyStart = 0;
-    if (headerEnd !== -1) {
-      bodyStart = headerEnd + 4;
-    } else {
-      headerEnd = part.indexOf(Buffer.from('\n\n'));
-      if (headerEnd !== -1) {
-        bodyStart = headerEnd + 2;
-      }
-    }
-
-    if (headerEnd !== -1) {
-      const headerStr = part.slice(0, headerEnd).toString('utf-8');
-      const match = headerStr.match(/name="([^"]+)"/i);
-      if (match) {
-        const fieldName = match[1];
-        const value = part.slice(bodyStart).toString('utf-8');
-        fields[fieldName] = value;
-      }
-    }
-
-    pos = nextIdx;
-  }
-  return fields;
-}
-
 function parseBody(req, buffer) {
-  const contentType = req.headers['content-type'] || '';
-  if (contentType.includes('multipart/form-data')) {
-    const match = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
-    if (match) {
-      const boundary = (match[1] || match[2]).trim();
-      return parseMultipart(buffer, boundary);
-    }
-  } else if (contentType.includes('application/json')) {
-    try {
-      return JSON.parse(buffer.toString('utf-8'));
-    } catch {
-      return {};
-    }
-  } else if (contentType.includes('application/x-www-form-urlencoded')) {
-    const str = buffer.toString('utf-8');
-    const params = new URLSearchParams(str);
-    const result = {};
-    for (const [k, v] of params.entries()) {
-      result[k] = v;
-    }
-    return result;
+  const str = buffer.toString('utf-8');
+  if (!str) return {};
+  try {
+    return JSON.parse(str);
+  } catch {
+    return {};
   }
-  return {};
 }
 
 function serveStaticFile(req, res, pathname) {
@@ -452,13 +375,13 @@ function renderSongPage(name, group, songCode, sheetHtml) {
                 return
             }
 
-            const formData = new FormData()
-            formData.append('code', code.value.replaceAll("\r\n", "\n"));
-            formData.append('sheet', sheet.innerHTML);
-
             const res = await fetch(window.location.href, {
                 method: 'POST',
-                body: formData,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: code.value.replaceAll("\r\n", "\n"),
+                    sheet: sheet.innerHTML
+                })
             })
 
             if (res.status == 200) cancelEdit()

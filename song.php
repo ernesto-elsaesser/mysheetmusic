@@ -9,11 +9,12 @@ $file = "songs/$group/$name.txt";
 $snap = "songs/$group/$name.html";
 
 if ($method == 'POST') {
-    $code = str_replace("\r", "", $_POST['code']);
+    $input = json_decode(file_get_contents('php://input'), true);
+    $code = str_replace("\r", "", $input['code'] ?? $_POST['code'] ?? '');
     file_put_contents($file, $code);
     $success = chmod($file, 0666);
     if ($success) {
-        file_put_contents($snap, $_POST['sheet']);
+        file_put_contents($snap, $input['sheet'] ?? $_POST['sheet'] ?? '');
         $success = chmod($snap, 0666);
     }
     if ($success) {
@@ -252,13 +253,13 @@ if (file_exists($snap)) $sheet = file_get_contents($snap);
                 return
             }
 
-            const formData = new FormData()
-            formData.append('code', code.value.replaceAll("\r\n", "\n"));
-            formData.append('sheet', sheet.innerHTML);
-
             const res = await fetch(window.location.href, {
                 method: 'POST',
-                body: formData,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: code.value.replaceAll("\r\n", "\n"),
+                    sheet: sheet.innerHTML
+                })
             })
 
             if (res.status == 200) cancelEdit()

@@ -29,7 +29,9 @@ app.get('/', async (req, res) => {
     groupsMap.get(group).push(name);
   }
 
-  const sortedGroups = Array.from(groupsMap.keys()).sort();
+  const sortedGroups = Array.from(groupsMap.keys()).sort((a, b) => {
+    return groupsMap.get(b).length - groupsMap.get(a).length || a.localeCompare(b);
+  });
   let colsHtml = '';
 
   for (const group of sortedGroups) {

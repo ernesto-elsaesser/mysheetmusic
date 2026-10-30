@@ -1,0 +1,119 @@
+
+function decodeSong(code) {
+
+    let prevNote = null
+
+    return code.split("\n\n").map((measure) => {
+
+        let lyrics = measure.split("\n")
+        let melody = lyrics.shift()
+        let notes = []
+
+        for (let token of melody.split(" ")) {
+
+            if (token == "") break
+            if (token == "|") continue
+
+            let note = {
+                degree: 0,
+                octave: 4,
+                duration: "",
+                acc: "",
+                dots: 0,
+                transFrom: null,
+                transTo: null,
+                inTriplet: false,
+                chordDegree: 0,
+                chordAcc: "",
+                chordSuffix: "",
+            }
+
+            const data = token.split("")
+
+            if (data[0] == "~") {
+                note.transFrom = prevNote
+                prevNote.transTo = note
+                data.shift()
+            }
+
+            note.degree = parseInt(data.shift())
+            while (data[0] == "'") {
+                data.shift()
+                note.octave += 1
+            }
+            while (data[0] == ",") {
+                data.shift()
+                note.octave -= 1
+            }
+
+            if (data[0] == "#") {
+                note.acc = "#"
+                data.shift()
+            } else if (data[0] == "b") {
+                note.acc = "b"
+                data.shift()
+            }
+
+            note.duration = data.shift()
+
+            while (data[0] == ".") {
+                note.dots += 1
+                data.shift()
+            }
+
+            if (data[0] == "t") {
+                data.shift()
+                note.isTriplet = true
+            }
+
+            notes.push(note)
+            prevNote = note
+
+            if (data.length == 0) continue
+
+            note.chordDegree = parseInt(data.shift())
+
+            if (data[0] == "#") {
+                note.chordAcc = "#"
+                data.shift()
+            }
+            else if (data[0] == "b") {
+                note.chordAcc = "b"
+                data.shift()
+            }
+
+            note.chordSuffix = data.join("")
+        }
+
+        return {notes: notes, source: melody, lyrics: lyrics}
+
+    }).filter((l) => l.notes.length > 0)
+}
+
+const OCTAVES = {
+    2: ",,",
+    3: ",",
+    4: "",
+    5: "'",
+    6: "''",
+}
+
+function encodeSong(song) {
+
+    return song.map((measure) => {
+        const melody = measure.notes.map(encodeNote).join(" ")
+        return [melody, ...measure.lyrics].join("\n")
+    }).join("\n\n")
+}
+
+function encodeNote(note) {
+
+    let code = note.degree.toString() + OCTAVES[note.octave] + note.acc + note.duration
+    for (let i = 0; i < note.dots; i += 1) code += "."
+    if (note.chordDegree > 0) {
+        code += note.chordDegree.toString() + note.chordAcc + note.chordSuffix
+    }
+    if (note.transFrom) code = "~" + code
+    return code
+}
+

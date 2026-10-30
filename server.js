@@ -7,20 +7,8 @@ const PORT = process.env.PORT || 3000;
 const SONGS_DIR = path.join(__dirname, 'songs');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
-// Middleware
 app.use(express.json());
 app.use(express.static(PUBLIC_DIR));
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
-
-function escapeHtml(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 function safeSongPath(group, name, ext) {
   if (!group || !name) return null;
@@ -34,17 +22,12 @@ function safeSongPath(group, name, ext) {
 }
 
 function renderIndex() {
-  const groupsFile = path.join(SONGS_DIR, 'groups.txt');
   let groups = [];
-  if (fs.existsSync(groupsFile)) {
-    groups = fs.readFileSync(groupsFile, 'utf-8').split('\n');
-  } else if (fs.existsSync(SONGS_DIR)) {
-    try {
-      groups = fs.readdirSync(SONGS_DIR).filter(item => {
-        try { return fs.statSync(path.join(SONGS_DIR, item)).isDirectory(); } catch { return false; }
-      });
-    } catch { groups = []; }
-  }
+  try {
+    groups = fs.readdirSync(SONGS_DIR).filter(item => {
+      try { return fs.statSync(path.join(SONGS_DIR, item)).isDirectory(); } catch { return false; }
+    });
+  } catch { groups = []; }
 
   let colsHtml = '';
   for (let group of groups) {
@@ -61,12 +44,12 @@ function renderIndex() {
     for (const file of files) {
       if (!file.endsWith('.txt')) continue;
       const songName = file.slice(0, -4);
-      linksHtml += `<a target="_blank" href="song?group=${encodeURIComponent(group)}&name=${encodeURIComponent(songName)}">${escapeHtml(songName)}</a><br/>\n`;
+      linksHtml += `<a target="_blank" href="song?group=${encodeURIComponent(group)}&name=${encodeURIComponent(songName)}">${songName}</a><br/>\n`;
     }
 
-    colsHtml += `<div class="col"><h2>${escapeHtml(group)}</h2>\n${linksHtml}` +
+    colsHtml += `<div class="col"><h2>${group}</h2>\n${linksHtml}` +
       `<form action="song" target="_blank"><input type="text" name="name" />` +
-      `<input type="text" name="group" value="${escapeHtml(group)}" hidden /> ` +
+      `<input type="text" name="group" value="${group}" hidden /> ` +
       `<input type="submit" value="+" /></form></div>\n`;
   }
 
@@ -77,17 +60,17 @@ function renderIndex() {
 function renderSongPage(name, group, songCode, sheetHtml) {
   const template = fs.readFileSync(path.join(__dirname, 'song.html'), 'utf-8');
   return template
-    .replace('{{NAME}}', escapeHtml(name))
+    .replace('{{NAME}}', name)
     .replace('{{SHEET}}', sheetHtml)
-    .replace('{{CODE}}', escapeHtml(songCode));
+    .replace('{{CODE}}', songCode);
 }
 
 // Routes
-app.get(['/', '/index', '/index.html', '/index.php'], (req, res) => {
+app.get('/', (req, res) => {
   res.send(renderIndex());
 });
 
-app.get(['/song', '/song.php'], (req, res) => {
+app.get('/song', (req, res) => {
   const group = req.query.group || '';
   const name = req.query.name || '';
   let song = '';
@@ -103,7 +86,7 @@ app.get(['/song', '/song.php'], (req, res) => {
   res.send(renderSongPage(name, group, song, sheet));
 });
 
-app.post(['/song', '/song.php'], (req, res) => {
+app.post('/song', (req, res) => {
   const group = req.query.group || req.body.group || '';
   const name = req.query.name || req.body.name || '';
   const filePath = safeSongPath(group, name, '.txt');
@@ -134,7 +117,7 @@ app.post(['/song', '/song.php'], (req, res) => {
   }
 });
 
-app.delete(['/song', '/song.php'], (req, res) => {
+app.delete('/song', (req, res) => {
   const group = req.query.group || '';
   const name = req.query.name || '';
   const filePath = safeSongPath(group, name, '.txt');

@@ -57,7 +57,7 @@ function getPianoSampler() {
     if (!pianoSampler) {
         pianoSampler = new Tone.Sampler({
             urls: PIANO_SAMPLES,
-            baseUrl: "assets/piano/",
+            baseUrl: "https://tonejs.github.io/audio/salamander/",
             release: 1
         }).toDestination()
     }

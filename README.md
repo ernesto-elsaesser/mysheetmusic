@@ -52,7 +52,7 @@ sea. And he
 Notes and chords are notated as scale degrees (1-7). For rendering, the
 degrees are translated into the C major scale:
 
-![](assets/vexflow.png)
+![](vexflow.png)
 
 ### Specification
 

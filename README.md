@@ -6,10 +6,10 @@ think **[lead sheets](https://en.wikipedia.org/wiki/Lead_sheet)**.
 
 ## User Interface
 
-The [index.html](public/index.html) page shows a list of all songs, with one column per
+The [/index](public/index.html) page shows a list of all songs, with one column per
 group. It also allows to add new songs.
 
-The [song.html](public/song.html) page renders the score for a single song. The UI is very
+The [/song](public/song.html) page renders the score for a single song. The UI is very
 minimal and should work well on any screen size (e.g. to view sheet music on a
 tablet on a music stand or piano).
 
@@ -20,6 +20,19 @@ The [VexFlow](https://www.vexflow.com/) library is used to render sheet
 music dynamically on page load based on the plain text notation.
 
 The song page also allows playing the song via a piano synthesizer (Tone.js).
+
+## Web App
+
+The web app is implemented as Node.js server. [server.js] defines three routes:
+
+- `GET /` - index page with song list
+- `GET /song` - display a song
+- `POST /song` - create or update a song
+
+The songs are stored in a Google Cloud Storage bucket. The bucket name can be
+changed via environment variable.
+
+The app is intended to be deployed as a Google Cloud Run container.
 
 ## File Format
 

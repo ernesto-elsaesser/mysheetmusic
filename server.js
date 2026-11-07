@@ -40,7 +40,7 @@ app.get('/', async (req, res) => {
     const songNames = groupsMap.get(group).sort();
     let linksHtml = '';
     for (const songName of songNames) {
-      linksHtml += `<a target="_blank" href="song?group=${encodeURIComponent(group)}&name=${encodeURIComponent(songName)}">${songName}</a><br/>\n`;
+      linksHtml += `<a target="_blank" href="sheet?group=${encodeURIComponent(group)}&name=${encodeURIComponent(songName)}">${songName}</a><br/>\n`;
     }
     colsHtml += `<div class="col"><h2>${group}</h2>\n${linksHtml}` +
       `<form action="song" target="_blank"><input type="text" name="name" />` +
@@ -78,6 +78,7 @@ app.get('/song', async (req, res) => {
 
 app.get('/sheet', async (req, res) => {
   const { group, name, offset = '0' } = req.query;
+  const editUrl = `/edit?group=${encodeURIComponent(group)}&name=${encodeURIComponent(name)}`;
   const file = bucket.file(`${group}/${name}`);
   const [exists] = await file.exists();
   let song = {};
@@ -92,23 +93,24 @@ app.get('/sheet', async (req, res) => {
     const scaleOffset = parseInt(offset);
     const last = song.length - 1;
     for (let i = 0; i < song.length; i += 1) {
-        const part = song[i];
-        const textLengths = part.lyrics.map((l) => l.length);
-        const maxLength = Math.max(part.size, ...textLengths);
+        const measure = song[i];
+        const textLengths = measure.lyrics.map((l) => l.length);
+        const notesLength = measure.notes.length * 3;
+        const maxLength = Math.max(notesLength, ...textLengths);
         const width = Math.max(40, (maxLength + 1) * 9);
         const tieEnd = i < last ? song[i+1].notes[0].tie : false;
-        const svg = renderStave("black", width, part.notes, tieEnd, scaleOffset);
-        const lyrics = part.lyrics.join("<br>");
-        html += `<div class="measure" style="width: ${width}px;">` +
+        const svg = renderStave("black", width, measure.notes, tieEnd, scaleOffset);
+        const lyrics = measure.lyrics.join("<br>");
+        sheet += `<div class="measure" style="width: ${width}px;">` +
             `<div class="frame">${svg}</div>` +
-            `<div class="lyrics">${lyrics}</div>` +
-            `</div>\n`;
+            `<div class="lyrics">${lyrics}</div></div>\n`;
     }
   }
 
   const html = fs.readFileSync('sheet.html', 'utf-8')
     .replace('{{NAME}}', name)
     .replace('{{SHEET}}', sheet)
+    .replace('{{EDIT}}', editUrl)
     .replace('{{SOUNDS}}', JSON.stringify(sounds));
   res.send(html);
 });

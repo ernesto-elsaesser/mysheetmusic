@@ -14,7 +14,7 @@ const STEPS = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
 
 function renderStave(color, width, notes, tieEnd, offset) {
 
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const container = document.createElement("div")
 
     let staveNotes = [];
     let tieOptions = [];
@@ -122,7 +122,7 @@ function renderStave(color, width, notes, tieEnd, offset) {
     }
 
     const scaledWidth = width * 1.25;
-    let renderer = new Vex.Flow.Renderer(svg, Vex.Flow.Renderer.Backends.SVG);
+    let renderer = new Vex.Flow.Renderer(container, Vex.Flow.Renderer.Backends.SVG);
     renderer.resize(scaledWidth, 100);
     let context = renderer.getContext();
     context.scale(0.8, 0.8);
@@ -151,7 +151,7 @@ function renderStave(color, width, notes, tieEnd, offset) {
     ties.forEach(t => t.draw());
     tuplets.forEach(t => t.draw());
 
-    return svg.outerHTML;
+    return container.firstChild.outerHTML;
 }
 
 module.exports = {

@@ -26,7 +26,6 @@ function decodeSong(code) {
         let lyrics = measure.split("\n")
         const melody = lyrics.shift()
         let notes = []
-        let size = 0
 
         for (let token of melody.split(" ")) {
 
@@ -34,7 +33,6 @@ function decodeSong(code) {
             if (token == "|") continue
 
             let note = {oct: 4}
-            size += 2
 
             const data = token.split("")
 
@@ -56,11 +54,9 @@ function decodeSong(code) {
             if (data[0] == "#") {
                 note.acc = "#"
                 data.shift()
-                size += 1
             } else if (data[0] == "b") {
                 note.acc = "b"
                 data.shift()
-                size += 1
             }
 
             note.dur = data.shift()
@@ -68,7 +64,6 @@ function decodeSong(code) {
             if (data[0] == ".") {
                 note.dot = 1
                 data.shift()
-                size += 1
                 if (data[0] == ".") {
                     note.dot = 2
                     data.shift()
@@ -99,7 +94,7 @@ function decodeSong(code) {
             note.crd.mod = data.join("")
         }
 
-        return {notes, lyrics, size}
+        return {notes, lyrics}
 
     }).filter((l) => l.notes.length > 0)
 }

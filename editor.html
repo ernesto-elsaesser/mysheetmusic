@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{NAME}}</title>
+    <link rel="icon" sizes="any" type="image/svg+xml" href="favicon.svg">
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.24.0/dist/zip.min.js"></script>
     <script src="js/parse.js"></script>
@@ -20,6 +21,7 @@
             <input type="button" onclick="shiftSheet(1)" value="+ STEP" />
             <input type="button" onclick="shiftSheet(7)" value="+ OCT" />
             <input type="button" onclick="saveSong()" value="SAVE" />
+            <input type="button" onclick="viewSong()" value="VIEW" />
             <textarea id="code">{{CODE}}</textarea>
             <label for="file">MusicXML: </label><input type="file" id="file" accept=".mxl">
             <div id="parts"></div>
@@ -31,6 +33,10 @@
         const code = document.getElementById('code')
         const fileInput = document.getElementById('file')
         const parts = document.getElementById('parts')
+
+        function viewSong() {
+            window.location.href = window.location.href.replace("/editor", "/sheet")
+        }
 
         function shiftNotes(song, steps) {
 

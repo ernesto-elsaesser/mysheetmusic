@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{NAME}}</title>
+    <link rel="icon" sizes="any" type="image/svg+xml" href="favicon.svg">
     <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
     <link rel="stylesheet" href="sheet.css" />
 </head>
@@ -34,7 +35,7 @@
         </select>
         <input type="button" onclick="playSong()" value="PLAY" />
         |
-        <a href="edit?TODO">EDIT</a>
+        <input type="button" onclick="editSong()" value="EDIT" />
     </div>
     <script>
 
@@ -77,6 +78,10 @@
         var isPlaying = false
 
         var lyricsOffset = 0
+
+        function editSong() {
+            window.location.href = window.location.href.replace("/sheet", "/editor")
+        }
 
         function scrollText(lines) {
 

@@ -5,3 +5,4 @@ npm-debug.log
 Dockerfile
 README.md
 vexflow.png
+*.sh

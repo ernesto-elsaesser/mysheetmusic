@@ -1,4 +1,5 @@
 const A4_DELTAS = [null, -9/12, -7/12, -5/12, -4/12, -2/12, 0, 2/12]
+
 const DURATION_FACTORS = {
     "w": 4.0,
     "h": 2.0,
@@ -7,6 +8,7 @@ const DURATION_FACTORS = {
     "x": 0.25,
     "z": 0.125,
 }
+
 const CHORD_STEPS = {
     "": [0, 4/12, 7/12],
     "7": [0, 4/12, 7/12, 10/12],
@@ -31,16 +33,8 @@ function decodeSong(code) {
             if (token == "") break
             if (token == "|") continue
 
-            let note = {
-                tie: false,
-                deg: 0,
-                oct: 4,
-                acc: "",
-                dur: "",
-                dot: 0,
-                tri: false,
-                crd: null,
-            }
+            let note = {oct: 4}
+            size += 2
 
             const data = token.split("")
 
@@ -71,9 +65,14 @@ function decodeSong(code) {
 
             note.dur = data.shift()
 
-            while (data[0] == ".") {
-                note.dot += 1
+            if (data[0] == ".") {
+                note.dot = 1
                 data.shift()
+                size += 1
+                if (data[0] == ".") {
+                    note.dot = 2
+                    data.shift()
+                }
             }
 
             if (data[0] == "t") {
@@ -83,25 +82,21 @@ function decodeSong(code) {
 
             notes.push(note)
 
-            size += 2 + note.acc.length + note.dot
-
             if (data.length == 0) continue
 
             const chordDegree = parseInt(data.shift())
+            note.crd = {deg: chordDegree}
 
-            let chordAcc = ""
             if (data[0] == "#") {
-                chordAcc = "#"
+                note.crd.acc = "#"
                 data.shift()
             }
             else if (data[0] == "b") {
-                chordAcc = "b"
+                note.crd.acc = "b"
                 data.shift()
             }
 
-            const chordMod = data.join("")
-            
-            note.crd = {deg: chordDegree, acc: chordAcc, mod: chordMod}
+            note.crd.mod = data.join("")
         }
 
         return {notes, lyrics, size}

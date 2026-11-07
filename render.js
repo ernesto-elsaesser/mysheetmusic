@@ -60,7 +60,8 @@ function renderStave(color, width, notes, tieEnd, offset) {
             mods.push(acc);
         }
 
-        for (let i = 0; i < note.dot; i += 1) {
+        const dots = note.dot || 0;
+        for (let i = 0; i < dots; i += 1) {
             let dot = new Vex.Flow.Dot();
             mods.push(dot);
         }
@@ -69,7 +70,7 @@ function renderStave(color, width, notes, tieEnd, offset) {
             clef: "treble",
             keys: [pitch],
             duration: duration,
-            dots: note.dot,
+            dots: dots,
             auto_stem: true,
         });
 

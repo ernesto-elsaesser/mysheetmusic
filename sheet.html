@@ -125,7 +125,7 @@
             let maxEnd = 0
 
             sounds.forEach(s => {
-                const note = Tone.Frequency(s[0], "midi").toNote()
+                const note = Tone.Frequency(60 + s[0], "midi").toNote()
                 const timeOffset = s[1] * secondsPerBeat
                 const duration = s[2] * secondsPerBeat
                 const velocity = s[3]

@@ -1,7 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const { Storage } = require('@google-cloud/storage');
-const { decodeSong, extractMelody } = require('./parser');
+const { decodeSong, extractSounds } = require('./parser');
 const { renderStave } = require('./render');
 
 const app = express();
@@ -88,7 +88,6 @@ app.get('/sheet', async (req, res) => {
     const snapshot = await file.download();
     const code = snapshot[0].toString('utf-8');
     song = decodeSong(code);
-    // TODO: fetch song object via GET /song, then extract melody on client side
     sounds = extractSounds(song);
     const scaleOffset = parseInt(offset);
     const last = song.length - 1;

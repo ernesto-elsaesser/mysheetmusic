@@ -140,15 +140,15 @@ function extractSounds(song) {
             pendingLength = 0
 
             if (note.val != null) {
-                const midi = (note.oct * 12) + note.val
-                melody.push([midi, offset, length])
+                const pitch = (note.oct * 12) + note.val
+                melody.push([pitch, offset, length])
             }
 
             if (note.crd) {
                 if (prevChord) prevChord.forEach(c => c[2] = offset - c[1])
                 const chord = CHORD_STEPS[note.crd.mod].map(shift => {
-                    const midi = 36 + note.crd.val + shift
-                    return [midi, offset, 0] // length set later
+                    const pitch = note.crd.val + shift - 12
+                    return [pitch, offset, 0] // length set later
                 })
                 harmony.push(...chord)
                 prevChord = chord

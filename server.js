@@ -1,6 +1,8 @@
 const express = require('express');
 const fs = require('fs');
 const { Storage } = require('@google-cloud/storage');
+const { decodeSong, extractMelody } = require('./parser');
+const { renderStave } = require('./render');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -56,21 +58,80 @@ app.get('/song', async (req, res) => {
   const { group, name } = req.query;
   const file = bucket.file(`${group}/${name}`);
   const [exists] = await file.exists();
-  let song = '';
+  let song = {};
   if (exists) {
     const snapshot = await file.download();
-    song = snapshot[0].toString('utf-8');
+    const code = snapshot[0].toString('utf-8');
+    song = decodeSong(code);
   }
-  const html = fs.readFileSync('song.html', 'utf-8')
+  const json = JSON.stringify(song);
+  
+  // JSON migration
+  await bucket.file(`SONGS/${group}/${name}`).save(json, {
+    contentType: 'application/json',
+    resumable: false
+  });
+
+  res.set('Content-Type', 'application/json');
+  res.send(json);
+});
+
+app.get('/sheet', async (req, res) => {
+  const { group, name, offset = '0' } = req.query;
+  const file = bucket.file(`${group}/${name}`);
+  const [exists] = await file.exists();
+  let song = {};
+  let sounds = [];
+  let sheet = "";
+  if (exists) {
+    const snapshot = await file.download();
+    const code = snapshot[0].toString('utf-8');
+    song = decodeSong(code);
+    // TODO: fetch song object via GET /song, then extract melody on client side
+    sounds = extractMelody(song);
+    const scaleOffset = parseInt(offset);
+    const last = song.length - 1;
+    for (let i = 0; i < song.length; i += 1) {
+        const part = song[i];
+        const textLengths = part.lyrics.map((l) => l.length);
+        const maxLength = Math.max(part.size, ...textLengths);
+        const width = Math.max(40, (maxLength + 1) * 9);
+        const tieEnd = i < last ? song[i+1].notes[0].tie : false;
+        const svg = renderStave("black", width, part.notes, tieEnd, scaleOffset);
+        const lyrics = part.lyrics.join("<br>");
+        html += `<div class="measure" style="width: ${width}px;">` +
+            `<div class="frame">${svg}</div>` +
+            `<div class="lyrics">${lyrics}</div>` +
+            `</div>\n`;
+    }
+  }
+
+  const html = fs.readFileSync('sheet.html', 'utf-8')
     .replace('{{NAME}}', name)
-    .replace('{{CODE}}', song);
+    .replace('{{SHEET}}', sheet)
+    .replace('{{SOUNDS}}', JSON.stringify(sounds));
   res.send(html);
 });
 
-app.post('/song', async (req, res) => {
+app.get('/editor', async (req, res) => {
   const { group, name } = req.query;
   const file = bucket.file(`${group}/${name}`);
-  await file.save(req.body.code.replace(/\r/g, ''), {
+  const [exists] = await file.exists();
+  let code = '';
+  if (exists) {
+    const snapshot = await file.download();
+    code = snapshot[0].toString('utf-8');
+  }
+  const html = fs.readFileSync('editor.html', 'utf-8')
+    .replace('{{NAME}}', name)
+    .replace('{{CODE}}', code);
+  res.send(html);
+});
+
+app.post('/editor', async (req, res) => {
+  const { group, name } = req.query;
+  const file = bucket.file(`${group}/${name}`);
+  await file.save(req.body.code, {
     contentType: 'text/plain; charset=utf-8',
     resumable: false
   });

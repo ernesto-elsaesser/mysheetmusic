@@ -86,7 +86,7 @@ function extractSong(epart, voice) {
     let baseLength = 6
     let fifths = 0
     let song = []
-    let prevNote = null
+
     for (const emeasure of emeasures) {
 
         const eattr = emeasure.getElementsByTagName("attributes")[0]
@@ -145,8 +145,7 @@ function extractSong(epart, voice) {
                 duration: "",
                 acc: "",
                 dots: 0,
-                transFrom: null,
-                transTo: null,
+                isTied: false,
                 inTriplet: false,
                 chordDegree: 0,
                 chordAcc: "",
@@ -186,7 +185,7 @@ function extractSong(epart, voice) {
                 else note.dots = duration.length - 1
             }
 
-            let isTied = inSlur
+            note.isTied = inSlur
 
             const enotations = node.getElementsByTagName("notations")[0]
             if (enotations) {
@@ -201,12 +200,7 @@ function extractSong(epart, voice) {
             const etie = node.getElementsByTagName("tie")[0]
             if (etie) {
                 const type = etie.attributes["type"].nodeValue
-                if (type == "stop") isTied = true
-            }
-
-            if (isTied) {
-                note.transFrom = prevNote
-                prevNote.transTo = note
+                if (type == "stop") note.isTied = true
             }
 
             if (chord) {
@@ -217,7 +211,6 @@ function extractSong(epart, voice) {
             }
 
             notes.push(note)
-            prevNote = note
 
             const elyrics = node.getElementsByTagName("lyric")
             for (const elyric of elyrics) {

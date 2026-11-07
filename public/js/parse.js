@@ -15,13 +15,12 @@ function decodeSong(code) {
             if (token == "|") continue
 
             let note = {
+                isTied: false,
                 degree: 0,
                 octave: 4,
-                duration: "",
                 acc: "",
+                duration: "",
                 dots: 0,
-                transFrom: null,
-                transTo: null,
                 inTriplet: false,
                 chordDegree: 0,
                 chordAcc: "",
@@ -31,8 +30,7 @@ function decodeSong(code) {
             const data = token.split("")
 
             if (data[0] == "~") {
-                note.transFrom = prevNote
-                prevNote.transTo = note
+                note.isTied = true
                 data.shift()
             }
 
@@ -63,7 +61,7 @@ function decodeSong(code) {
 
             if (data[0] == "t") {
                 data.shift()
-                note.isTriplet = true
+                note.inTriplet = true
             }
 
             notes.push(note)
@@ -85,7 +83,7 @@ function decodeSong(code) {
             note.chordSuffix = data.join("")
         }
 
-        return {notes: notes, source: melody, lyrics: lyrics}
+        return {notes: notes, lyrics: lyrics}
 
     }).filter((l) => l.notes.length > 0)
 }
@@ -110,10 +108,11 @@ function encodeNote(note) {
 
     let code = note.degree.toString() + OCTAVES[note.octave] + note.acc + note.duration
     for (let i = 0; i < note.dots; i += 1) code += "."
+    if (note.inTriplet) code += "t"
     if (note.chordDegree > 0) {
         code += note.chordDegree.toString() + note.chordAcc + note.chordSuffix
     }
-    if (note.transFrom) code = "~" + code
+    if (note.isTied) code = "~" + code
     return code
 }
 

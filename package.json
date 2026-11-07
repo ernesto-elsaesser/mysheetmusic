@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^7.11.0",
-    "express": "^5.0.0"
+    "express": "^5.0.0",
+    "svgdom": "^0.1.19",
+    "vexflow": "^4.2.5"
   },
   "author": "Ernesto Elsäßer"
 }

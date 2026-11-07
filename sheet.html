@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{NAME}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+    <link rel="stylesheet" href="sheet.css" />
+</head>
+
+<body>
+    <div id="content">
+        <div id="sheet">{{SHEET}}</div>
+    </div>
+    <div id="footer">
+        <input type="button" onclick="scrollText(-1)" value="&#708;" />
+        <input type="button" onclick="scrollText(1)" value="&#709;" />
+        |
+        <select id="speed">
+            <option value="60">60 BPM</option>
+            <option value="70">70 BPM</option>
+            <option value="80">80 BPM</option>
+            <option value="90">90 BPM</option>
+            <option value="100" selected>100 BPM</option>
+            <option value="110">110 BPM</option>
+            <option value="120">120 BPM</option>
+            <option value="130">130 BPM</option>
+            <option value="140">140 BPM</option>
+            <option value="150">150 BPM</option>
+            <option value="160">160 BPM</option>
+            <option value="180">180 BPM</option>
+            <option value="200">200 BPM</option>
+        </select>
+        <input type="button" onclick="playSong()" value="PLAY" />
+        |
+        <a href="edit?TODO">EDIT</a>
+    </div>
+    <script>
+
+        const PIANO_SAMPLES = {
+            A0: "A0.mp3",
+            C1: "C1.mp3",
+            "D#1": "Ds1.mp3",
+            "F#1": "Fs1.mp3",
+            A1: "A1.mp3",
+            C2: "C2.mp3",
+            "D#2": "Ds2.mp3",
+            "F#2": "Fs2.mp3",
+            A2: "A2.mp3",
+            C3: "C3.mp3",
+            "D#3": "Ds3.mp3",
+            "F#3": "Fs3.mp3",
+            A3: "A3.mp3",
+            C4: "C4.mp3",
+            "D#4": "Ds4.mp3",
+            "F#4": "Fs4.mp3",
+            A4: "A4.mp3",
+            C5: "C5.mp3",
+            "D#5": "Ds5.mp3",
+            "F#5": "Fs5.mp3",
+            A5: "A5.mp3",
+            C6: "C6.mp3",
+            "D#6": "Ds6.mp3",
+            "F#6": "Fs6.mp3",
+            A6: "A6.mp3",
+            C7: "C7.mp3",
+            "D#7": "Ds7.mp3",
+            "F#7": "Fs7.mp3",
+            A7: "A7.mp3",
+            C8: "C8.mp3"
+        }
+        
+        const sounds = {{SOUNDS}}
+
+        let pianoSampler = null
+        var isPlaying = false
+
+        var lyricsOffset = 0
+
+        function scrollText(lines) {
+
+            lyricsOffset += lines * 20
+            if (lyricsOffset < 0) lyricsOffset = 0
+            const textareas = document.getElementsByClassName("lyrics")
+            for (let textarea of textareas) {
+                textarea.scrollTop = lyricsOffset
+            }
+        }
+
+        async function playSong() {
+
+            if (isPlaying) {
+                stopPlayback()
+                return
+            }
+
+            const bpm = parseFloat(speed.value)
+            const secondsPerBeat = 60 / bpm
+
+            await Tone.start()
+            
+            if (!pianoSampler) {
+                pianoSampler = new Tone.Sampler({
+                    urls: PIANO_SAMPLES,
+                    baseUrl: "https://tonejs.github.io/audio/salamander/",
+                    release: 1
+                }).toDestination()
+            }
+
+            await Tone.loaded()
+
+            Tone.Transport.position = 0
+            Tone.Transport.bpm.value = bpm
+
+            let maxEnd = 0
+
+            sounds.forEach(sound => {
+                const midi = 69 + Math.round(sound.level * 12)
+                const note = Tone.Frequency(midi, "midi").toNote()
+                const timeOffset = sound.offset * secondsPerBeat
+                const soundLength = sound.length > 0 ? sound.length : (sound.offsetEnd ? sound.offsetEnd - sound.offset : 1.0)
+                const duration = Math.max(0.1, soundLength * secondsPerBeat)
+                const velocity = Math.min(1, (sound.gain || 0.3) * 2.5)
+
+                Tone.Transport.schedule(time => {
+                    pianoSampler.triggerAttackRelease(note, duration, time, velocity)
+                }, timeOffset)
+
+                const noteEnd = timeOffset + duration
+                if (noteEnd > maxEnd) {
+                    maxEnd = noteEnd
+                }
+            })
+
+            Tone.Transport.schedule(() => stopPlayback(), maxEnd + 0.5)
+            Tone.Transport.start()
+        }
+
+        function stopPlayback() {
+
+            Tone.Transport.stop()
+            Tone.Transport.cancel()
+            pianoSampler.releaseAll()
+            isPlaying = false
+        }
+    </script>
+</body>
+</html>
+

@@ -8,7 +8,6 @@ global.document = document;
 const vexflow = require('vexflow');
 const Vex = vexflow.Vex || vexflow.default || vexflow;
 
-const MAJOR = [null, 0, 2, 4, 5, 7, 9, 11];
 const STEPS = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
 
 
@@ -29,35 +28,26 @@ function renderStave(color, width, notes, tieEnd, offset) {
         duration = duration.replace("z", "32");
 
         let pitch = "";
-        let noteAcc = "";
+        let acc = null;
 
-        if (note.deg == 0) { // rest
+        if (note.val == null) { // rest
             pitch = duration == "w" ? "d/5" : "b/4";
             duration += "r";
         } else {
-            let octave = note.oct;
-            let tones = offset + MAJOR[note.deg];
-            if (note.acc === "#") {
-                tones += 1;
-            } else if (note.acc === "b") {
-                tones -= 1;
-                if (tones < 0) {
-                    octave -= 1;
-                    tones += 12;
-                }
-            }
-            if (tones > 11) {
+            let octave = 4 + note.oct;
+            let value = offset + note.val;
+            if (value > 11) {
                 octave += 1;
-                tones -= 12;
+                value -= 12;
             }
-            const name = STEPS[tones];
+            const name = STEPS[value];
             pitch = name[0] + "/" + octave.toString();
-            noteAcc = name[1] || "";
+            acc = name[1];
         }
 
-        if (noteAcc !== "") {
-            const acc = new Vex.Flow.Accidental(noteAcc);
-            mods.push(acc);
+        if (acc) {
+            const accidental = new Vex.Flow.Accidental(acc);
+            mods.push(accidental);
         }
 
         const dots = note.dot || 0;
@@ -96,15 +86,9 @@ function renderStave(color, width, notes, tieEnd, offset) {
         }
 
         if (note.crd) {
-            let tones = offset + MAJOR[note.crd.deg];
-            if (note.crd.acc === "#") {
-                tones += 1;
-            } else if (note.crd.acc === "b") {
-                tones -= 1;
-                if (tones < 0) tones += 12;
-            }
-            if (tones > 11) tones -= 12;
-            const chordName = STEPS[tones].toUpperCase();
+            let value = offset + note.crd.val;
+            if (value > 11) value -= 12;
+            const chordName = STEPS[value].toUpperCase();
             let chord = chordName + note.crd.mod;
             let symbol = new Vex.Flow.ChordSymbol();
             symbol.setHorizontal('center');

@@ -72,7 +72,7 @@
             C8: "C8.mp3"
         }
         
-        const sounds = {{SOUNDS}}
+        const SOUNDS = {{SOUNDS}}
 
         let pianoSampler = null
         var isPlaying = false
@@ -103,6 +103,10 @@
             const bpm = parseFloat(speed.value)
             const secondsPerBeat = 60 / bpm
 
+            const melody = SOUNDS.melody.map(s => [...s, 0.75])
+            const harmony = SOUNDS.harmony.map(s => [...s, 0.25])
+            const sounds = [...melody, ...harmony] 
+
             await Tone.start()
             
             if (!pianoSampler) {
@@ -120,22 +124,18 @@
 
             let maxEnd = 0
 
-            sounds.forEach(sound => {
-                const midi = 69 + Math.round(sound.level * 12)
-                const note = Tone.Frequency(midi, "midi").toNote()
-                const timeOffset = sound.offset * secondsPerBeat
-                const soundLength = sound.length > 0 ? sound.length : (sound.offsetEnd ? sound.offsetEnd - sound.offset : 1.0)
-                const duration = Math.max(0.1, soundLength * secondsPerBeat)
-                const velocity = Math.min(1, (sound.gain || 0.3) * 2.5)
+            sounds.forEach(s => {
+                const note = Tone.Frequency(s[0], "midi").toNote()
+                const timeOffset = s[1] * secondsPerBeat
+                const duration = s[2] * secondsPerBeat
+                const velocity = s[3]
 
                 Tone.Transport.schedule(time => {
                     pianoSampler.triggerAttackRelease(note, duration, time, velocity)
                 }, timeOffset)
 
                 const noteEnd = timeOffset + duration
-                if (noteEnd > maxEnd) {
-                    maxEnd = noteEnd
-                }
+                if (noteEnd > maxEnd) maxEnd = noteEnd
             })
 
             Tone.Transport.schedule(() => stopPlayback(), maxEnd + 0.5)

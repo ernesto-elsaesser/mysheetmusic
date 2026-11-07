@@ -89,13 +89,13 @@ app.get('/sheet', async (req, res) => {
     const code = snapshot[0].toString('utf-8');
     song = decodeSong(code);
     // TODO: fetch song object via GET /song, then extract melody on client side
-    sounds = extractMelody(song);
+    sounds = extractSounds(song);
     const scaleOffset = parseInt(offset);
     const last = song.length - 1;
     for (let i = 0; i < song.length; i += 1) {
         const measure = song[i];
         const textLengths = measure.lyrics.map((l) => l.length);
-        const notesLength = measure.notes.length * 3;
+        const notesLength = Math.max(measure.notes.length, 3) * 3;
         const maxLength = Math.max(notesLength, ...textLengths);
         const width = Math.max(40, (maxLength + 1) * 9);
         const tieEnd = i < last ? song[i+1].notes[0].tie : false;
@@ -110,7 +110,6 @@ app.get('/sheet', async (req, res) => {
   const html = fs.readFileSync('sheet.html', 'utf-8')
     .replace('{{NAME}}', name)
     .replace('{{SHEET}}', sheet)
-    .replace('{{EDIT}}', editUrl)
     .replace('{{SOUNDS}}', JSON.stringify(sounds));
   res.send(html);
 });

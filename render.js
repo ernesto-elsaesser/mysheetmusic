@@ -159,6 +159,6 @@ function renderStave(color, width, notes, tieEnd, offset) {
 }
 
 module.exports = {
-    renderStave,
+    renderSong,
 };
 

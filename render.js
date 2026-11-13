@@ -11,9 +11,29 @@ const Vex = vexflow.Vex || vexflow.default || vexflow;
 const STEPS = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
 
 
+function renderSong(song, scaleOffset) {
+
+  const last = song.length - 1;
+  let sheet = "";
+  for (let i = 0; i < song.length; i += 1) {
+      const measure = song[i];
+      const textLengths = measure.lyrics.map((l) => l.length);
+      const notesLength = Math.max(measure.notes.length, 3) * 3;
+      const maxLength = Math.max(notesLength, ...textLengths);
+      const width = Math.max(40, (maxLength + 1) * 9);
+      const tieEnd = i < last ? song[i+1].notes[0].tie : false;
+      const svg = renderStave("black", width, measure.notes, tieEnd, scaleOffset);
+      const lyrics = measure.lyrics.join("<br>");
+      sheet += `<div class="measure" style="width: ${width}px;">` +
+          `<div class="frame">${svg}</div>` +
+          `<div class="lyrics">${lyrics}</div></div>\n`;
+  }
+  return sheet;
+}
+
 function renderStave(color, width, notes, tieEnd, offset) {
 
-    const container = document.createElement("div")
+    const container = document.createElement("div");
 
     let staveNotes = [];
     let tieOptions = [];

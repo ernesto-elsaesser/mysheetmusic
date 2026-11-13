@@ -1,4 +1,12 @@
-const MAJOR_STEPS = [null, 0, 2, 4, 5, 7, 9, 11]
+const MAJOR_STEPS = {
+    "1": 0,
+    "2": 2,
+    "3": 4,
+    "4": 5,
+    "5": 7,
+    "6": 9,
+    "7": 11,
+}
 
 const DURATION_FACTORS = {
     "w": 4.0,
@@ -19,8 +27,8 @@ const CHORD_STEPS = {
 }
 
 
-function parseDegree(num) {
-    return MAJOR_STEPS[parseInt(num)] 
+function parseDegree(scaleDegree) {
+    return MAJOR_STEPS[scaleDegree] 
 }
 
 

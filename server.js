@@ -62,31 +62,24 @@ app.get('/sheet', async (req, res) => {
   let song = {};
   let sounds = [];
   let sheet = "";
+  let error = "";
   if (exists) {
     const snapshot = await file.download();
     const code = snapshot[0].toString('utf-8');
-    song = decodeSong(code);
-    sounds = extractSounds(song);
     const scaleOffset = parseInt(offset);
-    const last = song.length - 1;
-    for (let i = 0; i < song.length; i += 1) {
-        const measure = song[i];
-        const textLengths = measure.lyrics.map((l) => l.length);
-        const notesLength = Math.max(measure.notes.length, 3) * 3;
-        const maxLength = Math.max(notesLength, ...textLengths);
-        const width = Math.max(40, (maxLength + 1) * 9);
-        const tieEnd = i < last ? song[i+1].notes[0].tie : false;
-        const svg = renderStave("black", width, measure.notes, tieEnd, scaleOffset);
-        const lyrics = measure.lyrics.join("<br>");
-        sheet += `<div class="measure" style="width: ${width}px;">` +
-            `<div class="frame">${svg}</div>` +
-            `<div class="lyrics">${lyrics}</div></div>\n`;
+    try {
+      song = decodeSong(code);
+      sheet = renderSong(song, scaleOffset);
+      sounds = extractSounds(song);
+    } catch (err) {
+      error = err.toString();
     }
   }
 
   const html = fs.readFileSync('sheet.html', 'utf-8')
     .replace('{{NAME}}', name)
     .replace('{{SHEET}}', sheet)
+    .replace('{{ERROR}}', error)
     .replace('{{SOUNDS}}', JSON.stringify(sounds));
   res.send(html);
 });

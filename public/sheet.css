@@ -33,6 +33,10 @@ a {
     overflow-x: hidden;
 }
 
+#sheet {
+    color: #822;
+}
+
 .measure {
     float: left;
 }

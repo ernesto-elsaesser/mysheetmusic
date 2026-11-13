@@ -43,7 +43,7 @@ app.get('/', async (req, res) => {
       linksHtml += `<a target="_blank" href="sheet?group=${encodeURIComponent(group)}&name=${encodeURIComponent(songName)}">${songName}</a><br/>\n`;
     }
     colsHtml += `<div class="col"><h2>${group}</h2>\n${linksHtml}` +
-      `<form action="song" target="_blank"><input type="text" name="name" />` +
+      `<form action="sheet" target="_blank"><input type="text" name="name" />` +
       `<input type="text" name="group" value="${group}" hidden /> ` +
       `<input type="submit" value="+" /></form></div>\n`;
   }

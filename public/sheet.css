@@ -33,10 +33,6 @@ a {
     overflow-x: hidden;
 }
 
-#sheet {
-    color: #822;
-}
-
 .measure {
     float: left;
 }
@@ -84,5 +80,10 @@ a {
 
 [hidden] {
     display:none !important;
+}
+
+#error {
+    text-align: center;
+    color: #822;
 }
 

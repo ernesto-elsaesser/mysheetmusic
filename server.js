@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const { Storage } = require('@google-cloud/storage');
 const { decodeSong, extractSounds } = require('./parser');
-const { renderStave } = require('./render');
+const { renderSong } = require('./render');
 
 const app = express();
 const PORT = process.env.PORT || 8080;

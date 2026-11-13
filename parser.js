@@ -146,7 +146,8 @@ function extractSounds(song) {
 
             if (note.crd) {
                 if (prevChord) prevChord.forEach(c => c[2] = offset - c[1])
-                const chord = CHORD_STEPS[note.crd.mod].map(shift => {
+                const chordSteps = CHORD_STEPS[note.crd.mod] || [0]
+                const chord = chordSteps.map(shift => {
                     const pitch = note.crd.val + shift - 12
                     return [pitch, offset, 0] // length set later
                 })

@@ -54,28 +54,6 @@ app.get('/', async (req, res) => {
   res.send(html);
 });
 
-app.get('/song', async (req, res) => {
-  const { group, name } = req.query;
-  const file = bucket.file(`${group}/${name}`);
-  const [exists] = await file.exists();
-  let song = {};
-  if (exists) {
-    const snapshot = await file.download();
-    const code = snapshot[0].toString('utf-8');
-    song = decodeSong(code);
-  }
-  const json = JSON.stringify(song);
-  
-  // JSON migration
-  await bucket.file(`SONGS/${group}/${name}`).save(json, {
-    contentType: 'application/json',
-    resumable: false
-  });
-
-  res.set('Content-Type', 'application/json');
-  res.send(json);
-});
-
 app.get('/sheet', async (req, res) => {
   const { group, name, offset = '0' } = req.query;
   const editUrl = `/edit?group=${encodeURIComponent(group)}&name=${encodeURIComponent(name)}`;
